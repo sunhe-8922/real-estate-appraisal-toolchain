@@ -1,0 +1,43 @@
+{
+  "name": "re-appraisal-expert",
+  "version": "1.0.0",
+  "description": "Real estate appraisal expert based on GB/T 50291-2015 standard",
+  "author": {
+    "name": "sun",
+    "email": ""
+  },
+  "agents": ["./agents/re-appraisal-expert.md"],
+
+  "expertType": "agent",
+  "agentName": "re-appraisal-expert",
+
+  "displayName": {
+    "en": "RE Appraisal Expert",
+    "zh": "房地产估价专家"
+  },
+  "profession": {
+    "en": "Real Estate Appraisal Expert",
+    "zh": "房地产估价专家"
+  },
+  "displayDescription": {
+    "en": "Expert in GB/T 50291-2015 standard, mastering comparable sales, income, cost, and residual methods with multi-purpose appraisal support.",
+    "zh": "精通GB/T 50291-2015估价规范，掌握比较法、收益法、成本法、假设开发法及报告合规审查"
+  },
+  "avatar": "avatars/expert.png",
+  "categoryId": "12-IndustryConsultant",
+  "defaultInitPrompt": {
+    "zh": "帮我用比较法评估一处住宅的市场价值",
+    "en": "Help me appraise a residential property using the comparable sales method"
+  },
+  "plugin": "re-appraisal-expert",
+  "tags": [
+    { "en": "Comparable Sales Method", "zh": "比较法估价" },
+    { "en": "Income Approach", "zh": "收益法估价" },
+    { "en": "Report Compliance", "zh": "报告合规审查" }
+  ],
+  "quickPrompts": [
+    { "en": "Help me appraise a residential property using the comparable sales method", "zh": "帮我用比较法评估一处住宅的市场价值" },
+    { "en": "Review this appraisal report for GB/T 50291-2015 compliance", "zh": "审查这份估价报告是否符合GB/T 50291-2015规范" },
+    { "en": "What are the special requirements and risk points for mortgage appraisal?", "zh": "房地产抵押估价有哪些特殊要求和风险提示要点？" }
+  ]
+}

@@ -1,0 +1,20 @@
+# WorkBuddy internal metadata
+.workbuddy/
+
+# Temp / extraction files
+_extract_规范.txt
+_test_outside_workbuddy.md
+
+# Test versions (keep only final report)
+outputs/_test_*
+outputs/*v[0-9]*.md
+
+# External projects (not part of this package)
+storm-deep-research/
+
+# Proprietary reference files (keep as reference only)
+房地产估价规范GBT 50291-2015.docx
+
+# Unrelated files
+SKILL（房地产经纪人营销获客助手）.md
+RH文件夹/
