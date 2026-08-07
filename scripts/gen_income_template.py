@@ -64,7 +64,7 @@ for i, h in enumerate(["项目", "数值", "数据来源"], 1):
 s1_data = [
     (6,  "潜在毛租金收入 (元/m²·年)",   "BLUE", "如: 600", "4.3.7条: 租赁收入法; 来源: 市场调查/合同"),
     (7,  "空置和收租损失率",           "BLUE_PCT", "5.0%", "4.3.8条; 区域空置率调查"),
-    (8,  "有效毛收入 (元/m²·年)",     "FORMULA", '=B6*(1-B7)', "公式"),
+    (8,  "有效毛收入 (元/m²·年)",     "FORMULA", '=ROUND(B6*(1-B7),0)', "公式"),
     (9,  "其他收入 (元/m²·年)",       "BLUE", "如: 50", "押金利息/停车费/广告位等"),
     (10, "房地产税",                   "BLUE", "0", "城市房地产税/城镇土地使用税"),
     (11, "房屋保险费",                 "BLUE", "0", "建筑物及设备保险费"),
@@ -73,8 +73,8 @@ s1_data = [
     (14, "维修费",                     "BLUE", "0", "日常维修和大修基金"),
     (15, "水电费",                     "BLUE", "0", "公共区域水电"),
     (16, "其他运营费用",               "BLUE", "0", "其他正常运营必要支出"),
-    (17, "运营费用合计",               "FORMULA", '=SUM(B10:B16)', "公式"),
-    (18, "净收益 NOI (元/m²·年)",     "FORMULA", '=B8+B9-B17', "4.3.9条: 净收益 = 有效毛收入 - 运营费用"),
+    (17, "运营费用合计",               "FORMULA", '=ROUND(SUM(B10:B16),0)', "公式"),
+    (18, "净收益 NOI (元/m²·年)",     "FORMULA", '=ROUND(B8+B9-B17,0)', "4.3.9条: 净收益 = 有效毛收入 - 运营费用"),
     (19, "最近三年实际净收益: Y-2",   "BLUE", "0", "4.3.11条: 必须调查近三年实际数据"),
     (20, "最近三年实际净收益: Y-1",   "BLUE", "0", "与预测值差异需分析修正"),
     (21, "最近三年实际净收益: Y-0",   "BLUE", "0", "以正常客观值为准"),
@@ -163,7 +163,7 @@ for yr in range(1, MAX_YEARS + 1):
     ws2.cell(row=row, column=1, value=yr).font = BLACK_FONT
     ws2.cell(row=row, column=1).alignment = CENTER; ws2.cell(row=row, column=1).border = THIN_BORDER
     # 净收益 (跨表引用)
-    formula_income = f"=IF(A{row}<=$C$3, 净收益测算!B18, 0)"
+    formula_income = f"=ROUND(IF(A{row}<=$C$3, 净收益测算!B18, 0),0)"
     ws2.cell(row=row, column=2, value=formula_income).font = BLACK_FONT
     ws2.cell(row=row, column=2).number_format = '#,##0'; ws2.cell(row=row, column=2).border = THIN_BORDER
     # 折现系数
@@ -171,7 +171,7 @@ for yr in range(1, MAX_YEARS + 1):
     ws2.cell(row=row, column=3, value=formula_dcf).font = BLACK_FONT
     ws2.cell(row=row, column=3).number_format = '0.000000'; ws2.cell(row=row, column=3).border = THIN_BORDER
     # 现值
-    formula_pv = f"=B{row}*C{row}"
+    formula_pv = f"=ROUND(B{row}*C{row},0)"
     ws2.cell(row=row, column=4, value=formula_pv).font = BLACK_FONT
     ws2.cell(row=row, column=4).number_format = '#,##0'; ws2.cell(row=row, column=4).border = THIN_BORDER
 
@@ -180,7 +180,7 @@ row_val = 5 + MAX_YEARS + 1
 ws2.merge_cells(f'A{row_val}:C{row_val}')
 ws2.cell(row=row_val, column=1, value="收益价值 (全剩余寿命模式, 元/m²)").font = BOLD_BLACK
 ws2.cell(row=row_val, column=1).alignment = LEFT_WRAP
-formula_sum = f"=SUM(D6:D{5+MAX_YEARS})"
+formula_sum = f"=ROUND(SUM(D6:D{5+MAX_YEARS}),0)"
 ws2.cell(row=row_val, column=4, value=formula_sum).font = Font(name="Arial", size=12, color="000000", bold=True)
 ws2.cell(row=row_val, column=4).number_format = '#,##0'; ws2.cell(row=row_val, column=4).fill = YELLOW_FILL
 
@@ -201,14 +201,14 @@ row_tr3 = row_tr2 + 1
 ws2.merge_cells(f'A{row_tr3}:C{row_tr3}')
 ws2.cell(row=row_tr3, column=1, value="期末转售收益折现").font = BOLD_BLACK
 col_c_tr = get_column_letter(3)
-formula_tr = f"=IF({col_c_tr}{row_tr}*{col_c_tr}{row_tr2}=0,0,{col_c_tr}{row_tr}/(1+{col_c_tr}{row_tr2})^C3)"
+formula_tr = f"=ROUND(IF({col_c_tr}{row_tr}*{col_c_tr}{row_tr2}=0,0,{col_c_tr}{row_tr}/(1+{col_c_tr}{row_tr2})^C3),0)"
 ws2.cell(row=row_tr3, column=4, value=formula_tr).font = BLACK_FONT
 ws2.cell(row=row_tr3, column=4).number_format = '#,##0'
 
 row_total = row_tr3 + 2
 ws2.merge_cells(f'A{row_total}:C{row_total}')
 ws2.cell(row=row_total, column=1, value="收益总价值 (元/m²)").font = Font(name="Arial", size=12, color="000000", bold=True)
-ws2.cell(row=row_total, column=4, value=f"=D{row_val}+D{row_tr3}").font = Font(name="Arial", size=12, color="000000", bold=True)
+ws2.cell(row=row_total, column=4, value=f"=ROUND(D{row_val}+D{row_tr3},0)").font = Font(name="Arial", size=12, color="000000", bold=True)
 ws2.cell(row=row_total, column=4).number_format = '#,##0'; ws2.cell(row=row_total, column=4).fill = YELLOW_FILL
 
 # 数据验证

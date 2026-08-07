@@ -118,7 +118,7 @@ ws1.cell(row=row_total, column=1, value="重置成本合计 (元/m²)").font = F
 ws1.cell(row=row_total, column=1).alignment = CENTER
 ws1.cell(row=row_total, column=1).border = THIN_BORDER
 
-ws1.cell(row=row_total, column=3, value='=SUM(C6:C12)').font = Font(name="Arial", size=12, color="000000", bold=True)
+ws1.cell(row=row_total, column=3, value='=ROUND(SUM(C6:C12),0)').font = Font(name="Arial", size=12, color="000000", bold=True)
 ws1.cell(row=row_total, column=3).number_format = '#,##0'; ws1.cell(row=row_total, column=3).fill = YELLOW_FILL
 ws1.cell(row=row_total, column=3).alignment = CENTER
 
@@ -206,13 +206,13 @@ for i, h in enumerate(["折旧类型", "金额 (元/m²)", "原因"], 1):
 
 # 年龄-寿命法
 ws2.cell(row=row_sep+2, column=1, value="直线法折旧(年龄-寿命)").font = BOLD_BLACK; ws2.cell(row=row_sep+2, column=1).border = THIN_BORDER
-ws2.cell(row=row_sep+2, column=2, value="=(B5-B6)*MAX(0,MIN(1,B7/B8))").font = BLACK_FONT
+ws2.cell(row=row_sep+2, column=2, value="=ROUND((B5-B6)*MAX(0,MIN(1,B7/B8)),0)").font = BLACK_FONT
 ws2.cell(row=row_sep+2, column=2).number_format = '#,##0'; ws2.cell(row=row_sep+2, column=2).border = THIN_BORDER
 ws2.cell(row=row_sep+2, column=3, value="D = (C-S) × t/N。有效年龄≤经济寿命").font = Font(name="Arial", size=9, color="666666"); ws2.cell(row=row_sep+2, column=3).border = THIN_BORDER
 
 # 成新折扣法
 ws2.cell(row=row_sep+3, column=1, value="成新折扣法折旧").font = BOLD_BLACK; ws2.cell(row=row_sep+3, column=1).border = THIN_BORDER
-ws2.cell(row=row_sep+3, column=2, value="=B5*(1-B9)").font = BLACK_FONT
+ws2.cell(row=row_sep+3, column=2, value="=ROUND(B5*(1-B9),0)").font = BLACK_FONT
 ws2.cell(row=row_sep+3, column=2).number_format = '#,##0'; ws2.cell(row=row_sep+3, column=2).border = THIN_BORDER
 ws2.cell(row=row_sep+3, column=3, value="D = C × (1-q)。q=成新率").font = Font(name="Arial", size=9, color="666666"); ws2.cell(row=row_sep+3, column=3).border = THIN_BORDER
 
@@ -236,7 +236,7 @@ row_dep_total = row_sep + 8
 ws2.cell(row=row_dep_total, column=1, value="折旧合计 (元/m²)").font = Font(name="Arial", size=12, color="000000", bold=True)
 ws2.cell(row=row_dep_total, column=1).border = THIN_BORDER
 
-formula_dep = f'=IF(B4="年龄-寿命法",B{row_sep+2},IF(B4="成新折扣法",B{row_sep+3},B{row_sep+4}+B{row_sep+5}+B{row_sep+6}))'
+formula_dep = f'=ROUND(IF(B4="年龄-寿命法",B{row_sep+2},IF(B4="成新折扣法",B{row_sep+3},B{row_sep+4}+B{row_sep+5}+B{row_sep+6})),0)'
 ws2.cell(row=row_dep_total, column=2, value=formula_dep).font = Font(name="Arial", size=12, color="000000", bold=True)
 ws2.cell(row=row_dep_total, column=2).number_format = '#,##0'; ws2.cell(row=row_dep_total, column=2).fill = YELLOW_FILL
 ws2.cell(row=row_dep_total, column=2).border = THIN_BORDER
@@ -273,9 +273,9 @@ s3_data = [
     (4, "重置成本合计 (元/m²)",  "=重置成本!C14",      "跨表引用"),
     (5, "建筑物折旧合计 (元/m²)", "=折旧测算!B19",     "跨表引用"),
     (6, "权益状况调整 (元/m²)",   "BLUE",              "如有租赁/抵押/查封等权益限制"),
-    (7, "成本价值 (元/m²)",       "=B4-B5+B6",         "公式; 可加黄色底色"),
+    (7, "成本价值 (元/m²)",       "=ROUND(B4-B5+B6,0)",         "公式; 可加黄色底色"),
     (9, "建筑总面积 (m²)",        "BLUE",              "输入估价对象建筑面积"),
-    (10, "成本总价值 (元)",       "=B7*B9",            "最终结果"),
+    (10, "成本总价值 (元)",       "=ROUND(B7*B9,0)",            "最终结果"),
 ]
 
 for row, label, val, note in s3_data:

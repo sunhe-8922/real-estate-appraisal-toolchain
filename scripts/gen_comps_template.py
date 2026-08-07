@@ -106,7 +106,7 @@ for row, label, style, placeholder, comment_text in row_data:
 ws1.cell(row=13, column=1, value="比较价格 (元/m²)").font = BOLD_BLACK
 for col_idx in range(2, 6):
     col_letter = get_column_letter(col_idx)
-    formula = f"={col_letter}6*{col_letter}7*{col_letter}8*{col_letter}9*{col_letter}10*{col_letter}11*{col_letter}12"
+    formula = f"=ROUND({col_letter}6*{col_letter}7*{col_letter}8*{col_letter}9*{col_letter}10*{col_letter}11*{col_letter}12,0)"
     cell = ws1.cell(row=13, column=col_idx, value=formula)
     cell.font = BLACK_FONT; cell.number_format = '#,##0'
     cell.border = THIN_BORDER; cell.alignment = CENTER
@@ -202,9 +202,9 @@ for i, h in enumerate(["指标", "数值", "红线"], 1):
 
 # 数据行
 s2_data = [
-    (4, "比较价值-算术平均 (元/m²)", "=AVERAGE(可比实例数据!B13:E13)", "—"),
-    (5, "比较价值-加权平均 (元/m²)", "=SUMPRODUCT(可比实例数据!B13:E13*{1,1,1,1})/SUMPRODUCT({1,1,1,1})", "—"),
-    (6, "比较价值-中位数 (元/m²)", "=MEDIAN(可比实例数据!B13:E13)", "—"),
+    (4, "比较价值-算术平均 (元/m²)", "=ROUND(AVERAGE(可比实例数据!B13:E13),0)", "—"),
+    (5, "比较价值-加权平均 (元/m²)", "=ROUND(SUMPRODUCT(可比实例数据!B13:E13*{1,1,1,1})/SUMPRODUCT({1,1,1,1}),0)", "—"),
+    (6, "比较价值-中位数 (元/m²)", "=ROUND(MEDIAN(可比实例数据!B13:E13),0)", "—"),
     (8, "权重 A/B/C/D", "YELLOW_INPUT", "合计100%"),
     (10, "最高价/最低价 极差比", "=IF(COUNT(可比实例数据!B13:E13)>=2,MAX(可比实例数据!B13:E13)/MIN(可比实例数据!B13:E13),\"需≥2个实例\")", "≤1.2"),
     (11, "综合修正幅度-最大", "=MAX(可比实例数据!B14:E14)", "≤30%"),

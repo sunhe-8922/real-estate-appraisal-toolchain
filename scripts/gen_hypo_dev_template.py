@@ -97,7 +97,7 @@ row += 1
 
 period_items = [
     ("前期", "BLUE", "规划设计/报建", "建造期", "BLUE", "主体施工至竣工"),
-    ("销售期", "BLUE", "竣工后至售罄", "开发经营期总计", "=B10+C10", "(不含销售期) 公式"),
+    ("销售期", "BLUE", "竣工后至售罄", "开发经营期总计", "=ROUND(B10+C10,0)", "(不含销售期) 公式"),
 ]
 for label, style, hint, label2, style2, hint2 in period_items:
     ws1.cell(row=row, column=1, value=label).font = BOLD_BLACK; ws1.cell(row=row, column=1).border = THIN_BORDER
@@ -132,7 +132,7 @@ ws1.cell(row=row, column=4).font = BLUE_FONT; ws1.cell(row=row, column=4).border
 row += 1
 
 val_items = [
-    ("单价 (元/m²)", "BLUE_Y", "如: 25000", "总价 (元)", f"=B{row}*B7", "公式; 单价×规模"),
+    ("单价 (元/m²)", "BLUE_Y", "如: 25000", "总价 (元)", f"=ROUND(B{row}*B7,0)", "公式; 单价×规模"),
     ("信源等级", "DV_LIST_SRC", "T0/T1/T2", "建筑面积 (m²)", "=B7", "引用一、节的规模"),
 ]
 for label, style, hint, label2, formula, note in val_items:
@@ -180,11 +180,11 @@ for label, style, note in cost_items:
     if style == "BLUE":
         c2.font = BLUE_FONT; c2.number_format = '#,##0'; c2.border = THIN_BORDER
     elif style == "FORMULA_RATE":
-        c2.font = BLACK_FONT; c2.value = f"=B{row-4}*管理费率"; c2.number_format = '#,##0'; c2.border = THIN_BORDER
+        c2.font = BLACK_FONT; c2.value = f"=ROUND(B{row-4}*管理费率,0)"; c2.number_format = '#,##0'; c2.border = THIN_BORDER
     elif style == "FORMULA_RATE2":
-        c2.font = BLACK_FONT; c2.value = f"=D{row-8}*销售费率"; c2.number_format = '#,##0'; c2.border = THIN_BORDER
+        c2.font = BLACK_FONT; c2.value = f"=ROUND(D{row-8}*销售费率,0)"; c2.number_format = '#,##0'; c2.border = THIN_BORDER
     elif style == "FORMULA_TAX":
-        c2.font = BLACK_FONT; c2.value = f"=D{row-8}*税率"; c2.number_format = '#,##0'; c2.border = THIN_BORDER
+        c2.font = BLACK_FONT; c2.value = f"=ROUND(D{row-8}*税率,0)"; c2.number_format = '#,##0'; c2.border = THIN_BORDER
 
     c3 = ws1.cell(row=row, column=3)
     if style != "BLUE":
@@ -198,7 +198,7 @@ for label, style, note in cost_items:
 # 支出合计
 ws1.cell(row=row, column=1, value="支出合计").font = BOLD_BLACK; ws1.cell(row=row, column=1).border = THIN_BORDER
 start_cost_row = row - 5
-ws1.cell(row=row, column=2, value=f"=SUM(B{start_cost_row}:B{row-1})").font = BLACK_FONT
+ws1.cell(row=row, column=2, value=f"=ROUND(SUM(B{start_cost_row}:B{row-1}),0)").font = BLACK_FONT
 ws1.cell(row=row, column=2).number_format = '#,##0'; ws1.cell(row=row, column=2).border = THIN_BORDER
 row += 2
 
@@ -232,12 +232,12 @@ row += 1
 val_row = 16  # 开发完成后总价所在行 (approximate, user should verify)
 dr_row = discount_rate_row  # 折现率所在行
 discount_items = [
-    ("开发完成后价值折现 (元)",    f"=D{val_row}/(1+B{dr_row})^((C11+C10)/12)", "折现期=建造期+销售期, 转年"),
-    ("建设成本折现 (元)",           f"=B{start_cost_row}/(1+B{dr_row})^(D{start_cost_row}/12)", "按发生期分别折现"),
-    ("管理费用折现 (元)",           f"=B{start_cost_row+1}/(1+B{dr_row})^(D{start_cost_row+1}/12)", ""),
-    ("销售费用折现 (元)",           f"=B{start_cost_row+2}/(1+B{dr_row})^(D{start_cost_row+2}/12)", ""),
-    ("销售税费折现 (元)",           f"=B{start_cost_row+3}/(1+B{dr_row})^(D{start_cost_row+3}/12)", ""),
-    ("取得税费折现 (元)(如有)",     f"=B{start_cost_row+4}/(1+B{dr_row})^(D{start_cost_row+4}/12)", "仅转让开发前提"),
+    ("开发完成后价值折现 (元)",    f"=ROUND(D{val_row}/(1+B{dr_row})^((C11+C10)/12),0)", "折现期=建造期+销售期, 转年"),
+    ("建设成本折现 (元)",           f"=ROUND(B{start_cost_row}/(1+B{dr_row})^(D{start_cost_row}/12),0)", "按发生期分别折现"),
+    ("管理费用折现 (元)",           f"=ROUND(B{start_cost_row+1}/(1+B{dr_row})^(D{start_cost_row+1}/12),0)", ""),
+    ("销售费用折现 (元)",           f"=ROUND(B{start_cost_row+2}/(1+B{dr_row})^(D{start_cost_row+2}/12),0)", ""),
+    ("销售税费折现 (元)",           f"=ROUND(B{start_cost_row+3}/(1+B{dr_row})^(D{start_cost_row+3}/12),0)", ""),
+    ("取得税费折现 (元)(如有)",     f"=ROUND(B{start_cost_row+4}/(1+B{dr_row})^(D{start_cost_row+4}/12),0)", "仅转让开发前提"),
 ]
 for label, formula, note in discount_items:
     ws1.cell(row=row, column=1, value=label).font = BOLD_BLACK; ws1.cell(row=row, column=1).border = THIN_BORDER
@@ -250,7 +250,7 @@ for label, formula, note in discount_items:
 # 支出折现合计
 val_items_start = row - 6
 ws1.cell(row=row, column=1, value="支出折现合计 (元)").font = BOLD_BLACK; ws1.cell(row=row, column=1).border = THIN_BORDER
-ws1.cell(row=row, column=2, value=f"=SUM(B{val_items_start+1}:B{row-1})").font = BLACK_FONT
+ws1.cell(row=row, column=2, value=f"=ROUND(SUM(B{val_items_start+1}:B{row-1}),0)").font = BLACK_FONT
 ws1.cell(row=row, column=2).number_format = '#,##0'; ws1.cell(row=row, column=2).border = THIN_BORDER
 row += 1
 
@@ -258,7 +258,7 @@ row += 1
 dev_val_row = row
 ws1.cell(row=row, column=1, value="开发价值 总价 (元)").font = Font(name="Arial", size=12, color="000000", bold=True)
 ws1.cell(row=row, column=1).border = THIN_BORDER
-ws1.cell(row=row, column=2, value=f"=B{val_items_start}-B{row-1}").font = Font(name="Arial", size=12, color="000000", bold=True)
+ws1.cell(row=row, column=2, value=f"=ROUND(B{val_items_start}-B{row-1},0)").font = Font(name="Arial", size=12, color="000000", bold=True)
 ws1.cell(row=row, column=2).number_format = '#,##0'; ws1.cell(row=row, column=2).fill = YELLOW_FILL
 ws1.cell(row=row, column=2).border = THIN_BORDER
 row += 1
@@ -269,7 +269,7 @@ row += 1
 
 ws1.cell(row=row, column=1, value="开发价值 单价 (元/m²)").font = Font(name="Arial", size=12, color="000000", bold=True)
 ws1.cell(row=row, column=1).border = THIN_BORDER
-ws1.cell(row=row, column=2, value=f"=B{dev_val_row}/B{dev_val_row+1}").font = Font(name="Arial", size=12, color="000000", bold=True)
+ws1.cell(row=row, column=2, value=f"=ROUND(B{dev_val_row}/B{dev_val_row+1},0)").font = Font(name="Arial", size=12, color="000000", bold=True)
 ws1.cell(row=row, column=2).number_format = '#,##0'; ws1.cell(row=row, column=2).fill = YELLOW_FILL
 ws1.cell(row=row, column=2).border = THIN_BORDER
 row += 2
@@ -340,7 +340,7 @@ for t in range(24):
     ws2.cell(row=row, column=3).number_format = '#,##0'; ws2.cell(row=row, column=3).border = THIN_BORDER
 
     # 净现金流 = 流入 - 流出
-    ws2.cell(row=row, column=4, value=f"=B{row}-C{row}").font = BLACK_FONT
+    ws2.cell(row=row, column=4, value=f"=ROUND(B{row}-C{row},0)").font = BLACK_FONT
     ws2.cell(row=row, column=4).number_format = '#,##0'; ws2.cell(row=row, column=4).border = THIN_BORDER
 
     # 折现因子 (引用 Sheet1 折现率)
@@ -351,7 +351,7 @@ for t in range(24):
 row_npv = 28
 ws2.merge_cells(f'A{row_npv}:C{row_npv}')
 ws2.cell(row=row_npv, column=1, value="NPV (元)").font = Font(name="Arial", size=12, color="000000", bold=True)
-ws2.cell(row=row_npv, column=4, value="=SUMPRODUCT(D4:D27,E4:E27)").font = Font(name="Arial", size=12, color="000000", bold=True)
+ws2.cell(row=row_npv, column=4, value="=ROUND(SUMPRODUCT(D4:D27,E4:E27),0)").font = Font(name="Arial", size=12, color="000000", bold=True)
 ws2.cell(row=row_npv, column=4).number_format = '#,##0'; ws2.cell(row=row_npv, column=4).fill = YELLOW_FILL
 ws2.cell(row=row_npv, column=4).border = THIN_BORDER
 
