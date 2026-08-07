@@ -196,7 +196,7 @@ outputs/     ← 示例报告
 
 **问题**：GitHub 仓库的 `skills/` 和 `experts/` 是**导出副本**，不是运行时的真实路径。如果下一个 AI 助手只看 GitHub 仓库而不了解 `.workbuddy/` 的结构，可能修改了错误的位置。
 
-**建议**：在 README.md 中明确说明运行时路径，或编写安装脚本（`install.sh`/`install.ps1`）自动复制到正确位置。
+**已解决**（2026-08-07）：仓库已包含 `install.ps1`（Windows）和 `install.sh`（Unix/Git Bash），自动复制 `skills/` 和 `experts/` 到正确运行时路径，附带验证和检查模式。
 
 ---
 
@@ -238,7 +238,7 @@ outputs/     ← 示例报告
 |---|------|------|
 | 1 | **修复收益法住宅场景默认策略** | 当前报酬资本化法低估 50%（146 万 vs 311 万），触发"持有加转售模式"作为住宅默认 |
 | 2 | **实际生成可用的 .xlsx 模板** | 四条测算技能的 openpyxl 指令已完成但未执行，需要实际生成并 Excel 验证 |
-| 3 | **编写安装脚本** | `install.ps1`（Windows）/ `install.sh`（Unix），自动将 `skills/` 和 `experts/` 复制到正确运行时路径 |
+| 3 | ~~编写安装脚本~~ ✅ 已完成（2026-08-07） | `install.ps1`（Windows）/ `install.sh`（Unix），自动复制+验证+检查模式 |
 | 4 | ~~定义测算结果 JSON Schema~~ ✅ 已完成（2026-08-07） | 详见 `schema/` 目录 |
 
 ### 5.2 中优先级（v1.2）

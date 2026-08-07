@@ -55,14 +55,52 @@
 │   └── re-appraisal-expert/
 ├── outputs/                       # 示例输出
 │   └── 武汉洪山住宅_抵押估价报告.md
+├── schema/                        # JSON 数据契约
+│   ├── appraisal-result.schema.json
+│   └── example-武汉洪山住宅.json
+├── install.ps1                    # Windows 安装脚本
+├── install.sh                     # Unix/Git Bash 安装脚本
+├── HANDOFF.md                     # 任务交接文档
 ├── CLAUDE.md                      # 项目上下文
 └── README.md
 ```
 
 ## 安装
 
-1. 将 `skills/` 复制到 `[项目]/.workbuddy/skills/` 或 `~/.workbuddy/skills/`
-2. 将 `experts/` 复制到 `~/.workbuddy/plugins/marketplaces/my-experts/plugins/`
+### 一键安装
+
+```bash
+# 克隆仓库
+git clone https://github.com/sunhe-8922/real-estate-appraisal-toolchain.git
+cd real-estate-appraisal-toolchain
+
+# Windows (PowerShell)
+.\install.ps1
+
+# Unix / Git Bash
+./install.sh
+```
+
+安装脚本会自动：
+- 复制 7 个技能到项目级 `.workbuddy/skills/` 和用户级 `~/.workbuddy/skills/`
+- 复制专家到 `~/.workbuddy/plugins/marketplaces/my-experts/plugins/`
+- 复制 JSON Schema 到 `.workbuddy/schema/`
+- 验证安装结果（7/7 技能 + 3/3 专家文件）
+
+### 安装选项
+
+| 命令 | 说明 |
+|------|------|
+| `install.ps1` / `./install.sh` | 全量安装 |
+| `install.ps1 -SkillsOnly` / `./install.sh --skills-only` | 仅安装技能 |
+| `install.ps1 -ExpertsOnly` / `./install.sh --experts-only` | 仅安装专家 |
+| `install.ps1 -Check` / `./install.sh --check` | 检查安装状态 |
+| `install.ps1 -Force` / `./install.sh --force` | 跳过确认提示 |
+
+### 手动安装
+
+1. 将 `skills/` 复制到 `[项目]/.workbuddy/skills/` 和 `~/.workbuddy/skills/`
+2. 将 `experts/re-appraisal-expert/` 复制到 `~/.workbuddy/plugins/marketplaces/my-experts/plugins/`
 3. 重启 WorkBuddy 使技能索引生效
 
 ## 测试报告
