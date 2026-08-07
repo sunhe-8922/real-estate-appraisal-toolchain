@@ -1,0 +1,241 @@
+{
+  "schemaVersion": "1.0",
+  "project": {
+    "name": "武汉市洪山区珞狮路某小区3栋2单元1804室住宅房地产抵押估价",
+    "purpose": "为确定抵押贷款额度提供参考依据而评估房地产抵押价值",
+    "client": "××银行股份有限公司武汉分行",
+    "agency": "××房地产土地资产评估有限公司",
+    "appraiser": {
+      "name": "张××",
+      "registrationNumber": "××××××"
+    },
+    "coAppraiser": {
+      "name": "李××",
+      "registrationNumber": "××××××"
+    },
+    "reportDate": "2026-08-03",
+    "reportNumber": "××房估字〔2026〕第0817号"
+  },
+
+  "property": {
+    "area": 128.50,
+    "usage": "住宅",
+    "address": "武汉市洪山区珞狮路某小区3栋2单元1804室",
+    "propertyType": "商品房",
+    "completionYear": 2018,
+    "remainingUsefulLife": 59.5,
+    "landUseRightYears": 58.3,
+    "floor": "18/33层",
+    "orientation": "南向",
+    "decoration": "精装修",
+    "ownershipType": "出让"
+  },
+
+  "valuation": {
+    "valueDate": "2026-08-01",
+    "valueType": "抵押价值（等于市场价值）",
+    "currency": "CNY"
+  },
+
+  "methods": {
+    "comps": {
+      "applicable": true,
+      "comparableInstances": [
+        {
+          "name": "可比实例A — 珞狮路1号小区",
+          "location": "洪山区珞狮路",
+          "area": 125.00,
+          "transactionDate": "2026-05-15",
+          "transactionPrice": 3125000,
+          "unitPrice": 25000,
+          "adjustments": {
+            "transactionSituation": 1.00,
+            "marketCondition": 1.02,
+            "location": 0.98,
+            "physical": 1.03,
+            "interest": 1.00
+          },
+          "adjustedUnitPrice": 25096,
+          "sourceGrade": "T1"
+        },
+        {
+          "name": "可比实例B — 珞狮路2号小区",
+          "location": "洪山区珞狮路",
+          "area": 130.00,
+          "transactionDate": "2026-06-10",
+          "transactionPrice": 3380000,
+          "unitPrice": 26000,
+          "adjustments": {
+            "transactionSituation": 1.00,
+            "marketCondition": 1.01,
+            "location": 1.00,
+            "physical": 0.96,
+            "interest": 1.00
+          },
+          "adjustedUnitPrice": 25098,
+          "sourceGrade": "T1"
+        },
+        {
+          "name": "可比实例C — 珞狮路3号小区",
+          "location": "洪山区珞狮路",
+          "area": 127.00,
+          "transactionDate": "2026-06-20",
+          "transactionPrice": 3238500,
+          "unitPrice": 25500,
+          "adjustments": {
+            "transactionSituation": 1.00,
+            "marketCondition": 1.00,
+            "location": 0.99,
+            "physical": 1.00,
+            "interest": 1.00
+          },
+          "adjustedUnitPrice": 25245,
+          "sourceGrade": "T1"
+        }
+      ],
+      "finalValue": {
+        "total": 3205000,
+        "unit": 24942
+      },
+      "weight": 0.6,
+      "weightRationale": "住宅交易活跃，可比实例成交时间近、修正幅度小，比较法结果最可靠",
+      "redLineChecks": [
+        {
+          "rule": "可比实例数量",
+          "threshold": "≥3个",
+          "actualValue": "3个",
+          "passed": true,
+          "explanation": ""
+        },
+        {
+          "rule": "成交距价值时点",
+          "threshold": "≤2年",
+          "actualValue": "最远77天",
+          "passed": true,
+          "explanation": ""
+        },
+        {
+          "rule": "单项修正幅度",
+          "threshold": "≤20%",
+          "actualValue": "最大4%（实物状况）",
+          "passed": true,
+          "explanation": ""
+        },
+        {
+          "rule": "综合修正幅度",
+          "threshold": "≤30%",
+          "actualValue": "最大3.6%",
+          "passed": true,
+          "explanation": ""
+        },
+        {
+          "rule": "最高价/最低价比",
+          "threshold": "≤1.2",
+          "actualValue": "25245/25096=1.006",
+          "passed": true,
+          "explanation": ""
+        }
+      ]
+    },
+
+    "income": {
+      "applicable": true,
+      "calculationMode": "directCapitalization",
+      "incomeType": "rentalIncome",
+      "netOperatingIncome": {
+        "effectiveGrossIncome": 57000,
+        "operatingExpenses": 8876,
+        "annualAmount": 48124,
+        "historicalDataYears": 3
+      },
+      "rate": {
+        "type": "capitalizationRate",
+        "value": 0.015,
+        "determinationMethod": "市场提取法 — 同区域同类住宅租金回报率中位数"
+      },
+      "finalValue": {
+        "total": 3208267,
+        "unit": 24967
+      },
+      "weight": 0.4,
+      "weightRationale": "住宅非纯收益型资产，收益法作为辅助验证。采用直接资本化法，报酬资本化法全剩余寿命模式低估严重（详见差异分析）",
+      "redLineChecks": [
+        {
+          "rule": "历史数据调查年数",
+          "threshold": "≥3年",
+          "actualValue": "3年（2023-2025）",
+          "passed": true,
+          "explanation": ""
+        },
+        {
+          "rule": "净收益客观性",
+          "threshold": "取正常客观值",
+          "actualValue": "已扣除空置损失+运营费用",
+          "passed": true,
+          "explanation": ""
+        }
+      ]
+    },
+
+    "cost": null,
+    "hypotheticalDev": null
+  },
+
+  "result": {
+    "finalTotalValue": 3205000,
+    "finalUnitValue": 24942,
+    "finalTotalValueInWords": "人民币叁佰贰拾万零伍仟元整",
+    "determinationMethod": "加权平均（比较法60% + 收益法40%）",
+    "weightAllocation": {
+      "comps": 0.6,
+      "income": 0.4,
+      "cost": 0,
+      "hypotheticalDev": 0
+    },
+    "weightSum": 1.0,
+    "crossMethodDifference": {
+      "maxValue": 3208267,
+      "minValue": 3205000,
+      "ratio": 1.001,
+      "analysis": "两方法结果差异<0.1%，高度收敛。收益法直接资本化法结果略高于比较法，原因在于当前市场租金回报率偏低（1.5%），资本化率取值偏保守。报酬资本化法全剩余寿命模式（59.5年折现）测算结果约146万元，严重低估住宅资产价值，故不采用。"
+    }
+  },
+
+  "crossMethodConsistency": [
+    {
+      "checkItem": "area",
+      "passed": true,
+      "detail": "两方法均使用 128.50 m²"
+    },
+    {
+      "checkItem": "usage",
+      "passed": true,
+      "detail": "两方法均为住宅用途"
+    },
+    {
+      "checkItem": "valueDate",
+      "passed": true,
+      "detail": "两方法价值时点均为 2026-08-01"
+    },
+    {
+      "checkItem": "propertyType",
+      "passed": true,
+      "detail": "两方法均为商品房"
+    },
+    {
+      "checkItem": "remainingYears",
+      "passed": true,
+      "detail": "两方法均使用 59.5 年剩余经济寿命"
+    },
+    {
+      "checkItem": "landUseRight",
+      "passed": true,
+      "detail": "两方法均使用 58.3 年剩余土地使用权"
+    },
+    {
+      "checkItem": "rate",
+      "passed": true,
+      "detail": "比较法不涉及报酬率；收益法资本化率1.5%，来源为市场提取法"
+    }
+  ]
+}

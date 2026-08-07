@@ -379,7 +379,50 @@ Before delivering 假设开发法测算结果, verify:
 - [ ] 颜色图例行已在 Sheet1 行3
 - [ ] 公式单元格已锁保护（仅蓝字可编辑）
 
-## 六、持续改进
+## 六、结构化输出（JSON）
+
+完成测算后，除 Excel/表格输出外，**必须同时输出结构化 JSON 片段**，供 `appraisal-report` 技能读取组装报告。
+
+完整 Schema 定义：`schema/appraisal-result.schema.json`
+完整示例：`schema/example-武汉洪山住宅.json`（`methods.hypotheticalDev` 部分，示例中为 null — 该案例未采用假设开发法）
+
+本方法输出的 JSON 结构（假设采用假设开发法时）：
+
+```json
+{
+  "hypotheticalDev": {
+    "applicable": true,
+    "analysisMethod": "dynamic",
+    "premise": "ownerInitiated",
+    "developmentValue": 5000000,
+    "subsequentCosts": {
+      "construction": 1000000,
+      "management": 50000,
+      "investmentInterest": 0,
+      "salesTax": 150000,
+      "developerProfit": 0
+    },
+    "discountRate": 0.08,
+    "developmentPeriod": 1.5,
+    "finalValue": { "total": 3800000, "unit": 29572 },
+    "weight": 0.5,
+    "weightRationale": "待开发土地，假设开发法为主要方法",
+    "redLineChecks": [
+      { "rule": "完成后价值禁成本法", "threshold": "4.5.7条", "actualValue": "用比较法测算", "passed": true },
+      { "rule": "动态法不另算利息利润", "threshold": "4.5.6条", "actualValue": "利息利润=0", "passed": true },
+      { "rule": "前提匹配估价目的", "threshold": "4.5.2条", "actualValue": "业主自行开发匹配抵押目的", "passed": true }
+    ]
+  }
+}
+```
+
+**输出要求**：
+- `analysisMethod` 必须明确（dynamic / static）
+- `premise` 必须匹配估价目的（抵押→ownerInitiated / 拍卖→forcedTransfer）
+- `subsequentCosts.investmentInterest` 和 `developerProfit` 在动态法中必须为 0
+- 若假设开发法不适用，设 `applicable: false` 并填 `notApplicableReason`
+
+## 七、持续改进
 
 After completing 假设开发法测算, ask:
 

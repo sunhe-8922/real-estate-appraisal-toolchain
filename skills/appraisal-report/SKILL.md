@@ -725,17 +725,84 @@ Before delivering 估价报告, verify:
 
 ## 五、与其他技能的协作
 
-| 协同技能 | 调用时机 | 传递数据 |
-|---------|---------|---------|
-| comps-method | Step 2 收集比较法结果 | 比较价值、可比实例明细、修正系数 |
-| income-method | Step 2 收集收益法结果 | 收益价值、净收益、报酬率 |
-| cost-method | Step 2 收集成本法结果 | 成本价值、各项支出、折旧 |
-| hypothetical-dev-method | Step 2 收集假设开发法结果 | 开发价值、红线检查 |
-| appraisal-data-collection | Step 2 收集基础信息 | 估价对象资料、市场数据 |
+| 协同技能 | 调用时机 | 传递数据（结构化 JSON） |
+|---------|---------|----------------------|
+| comps-method | Step 2 收集比较法结果 | `methods.comps` — 比较价值、可比实例明细、修正系数、红线检查 |
+| income-method | Step 2 收集收益法结果 | `methods.income` — 收益价值、净收益、报酬率/资本化率、红线检查 |
+| cost-method | Step 2 收集成本法结果 | `methods.cost` — 成本价值、7项支出、折旧、红线检查 |
+| hypothetical-dev-method | Step 2 收集假设开发法结果 | `methods.hypotheticalDev` — 开发价值、后续支出、红线检查 |
+| appraisal-data-collection | Step 2 收集基础信息 | `project` + `property` + `valuation` 基础信息 |
 | web-research-methodology | Step 3.6 市场背景分析、Step 2 参数信源验证 | 宏观经济数据、市场报告、参数T0/T1/T2标注 |
-| xlsx | 读取测算 .xlsx 结果 | 解析为报告中的表格 |
 
-## 六、持续改进
+**数据交换格式**：各方法技能输出符合 `schema/appraisal-result.schema.json` 的 JSON 片段，本技能组装为完整 `AppraisalCalculationResult` 对象后生成报告。
+
+## 六、结构化输入（JSON）
+
+报告生成前，**优先收集各方法技能的结构化 JSON 输出**，组装为完整的 `AppraisalCalculationResult` 对象。这消除跨技能自然语言依赖，确保数据一致性可自动校验。
+
+完整 Schema 定义：`schema/appraisal-result.schema.json`
+完整示例：`schema/example-武汉洪山住宅.json`
+
+### 6.1 JSON 组装流程
+
+```
+1. 从 appraisal-data-collection 取 → project + property + valuation（基础信息）
+2. 从各方法技能取 JSON 片段 → methods.{comps, income, cost, hypotheticalDev}
+3. 汇总计算 → result（加权平均 + 差异分析 + 权重校验）
+4. 自动校验 → crossMethodConsistency（7项跨方法一致性检查）
+5. 模板变量映射 → 生成报告
+```
+
+### 6.2 模板变量映射表
+
+报告中的 `{{模板变量}}` 直接从 JSON 对象取值：
+
+| 模板变量 | JSON 路径 | 说明 |
+|---------|----------|------|
+| `{{项目名称}}` | `project.name` | 估价项目名称 |
+| `{{委托人}}` | `project.client` | 估价委托人 |
+| `{{机构名称}}` | `project.agency` | 估价机构 |
+| `{{估价师姓名}}` | `project.appraiser.name` | 注册估价师 |
+| `{{出具日期}}` | `project.reportDate` | 出具日期 |
+| `{{报告编号}}` | `project.reportNumber` | 报告编号 |
+| `{{估价对象面积}}` | `property.area` | 建筑面积 |
+| `{{估价对象用途}}` | `property.usage` | 用途 |
+| `{{价值时点}}` | `valuation.valueDate` | 价值时点 |
+| `{{比较法总价}}` | `methods.comps.finalValue.total` | 比较法总价 |
+| `{{比较法单价}}` | `methods.comps.finalValue.unit` | 比较法单价 |
+| `{{收益法总价}}` | `methods.income.finalValue.total` | 收益法总价 |
+| `{{收益法单价}}` | `methods.income.finalValue.unit` | 收益法单价 |
+| `{{比较法权重}}` | `result.weightAllocation.comps` | 比较法权重 |
+| `{{收益法权重}}` | `result.weightAllocation.income` | 收益法权重 |
+| `{{最终总价}}` | `result.finalTotalValue` | 最终估价结果总价 |
+| `{{最终单价}}` | `result.finalUnitValue` | 最终估价结果单价 |
+| `{{总价大写}}` | `result.finalTotalValueInWords` | 总价大写 |
+| `{{确定方式}}` | `result.determinationMethod` | 结果确定方式 |
+
+### 6.3 自动校验规则
+
+组装 JSON 后，在生成报告前必须执行以下校验：
+
+| 校验项 | 规则 | 失败处理 |
+|--------|------|---------|
+| 权重合计 | `result.weightSum == 1.0` | 报错，要求调整权重 |
+| 跨方法一致性 | `crossMethodConsistency` 全部 `passed == true` | 报错，标记不一致项 |
+| 红线全通过 | 各方法 `redLineChecks` 全部 `passed == true` | 报错，超标项需有 `explanation` |
+| 总价÷面积 | `finalTotalValue / property.area ≈ finalUnitValue` | 差异>1%时警告 |
+| 可比实例≥3 | `methods.comps.comparableInstances.length >= 3` | 报错 |
+| 历史数据≥3年 | `methods.income.netOperatingIncome.historicalDataYears >= 3` | 报错 |
+| 动态法利息利润=0 | `hypotheticalDev.subsequentCosts.investmentInterest == 0 && developerProfit == 0` | 报错（4.5.6条红线） |
+
+### 6.4 降级策略
+
+如果上游技能未输出结构化 JSON（旧版本或手工输入场景），降级为自然语言解析模式：
+
+1. 尝试从上游技能的自然语言输出中提取关键数值
+2. 填入 JSON 对象的对应字段
+3. 标注 `"sourceMode": "naturalLanguage"` 表示数据来自非结构化解析
+4. 在报告假设和限制条件中增加声明：部分参数系 AI 解析，未经结构化校验
+
+## 七、持续改进
 
 After generating 估价报告, ask:
 

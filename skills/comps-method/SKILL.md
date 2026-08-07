@@ -365,7 +365,59 @@ Before delivering 比较法测算结果, verify:
 - [ ] 公式单元格已锁保护（仅蓝字可编辑）
 - [ ] 用户可自行增加可比实例：插入列→复制公式→扩展 SUM 范围
 
-## 六、持续改进
+## 六、结构化输出（JSON）
+
+完成测算后，除 Excel/表格输出外，**必须同时输出结构化 JSON 片段**，供 `appraisal-report` 技能读取组装报告。
+
+完整 Schema 定义：`schema/appraisal-result.schema.json`
+完整示例：`schema/example-武汉洪山住宅.json`（`methods.comps` 部分）
+
+本方法输出的 JSON 结构：
+
+```json
+{
+  "comps": {
+    "applicable": true,
+    "comparableInstances": [
+      {
+        "name": "可比实例A",
+        "location": "洪山区珞狮路",
+        "area": 125.00,
+        "transactionDate": "2026-05-15",
+        "transactionPrice": 3125000,
+        "unitPrice": 25000,
+        "adjustments": {
+          "transactionSituation": 1.00,
+          "marketCondition": 1.02,
+          "location": 0.98,
+          "physical": 1.03,
+          "interest": 1.00
+        },
+        "adjustedUnitPrice": 25096,
+        "sourceGrade": "T1"
+      }
+    ],
+    "finalValue": { "total": 3205000, "unit": 24942 },
+    "weight": 0.6,
+    "weightRationale": "住宅交易活跃，修正幅度小",
+    "redLineChecks": [
+      { "rule": "可比实例数量", "threshold": "≥3个", "actualValue": "3个", "passed": true },
+      { "rule": "成交距价值时点", "threshold": "≤2年", "actualValue": "最远77天", "passed": true },
+      { "rule": "单项修正幅度", "threshold": "≤20%", "actualValue": "最大4%", "passed": true },
+      { "rule": "综合修正幅度", "threshold": "≤30%", "actualValue": "最大3.6%", "passed": true },
+      { "rule": "最高价/最低价比", "threshold": "≤1.2", "actualValue": "1.006", "passed": true }
+    ]
+  }
+}
+```
+
+**输出要求**：
+- `comparableInstances` 至少 3 个元素
+- `redLineChecks` 必须覆盖全部 5 条红线
+- `sourceGrade` 标注每个实例的信源等级
+- 金额单位：元（不用万元）
+
+## 七、持续改进
 
 After completing 比较法测算, ask:
 

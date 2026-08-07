@@ -359,7 +359,55 @@ Before delivering 成本法测算结果, verify:
 - [ ] 颜色图例行已在 Sheet1 行3
 - [ ] 公式单元格已锁保护（仅蓝字可编辑）
 
-## 六、持续改进
+## 六、结构化输出（JSON）
+
+完成测算后，除 Excel/表格输出外，**必须同时输出结构化 JSON 片段**，供 `appraisal-report` 技能读取组装报告。
+
+完整 Schema 定义：`schema/appraisal-result.schema.json`
+完整示例：`schema/example-武汉洪山住宅.json`（`methods.cost` 部分，示例中为 null — 该案例未采用成本法）
+
+本方法输出的 JSON 结构（假设采用成本法时）：
+
+```json
+{
+  "cost": {
+    "applicable": true,
+    "pathType": "combined",
+    "costComponents": {
+      "landCost": 800000,
+      "constructionCost": 1500000,
+      "managementFee": 60000,
+      "investmentInterest": 120000,
+      "salesTax": 90000,
+      "developerProfit": 150000,
+      "other": 30000
+    },
+    "reproductionCost": 2750000,
+    "depreciation": {
+      "method": "ageLife",
+      "physical": 165000,
+      "functional": 0,
+      "external": 0,
+      "total": 165000
+    },
+    "finalValue": { "total": 2585000, "unit": 20117 },
+    "weight": 0.3,
+    "weightRationale": "成本法反映重置成本减折旧，作为辅助验证",
+    "redLineChecks": [
+      { "rule": "现场查勘", "threshold": "必须执行", "actualValue": "已查勘", "passed": true },
+      { "rule": "7项支出完整", "threshold": "不得遗漏", "actualValue": "7项齐全", "passed": true }
+    ]
+  }
+}
+```
+
+**输出要求**：
+- `pathType` 必须明确（combined / separated）
+- `depreciation.method` 必须标注（ageLife / marketExtraction / breakdown）
+- `costComponents` 7 项不得遗漏（无值的填 0）
+- 若成本法不适用，设 `applicable: false` 并填 `notApplicableReason`
+
+## 七、持续改进
 
 After completing 成本法测算, ask:
 

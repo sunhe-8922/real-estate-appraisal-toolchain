@@ -376,7 +376,50 @@ Before delivering 收益法测算结果, verify:
 - [ ] 公式单元格已锁保护（仅蓝字可编辑）
 - [ ] 用户可拖拽折现行扩展收益期
 
-## 六、持续改进
+## 六、结构化输出（JSON）
+
+完成测算后，除 Excel/表格输出外，**必须同时输出结构化 JSON 片段**，供 `appraisal-report` 技能读取组装报告。
+
+完整 Schema 定义：`schema/appraisal-result.schema.json`
+完整示例：`schema/example-武汉洪山住宅.json`（`methods.income` 部分）
+
+本方法输出的 JSON 结构：
+
+```json
+{
+  "income": {
+    "applicable": true,
+    "calculationMode": "directCapitalization",
+    "incomeType": "rentalIncome",
+    "netOperatingIncome": {
+      "effectiveGrossIncome": 57000,
+      "operatingExpenses": 8876,
+      "annualAmount": 48124,
+      "historicalDataYears": 3
+    },
+    "rate": {
+      "type": "capitalizationRate",
+      "value": 0.015,
+      "determinationMethod": "市场提取法"
+    },
+    "finalValue": { "total": 3208267, "unit": 24967 },
+    "weight": 0.4,
+    "weightRationale": "住宅非纯收益型资产，收益法作为辅助验证",
+    "redLineChecks": [
+      { "rule": "历史数据调查年数", "threshold": "≥3年", "actualValue": "3年", "passed": true },
+      { "rule": "净收益客观性", "threshold": "取正常客观值", "actualValue": "已扣空置+运营费用", "passed": true }
+    ]
+  }
+}
+```
+
+**输出要求**：
+- `calculationMode` 必须明确标注（fullRemainingLife / holdAndResale / directCapitalization）
+- `rate.value` 用小数（0.015 = 1.5%）
+- `historicalDataYears` ≥ 3
+- 若选用 fullRemainingLife 模式且结果与其他方法差异大，须在 `weightRationale` 中说明原因
+
+## 七、持续改进
 
 After completing 收益法测算, ask:
 
