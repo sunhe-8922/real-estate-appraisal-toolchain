@@ -417,6 +417,12 @@ Before delivering 比较法测算结果, verify:
 - `sourceGrade` 标注每个实例的信源等级
 - 金额单位：元（不用万元）
 
+**输出前自检**（使用验证脚本）：
+```bash
+python scripts/validate_appraisal_json.py --fragment comps <你的JSON文件>
+```
+验证通过后再传给 `appraisal-report` 技能。常见错误：缺少 `weightRationale`、`sourceGrade` 值不是 T0/T1/T2、`weight` 超出 0-1 范围。
+
 ## 七、持续改进
 
 After completing 比较法测算, ask:

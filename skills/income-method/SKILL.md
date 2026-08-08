@@ -419,6 +419,12 @@ Before delivering 收益法测算结果, verify:
 - `historicalDataYears` ≥ 3
 - 若选用 fullRemainingLife 模式且结果与其他方法差异大，须在 `weightRationale` 中说明原因
 
+**输出前自检**（使用验证脚本）：
+```bash
+python scripts/validate_appraisal_json.py --fragment income <你的JSON文件>
+```
+验证通过后再传给 `appraisal-report` 技能。常见错误：`calculationMode` 值不在枚举内、`rate.type` 不是 yieldRate/capitalizationRate、缺少 `historicalDataYears`。
+
 ## 七、持续改进
 
 After completing 收益法测算, ask:

@@ -1,0 +1,29 @@
+{
+  "applicable": true,
+  "pathType": "combined",
+  "costComponents": {
+    "landCost": 800000,
+    "constructionCost": 1200000,
+    "managementFee": 60000,
+    "investmentInterest": 85000,
+    "salesTax": 72000,
+    "developerProfit": 150000,
+    "other": 0
+  },
+  "reproductionCost": 2367000,
+  "depreciation": {
+    "method": "ageLife",
+    "physical": 180000,
+    "functional": 20000,
+    "external": 0,
+    "total": 200000
+  },
+  "finalValue": { "total": 2167000, "unit": 25435 },
+  "weight": 0.3,
+  "weightRationale": "成本法反映重置成本减折旧，作为商业用房估值的下限验证",
+  "redLineChecks": [
+    { "rule": "现场查勘", "threshold": "必须执行", "actualValue": "已查勘2026-07-25", "passed": true, "explanation": "" },
+    { "rule": "7项支出完整", "threshold": "不得遗漏", "actualValue": "7项齐全（other=0）", "passed": true, "explanation": "" },
+    { "rule": "利息基数不含利润", "threshold": "4.4.6条", "actualValue": "利息基数=土地+建设+管理，不含销售税费和利润", "passed": true, "explanation": "" }
+  ]
+}

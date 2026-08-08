@@ -407,6 +407,12 @@ Before delivering 成本法测算结果, verify:
 - `costComponents` 7 项不得遗漏（无值的填 0）
 - 若成本法不适用，设 `applicable: false` 并填 `notApplicableReason`
 
+**输出前自检**（使用验证脚本）：
+```bash
+python scripts/validate_appraisal_json.py --fragment cost <你的JSON文件>
+```
+验证通过后再传给 `appraisal-report` 技能。常见错误：`costComponents` 缺少某项、`pathType` 值不在枚举内、`depreciation.method` 值非法。
+
 ## 七、持续改进
 
 After completing 成本法测算, ask:

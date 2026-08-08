@@ -5,13 +5,21 @@
   "description": "房地产估价测算结果标准格式（GB/T 50291-2015）。四大方法技能各输出自己部分，报告技能读取组装后的完整对象。",
 
   "type": "object",
-  "required": ["schemaVersion", "project", "property", "valuation", "methods", "result"],
+  "required": ["schemaVersion", "project", "property", "valuation", "methods", "result", "crossMethodConsistency"],
+  "additionalProperties": false,
   "properties": {
 
     "schemaVersion": {
       "type": "string",
       "const": "1.0",
       "description": "Schema 版本号，当前 1.0"
+    },
+
+    "sourceMode": {
+      "type": "string",
+      "enum": ["json", "naturalLanguage"],
+      "default": "json",
+      "description": "数据来源模式：json=各方法技能直接输出结构化JSON；naturalLanguage=从自然语言解析提取（降级模式，需在报告假设中声明）"
     },
 
     "project": {
@@ -81,6 +89,7 @@
         "comps": {
           "type": ["object", "null"],
           "description": "比较法结果（4.2节）",
+          "additionalProperties": false,
           "required": ["applicable", "finalValue", "weight", "redLineChecks"],
           "properties": {
             "applicable": { "type": "boolean", "description": "是否选用比较法" },
@@ -136,6 +145,7 @@
         "income": {
           "type": ["object", "null"],
           "description": "收益法结果（4.3节）",
+          "additionalProperties": false,
           "required": ["applicable", "finalValue", "weight", "redLineChecks"],
           "properties": {
             "applicable": { "type": "boolean" },
@@ -200,6 +210,7 @@
         "cost": {
           "type": ["object", "null"],
           "description": "成本法结果（4.4节）",
+          "additionalProperties": false,
           "required": ["applicable", "finalValue", "weight", "redLineChecks"],
           "properties": {
             "applicable": { "type": "boolean" },
@@ -258,6 +269,7 @@
         "hypotheticalDev": {
           "type": ["object", "null"],
           "description": "假设开发法结果（4.5节）",
+          "additionalProperties": false,
           "required": ["applicable", "finalValue", "weight", "redLineChecks"],
           "properties": {
             "applicable": { "type": "boolean" },
@@ -317,7 +329,7 @@
     "result": {
       "type": "object",
       "description": "估价结果汇总（7.0.15条 结果确定）",
-      "required": ["finalTotalValue", "finalUnitValue", "determinationMethod", "weightAllocation"],
+      "required": ["finalTotalValue", "finalUnitValue", "determinationMethod", "weightAllocation", "weightSum"],
       "properties": {
         "finalTotalValue": { "type": "number", "description": "最终估价结果总价（元）" },
         "finalUnitValue": { "type": "number", "description": "最终估价结果单价（元/m²）" },

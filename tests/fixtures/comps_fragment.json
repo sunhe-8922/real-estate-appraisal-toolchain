@@ -1,0 +1,66 @@
+{
+  "applicable": true,
+  "comparableInstances": [
+    {
+      "name": "可比实例A — 光谷步行街1号",
+      "location": "东湖高新区光谷步行街",
+      "area": 85.00,
+      "transactionDate": "2026-04-20",
+      "transactionPrice": 2125000,
+      "unitPrice": 25000,
+      "adjustments": {
+        "transactionSituation": 1.00,
+        "marketCondition": 1.03,
+        "location": 0.97,
+        "physical": 1.02,
+        "interest": 1.00
+      },
+      "adjustedUnitPrice": 25498,
+      "sourceGrade": "T1"
+    },
+    {
+      "name": "可比实例B — 光谷步行街2号",
+      "location": "东湖高新区光谷步行街",
+      "area": 88.00,
+      "transactionDate": "2026-05-10",
+      "transactionPrice": 2288000,
+      "unitPrice": 26000,
+      "adjustments": {
+        "transactionSituation": 1.00,
+        "marketCondition": 1.02,
+        "location": 1.00,
+        "physical": 0.98,
+        "interest": 1.00
+      },
+      "adjustedUnitPrice": 25970,
+      "sourceGrade": "T1"
+    },
+    {
+      "name": "可比实例C — 光谷步行街3号",
+      "location": "东湖高新区光谷步行街",
+      "area": 82.00,
+      "transactionDate": "2026-06-05",
+      "transactionPrice": 2050000,
+      "unitPrice": 25000,
+      "adjustments": {
+        "transactionSituation": 1.00,
+        "marketCondition": 1.01,
+        "location": 0.99,
+        "physical": 1.01,
+        "interest": 1.00
+      },
+      "adjustedUnitPrice": 25248,
+      "sourceGrade": "T1"
+    }
+  ],
+  "finalValue": { "total": 2182000, "unit": 25588 },
+  "weight": 0.6,
+  "weightRationale": "商业交易活跃，3个可比实例修正幅度均<5%，比较法结果最可靠",
+  "redLineChecks": [
+    { "rule": "可比实例数量", "threshold": "≥3个", "actualValue": "3个", "passed": true, "explanation": "" },
+    { "rule": "成交距价值时点", "threshold": "≤2年", "actualValue": "最远103天", "passed": true, "explanation": "" },
+    { "rule": "单项修正幅度", "threshold": "≤20%", "actualValue": "最大3%（市场状况）", "passed": true, "explanation": "" },
+    { "rule": "综合修正幅度", "threshold": "≤30%", "actualValue": "最大3.9%", "passed": true, "explanation": "" },
+    { "rule": "最高价/最低价比", "threshold": "≤1.2", "actualValue": "25970/25248=1.029", "passed": true, "explanation": "" }
+  ]
+}

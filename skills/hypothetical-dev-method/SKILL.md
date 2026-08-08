@@ -422,6 +422,12 @@ Before delivering 假设开发法测算结果, verify:
 - `subsequentCosts.investmentInterest` 和 `developerProfit` 在动态法中必须为 0
 - 若假设开发法不适用，设 `applicable: false` 并填 `notApplicableReason`
 
+**输出前自检**（使用验证脚本）：
+```bash
+python scripts/validate_appraisal_json.py --fragment hypotheticalDev <你的JSON文件>
+```
+验证通过后再传给 `appraisal-report` 技能。常见错误：动态法下 `investmentInterest`/`developerProfit` 不为 0、`premise` 值不在枚举内、缺少 `discountRate`。
+
 ## 七、持续改进
 
 After completing 假设开发法测算, ask:

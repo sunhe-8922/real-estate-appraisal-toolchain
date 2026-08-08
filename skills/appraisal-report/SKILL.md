@@ -802,6 +802,29 @@ Before delivering 估价报告, verify:
 3. 标注 `"sourceMode": "naturalLanguage"` 表示数据来自非结构化解析
 4. 在报告假设和限制条件中增加声明：部分参数系 AI 解析，未经结构化校验
 
+### 6.5 输入校验（必执行）
+
+**组装完整 JSON 对象后，生成报告前，必须运行验证脚本：**
+
+```bash
+# 完整对象验证
+python scripts/validate_appraisal_json.py path/to/assembled_result.json
+
+# 降级模式验证（检查 sourceMode = naturalLanguage）
+python scripts/validate_appraisal_json.py --degraded path/to/assembled_result.json
+```
+
+**验证必须通过（0 错误）才能继续生成报告。** 常见失败原因：
+- `weightSum` 不等于 1.0 → 调整权重分配
+- `crossMethodConsistency` 有 `passed: false` → 检查跨方法数据一致性
+- 某方法 `redLineChecks` 有 `passed: false` → 红线超标，需有 `explanation`
+- `additionalProperties` 报错 → JSON 中有多余字段（拼写错误）
+- 可比实例 < 3 个 → 比较法不可用，设 `applicable: false`
+
+**降级模式额外检查**：
+- `sourceMode` 必须为 `"naturalLanguage"`
+- 报告假设和限制条件中必须包含声明：「部分参数系 AI 从自然语言解析提取，未经结构化校验，建议人工复核」
+
 ## 七、持续改进
 
 After generating 估价报告, ask:

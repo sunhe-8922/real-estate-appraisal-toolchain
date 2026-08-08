@@ -1,0 +1,23 @@
+{
+  "applicable": true,
+  "analysisMethod": "dynamic",
+  "premise": "voluntaryTransfer",
+  "developmentValue": 5000000,
+  "subsequentCosts": {
+    "construction": 1200000,
+    "management": 60000,
+    "investmentInterest": 0,
+    "salesTax": 150000,
+    "developerProfit": 0
+  },
+  "discountRate": 0.08,
+  "developmentPeriod": 1.5,
+  "finalValue": { "total": 3500000, "unit": 17241 },
+  "weight": 0.5,
+  "weightRationale": "待开发商业用地，假设开发法为主要方法。动态分析法，自愿转让前提",
+  "redLineChecks": [
+    { "rule": "完成后价值禁成本法", "threshold": "4.5.7条", "actualValue": "用比较法测算", "passed": true, "explanation": "" },
+    { "rule": "动态法不另算利息利润", "threshold": "4.5.6条", "actualValue": "investmentInterest=0, developerProfit=0", "passed": true, "explanation": "" },
+    { "rule": "前提匹配估价目的", "threshold": "4.5.2条", "actualValue": "自愿转让开发匹配转让目的", "passed": true, "explanation": "" }
+  ]
+}

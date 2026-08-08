@@ -1,0 +1,27 @@
+{
+  "applicable": true,
+  "calculationMode": "holdAndResale",
+  "incomeType": "rentalIncome",
+  "netOperatingIncome": {
+    "effectiveGrossIncome": 180000,
+    "operatingExpenses": 36000,
+    "annualAmount": 144000,
+    "growthRate": 0.03,
+    "historicalDataYears": 3
+  },
+  "rate": {
+    "type": "yieldRate",
+    "value": 0.055,
+    "determinationMethod": "市场提取法 — 同区域3个可比商铺租售比中位数"
+  },
+  "holdingPeriod": 5,
+  "resaleValue": 2300000,
+  "finalValue": { "total": 2200000, "unit": 25824 },
+  "weight": 0.4,
+  "weightRationale": "商业用房有稳定租金收益，收益法作为辅助验证。持有加转售模式，5年持有期+期末转售",
+  "redLineChecks": [
+    { "rule": "历史数据调查年数", "threshold": "≥3年", "actualValue": "3年（2023-2025）", "passed": true, "explanation": "" },
+    { "rule": "净收益客观性", "threshold": "取正常客观值", "actualValue": "已扣除空置损失+运营费用", "passed": true, "explanation": "" },
+    { "rule": "期末转售方法", "threshold": "禁用成本法", "actualValue": "用直接资本化法测算", "passed": true, "explanation": "" }
+  ]
+}

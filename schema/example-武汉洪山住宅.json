@@ -1,5 +1,6 @@
 {
   "schemaVersion": "1.0",
+  "sourceMode": "json",
   "project": {
     "name": "武汉市洪山区珞狮路某小区3栋2单元1804室住宅房地产抵押估价",
     "purpose": "为确定抵押贷款额度提供参考依据而评估房地产抵押价值",

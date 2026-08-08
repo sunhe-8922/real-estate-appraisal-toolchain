@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "1.0",
+  "sourceMode": "naturalLanguage",
+  "project": {
+    "name": "武昌区中南路某写字楼抵押估价",
+    "purpose": "为确定抵押贷款额度提供参考依据而评估房地产抵押价值",
+    "client": "××银行股份有限公司武汉分行",
+    "agency": "××房地产土地资产评估有限公司",
+    "appraiser": {
+      "name": "王××",
+      "registrationNumber": "××××××"
+    },
+    "reportDate": "2026-08-01",
+    "reportNumber": "××房估字〔2026〕第0820号"
+  },
+  "property": {
+    "area": 500.00,
+    "usage": "办公",
+    "address": "武汉市武昌区中南路××大厦12层",
+    "propertyType": "写字楼",
+    "completionYear": 2015,
+    "remainingUsefulLife": 39.0,
+    "landUseRightYears": 34.5,
+    "floor": "12/28层",
+    "ownershipType": "出让"
+  },
+  "valuation": {
+    "valueDate": "2026-08-01",
+    "valueType": "抵押价值（等于市场价值）",
+    "currency": "CNY"
+  },
+  "methods": {
+    "comps": {
+      "applicable": true,
+      "comparableInstances": [
+        {
+          "name": "可比实例A",
+          "location": "武昌区中南路",
+          "area": 480.00,
+          "transactionDate": "2026-05-01",
+          "transactionPrice": 12000000,
+          "unitPrice": 25000,
+          "adjustments": {
+            "transactionSituation": 1.00,
+            "marketCondition": 1.02,
+            "location": 0.98,
+            "physical": 1.00,
+            "interest": 1.00
+          },
+          "adjustedUnitPrice": 24990,
+          "sourceGrade": "T2"
+        },
+        {
+          "name": "可比实例B",
+          "location": "武昌区中南路",
+          "area": 510.00,
+          "transactionDate": "2026-06-15",
+          "transactionPrice": 13260000,
+          "unitPrice": 26000,
+          "adjustments": {
+            "transactionSituation": 1.00,
+            "marketCondition": 1.01,
+            "location": 1.00,
+            "physical": 0.97,
+            "interest": 1.00
+          },
+          "adjustedUnitPrice": 25522,
+          "sourceGrade": "T2"
+        },
+        {
+          "name": "可比实例C",
+          "location": "武昌区中南路",
+          "area": 495.00,
+          "transactionDate": "2026-07-01",
+          "transactionPrice": 12375000,
+          "unitPrice": 25000,
+          "adjustments": {
+            "transactionSituation": 1.00,
+            "marketCondition": 1.00,
+            "location": 0.99,
+            "physical": 1.02,
+            "interest": 1.00
+          },
+          "adjustedUnitPrice": 25245,
+          "sourceGrade": "T2"
+        }
+      ],
+      "finalValue": { "total": 12650000, "unit": 25300 },
+      "weight": 0.6,
+      "weightRationale": "写字楼交易活跃，比较法为主。注意：sourceGrade=T2，数据来自中介报价未经交叉验证",
+      "redLineChecks": [
+        { "rule": "可比实例数量", "threshold": "≥3个", "actualValue": "3个", "passed": true, "explanation": "" },
+        { "rule": "成交距价值时点", "threshold": "≤2年", "actualValue": "最远92天", "passed": true, "explanation": "" },
+        { "rule": "单项修正幅度", "threshold": "≤20%", "actualValue": "最大3%（实物状况）", "passed": true, "explanation": "" },
+        { "rule": "综合修正幅度", "threshold": "≤30%", "actualValue": "最大2.1%", "passed": true, "explanation": "" },
+        { "rule": "最高价/最低价比", "threshold": "≤1.2", "actualValue": "1.018", "passed": true, "explanation": "" }
+      ]
+    },
+    "income": {
+      "applicable": true,
+      "calculationMode": "directCapitalization",
+      "incomeType": "rentalIncome",
+      "netOperatingIncome": {
+        "effectiveGrossIncome": 1500000,
+        "operatingExpenses": 300000,
+        "annualAmount": 1200000,
+        "historicalDataYears": 3
+      },
+      "rate": {
+        "type": "capitalizationRate",
+        "value": 0.095,
+        "determinationMethod": "市场提取法"
+      },
+      "finalValue": { "total": 12631579, "unit": 25263 },
+      "weight": 0.4,
+      "weightRationale": "写字楼有稳定租金收益，收益法辅助验证",
+      "redLineChecks": [
+        { "rule": "历史数据调查年数", "threshold": "≥3年", "actualValue": "3年", "passed": true, "explanation": "" },
+        { "rule": "净收益客观性", "threshold": "取正常客观值", "actualValue": "已扣空置+运营费用", "passed": true, "explanation": "" }
+      ]
+    },
+    "cost": null,
+    "hypotheticalDev": null
+  },
+  "result": {
+    "finalTotalValue": 12640000,
+    "finalUnitValue": 25280,
+    "finalTotalValueInWords": "人民币壹仟贰佰陆拾肆万元整",
+    "determinationMethod": "加权平均（比较法60% + 收益法40%）",
+    "weightAllocation": {
+      "comps": 0.6,
+      "income": 0.4,
+      "cost": 0,
+      "hypotheticalDev": 0
+    },
+    "weightSum": 1.0,
+    "crossMethodDifference": {
+      "maxValue": 12650000,
+      "minValue": 12631579,
+      "ratio": 1.001,
+      "analysis": "两方法差异<0.2%，高度收敛。注意：sourceMode=naturalLanguage，数据系AI从自然语言解析提取，未经结构化校验，建议人工复核"
+    }
+  },
+  "crossMethodConsistency": [
+    { "checkItem": "area", "passed": true, "detail": "两方法均使用 500.00 m²" },
+    { "checkItem": "usage", "passed": true, "detail": "两方法均为办公用途" },
+    { "checkItem": "valueDate", "passed": true, "detail": "两方法价值时点均为 2026-08-01" },
+    { "checkItem": "propertyType", "passed": true, "detail": "两方法均为写字楼" },
+    { "checkItem": "remainingYears", "passed": true, "detail": "两方法均使用 39.0 年剩余经济寿命" },
+    { "checkItem": "landUseRight", "passed": true, "detail": "两方法均使用 34.5 年剩余土地使用权" },
+    { "checkItem": "rate", "passed": true, "detail": "比较法不涉及报酬率；收益法资本化率9.5%" }
+  ]
+}

@@ -209,11 +209,16 @@ outputs/     ← 示例报告
 ### 4.2 数据孤岛风险 — ✅ 已解决（2026-08-07）
 
 - ~~7 个技能之间通过自然语言指令协作，没有结构化的数据交换格式~~
-- **已定义** `schema/appraisal-result.schema.json`（JSON Schema draft 2020-12，386行）
+- **已定义** `schema/appraisal-result.schema.json`（JSON Schema draft 2020-12，394行）
 - 各方法技能新增「结构化输出」章节，输出符合 Schema 的 JSON 片段
 - 报告技能新增「结构化输入」章节，含组装流程 + 模板变量映射表 + 7项自动校验 + 降级策略
 - 完整示例：`schema/example-武汉洪山住宅.json`（基于测试案例）
-- **待验证**：实际对话中各方法技能是否可靠输出 JSON、报告技能是否正确读取
+- **端到端验证完成**（2026-08-08）：
+  - Schema 修复 4 个缺陷：`sourceMode` 字段缺失、`crossMethodConsistency`/`weightSum` 未设为必需、缺 `additionalProperties: false`
+  - 验证脚本 `scripts/validate_appraisal_json.py`：完整对象/单方法片段/降级模式三种入口
+  - 50 pytest 用例 + 5 个 fixture（4 方法片段 + 降级场景），78/78 全绿
+  - 5 个 SKILL.md 补充 JSON 输出前自检指令
+  - **仍待验证**：实际对话中 AI 是否可靠输出 JSON（需 expert 实测）
 
 ### 4.3 规范合规风险
 - GB/T 50291-2015 是推荐性国标，地方政府可能有补充规定或更严格的地方标准。当前工具链仅基于国标，未纳入任何地方性法规。
@@ -247,7 +252,7 @@ outputs/     ← 示例报告
 |---|------|------|
 | 5 | **实现所有 5 种报告输出格式** | 当前仅 Markdown 验证通过，Word/HTML/PDF/Dashboard 需逐一实现和测试 |
 | 6 | ~~激活测试 re-appraisal-expert~~ 🧪 测试方案已出（2026-08-07） | `outputs/re-appraisal-expert_测试方案.md` 含 5 Case（方法选用/红线触发/报告审查/抵押谨慎/边界），待切换到专家对话执行 |
-| 7 | **增加单元测试** | 四条测算技能的核心计算逻辑应有 Python 单测，确保公式生成的 Excel 校验通过 |
+| 7 | ~~增加单元测试~~ ✅ 已完成（2026-08-07） | `tests/conftest.py` + `tests/test_templates.py`：28 pytest 用例（sheet 结构/ROUND broad scan/4 模板 specific 公式/数据验证/注释），`python -m pytest tests/ -v` 7.99s 全绿。engine.js 未创建，node --test 待后续 |
 | 8 | **批量报告生成** | 一套模板 + 多套数据 = 批量报告（已设计但未实现） |
 
 ### 5.3 低优先级（v2.0）
