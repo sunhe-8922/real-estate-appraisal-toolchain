@@ -18,3 +18,7 @@ storm-deep-research/
 # Unrelated files
 SKILL（房地产经纪人营销获客助手）.md
 RH文件夹/
+
+# Python cache
+__pycache__/
+*.pyc
