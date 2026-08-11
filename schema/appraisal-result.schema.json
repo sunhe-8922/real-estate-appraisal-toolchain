@@ -26,6 +26,7 @@
       "type": "object",
       "description": "估价项目基本信息（对应报告封面 + 致函抬头）",
       "required": ["name", "purpose", "client", "agency", "appraiser", "reportDate", "reportNumber"],
+      "additionalProperties": false,
       "properties": {
         "name": { "type": "string", "description": "估价项目名称" },
         "purpose": { "type": "string", "description": "估价目的（抵押/转让/征收/拍卖等）" },
@@ -56,6 +57,7 @@
       "type": "object",
       "description": "估价对象基本信息 — 跨方法一致性校验基准。所有方法必须使用相同的 property 数据。",
       "required": ["area", "usage", "address", "propertyType", "completionYear", "remainingUsefulLife", "landUseRightYears"],
+      "additionalProperties": false,
       "properties": {
         "area": { "type": "number", "description": "建筑面积（m²）" },
         "usage": { "type": "string", "description": "用途（住宅/商业/办公/工业等）" },
@@ -75,6 +77,7 @@
       "type": "object",
       "description": "估价参数",
       "required": ["valueDate", "valueType", "currency"],
+      "additionalProperties": false,
       "properties": {
         "valueDate": { "type": "string", "format": "date", "description": "价值时点 YYYY-MM-DD" },
         "valueType": { "type": "string", "description": "价值类型（市场价值/抵押价值/快速变现价值等）" },
@@ -85,6 +88,8 @@
     "methods": {
       "type": "object",
       "description": "各方法测算结果。不使用的方法设为 null 并在 notApplicableReason 中说明。",
+      "minProperties": 1,
+      "additionalProperties": false,
       "properties": {
         "comps": {
           "type": ["object", "null"],
@@ -94,8 +99,9 @@
           "properties": {
             "applicable": { "type": "boolean", "description": "是否选用比较法" },
             "notApplicableReason": { "type": "string", "description": "不适用的理由（applicable=false 时必填）" },
-            "comparableInstances": {
+              "comparableInstances": {
               "type": "array",
+              "minItems": 3,
               "description": "可比实例列表（applicable=true 时必填，≥3个）",
               "items": {
                 "type": "object",
@@ -136,7 +142,8 @@
             "weightRationale": { "type": "string", "description": "权重分配理由" },
             "redLineChecks": {
               "type": "array",
-              "description": "比较法红线检查",
+              "minItems": 1,
+              "description": "比较法红线检查（至少一条）",
               "items": { "$ref": "#/$defs/redLineCheck" }
             }
           }
@@ -202,6 +209,8 @@
             "weightRationale": { "type": "string" },
             "redLineChecks": {
               "type": "array",
+              "minItems": 1,
+              "description": "收益法红线检查（至少一条）",
               "items": { "$ref": "#/$defs/redLineCheck" }
             }
           }
@@ -261,6 +270,8 @@
             "weightRationale": { "type": "string" },
             "redLineChecks": {
               "type": "array",
+              "minItems": 1,
+              "description": "成本法红线检查（至少一条）",
               "items": { "$ref": "#/$defs/redLineCheck" }
             }
           }
@@ -319,6 +330,8 @@
             "weightRationale": { "type": "string" },
             "redLineChecks": {
               "type": "array",
+              "minItems": 1,
+              "description": "假设开发法红线检查（至少一条）",
               "items": { "$ref": "#/$defs/redLineCheck" }
             }
           }
@@ -330,6 +343,7 @@
       "type": "object",
       "description": "估价结果汇总（7.0.15条 结果确定）",
       "required": ["finalTotalValue", "finalUnitValue", "determinationMethod", "weightAllocation", "weightSum"],
+      "additionalProperties": false,
       "properties": {
         "finalTotalValue": { "type": "number", "description": "最终估价结果总价（元）" },
         "finalUnitValue": { "type": "number", "description": "最终估价结果单价（元/m²）" },
@@ -348,7 +362,7 @@
             "hypotheticalDev": { "type": "number", "minimum": 0, "maximum": 1 }
           }
         },
-        "weightSum": { "type": "number", "description": "权重合计（必须=1.0）" },
+        "weightSum": { "type": "number", "const": 1.0, "description": "权重合计必须等于 1.0" },
         "crossMethodDifference": {
           "type": "object",
           "description": "各方法结果差异分析",

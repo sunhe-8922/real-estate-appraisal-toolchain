@@ -112,6 +112,10 @@ copy_tree() {
     fi
 }
 
+# verify_* 函数把明细行直接打到 stdout，计数通过全局变量 VERIFY_COUNT 返回。
+# 不能用 $(verify_...) 捕获：命令替换会吞掉明细行，导致 --check 输出破碎。
+VERIFY_COUNT=0
+
 verify_skills() {
     local path="$1"
     local label="$2"
@@ -121,12 +125,12 @@ verify_skills() {
         if [ -f "$skill_file" ]; then
             local lines=$(wc -l < "$skill_file" | tr -d ' ')
             echo -e "    $s : ${lines} lines"
-            ((found++))
+            found=$((found+1))
         else
             warn "$label 缺失: $s"
         fi
     done
-    echo "$found"
+    VERIFY_COUNT=$found
 }
 
 verify_expert() {
@@ -151,12 +155,12 @@ verify_expert() {
                 fi
             fi
             echo -e "    $c : ${size}"
-            ((found++))
+            found=$((found+1))
         else
             warn "专家缺失: $c"
         fi
     done
-    echo "$found"
+    VERIFY_COUNT=$found
 }
 
 # ── 检查模式 ─────────────────────────────────────────────
@@ -165,14 +169,17 @@ if $CHECK_ONLY; then
     section "检查安装状态"
     echo ""
     echo -e "  项目级技能路径: $PROJECT_SKILLS"
-    p_count=$(verify_skills "$PROJECT_SKILLS" "项目级")
+    verify_skills "$PROJECT_SKILLS" "项目级"
+    p_count=$VERIFY_COUNT
     echo ""
     echo -e "  用户级技能路径: $USER_SKILLS"
-    u_count=$(verify_skills "$USER_SKILLS" "用户级")
+    verify_skills "$USER_SKILLS" "用户级"
+    u_count=$VERIFY_COUNT
     echo ""
     expert_path="$USER_EXPERTS/re-appraisal-expert"
     echo -e "  专家路径: $expert_path"
-    e_count=$(verify_expert "$expert_path")
+    verify_expert "$expert_path"
+    e_count=$VERIFY_COUNT
     echo ""
     echo -e "  汇总: 项目级 ${p_count}/7, 用户级 ${u_count}/7, 专家 ${e_count}/3"
     exit 0
@@ -223,7 +230,8 @@ if $INSTALL_SKILLS; then
     echo -e "  [1/2] 复制到项目级路径..."
     echo -e "  $PROJECT_SKILLS"
     copy_tree "$SKILLS_SRC" "$PROJECT_SKILLS"
-    p_count=$(verify_skills "$PROJECT_SKILLS" "项目级")
+    verify_skills "$PROJECT_SKILLS" "项目级"
+    p_count=$VERIFY_COUNT
     step "项目级 ${p_count}/7 技能已安装"
 
     # 用户级
@@ -231,7 +239,8 @@ if $INSTALL_SKILLS; then
     echo -e "  [2/2] 复制到用户级路径..."
     echo -e "  $USER_SKILLS"
     copy_tree "$SKILLS_SRC" "$USER_SKILLS"
-    u_count=$(verify_skills "$USER_SKILLS" "用户级")
+    verify_skills "$USER_SKILLS" "用户级"
+    u_count=$VERIFY_COUNT
     step "用户级 ${u_count}/7 技能已安装"
 
     if [ "$p_count" -lt 7 ] || [ "$u_count" -lt 7 ]; then
@@ -249,7 +258,8 @@ if $INSTALL_EXPERTS; then
     echo -e "  复制到用户级专家路径..."
     echo -e "  $expert_dst"
     copy_tree "$EXPERT_SRC" "$expert_dst"
-    e_count=$(verify_expert "$expert_dst")
+    verify_expert "$expert_dst"
+    e_count=$VERIFY_COUNT
     step "专家 ${e_count}/3 文件已安装"
 
     if [ "$e_count" -lt 3 ]; then

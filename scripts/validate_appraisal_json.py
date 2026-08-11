@@ -50,9 +50,13 @@ def validate_full(data: dict) -> list:
     """
     验证完整的 AppraisalCalculationResult 对象。
     返回错误列表，空列表=通过。
+    启用 FormatChecker 以支持 format: "date" 等格式校验。
     """
     schema = _load_schema()
-    validator = jsonschema.Draft202012Validator(schema)
+    validator = jsonschema.Draft202012Validator(
+        schema,
+        format_checker=jsonschema.FormatChecker(),
+    )
     errors = sorted(validator.iter_errors(data), key=lambda e: list(e.path))
     return errors
 
@@ -75,7 +79,10 @@ def validate_fragment(data: dict, method: str) -> list:
 
     # 把 $defs 注入子 schema，使 $ref: "#/$defs/redLineCheck" 可解析
     wrapper = {"$defs": schema.get("$defs", {}), **subschema}
-    validator = jsonschema.Draft202012Validator(wrapper)
+    validator = jsonschema.Draft202012Validator(
+        wrapper,
+        format_checker=jsonschema.FormatChecker(),
+    )
     errors = sorted(validator.iter_errors(data), key=lambda e: list(e.path))
     return errors
 
@@ -83,8 +90,9 @@ def validate_fragment(data: dict, method: str) -> list:
 def validate_degraded(data: dict) -> list:
     """
     验证降级模式对象。
-    降级模式要求：sourceMode == "naturalLanguage"
-    额外检查：不能有 redLineChecks 全为 passed=true 的方法（降级模式无法保证红线已验）。
+    降级模式要求：
+    1. sourceMode == "naturalLanguage"
+    2. 至少有一个方法通过全部红线检查（降级模式仍须验红线）
     """
     errors = validate_full(data)
 
@@ -92,6 +100,23 @@ def validate_degraded(data: dict) -> list:
     if data.get("sourceMode") != "naturalLanguage":
         errors = list(errors) + [
             _make_error("sourceMode 必须为 'naturalLanguage'（降级模式）", ["sourceMode"])
+        ]
+
+    # 业务规则：降级模式至少一个方法红线条目非空（确保已做红线检查）
+    methods = data.get("methods", {}) or {}
+    has_redline_check = False
+    for method_name, method_data in methods.items():
+        if isinstance(method_data, dict) and method_data.get("applicable"):
+            redlines = method_data.get("redLineChecks") or []
+            if len(redlines) > 0:
+                has_redline_check = True
+                break
+    if not has_redline_check:
+        errors = list(errors) + [
+            _make_error(
+                "降级模式下至少一个适用方法必须有 redLineChecks（不能全为空）",
+                ["methods"],
+            )
         ]
 
     return errors

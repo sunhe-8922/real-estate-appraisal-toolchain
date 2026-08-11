@@ -65,13 +65,13 @@ for i, h in enumerate(["序号", "构成项", "金额 (元/m²)", "测算依据"
 
 # 数据行
 s1_data = [
-    (6,  1, "土地成本",            "BLUE",    "如: 5000",   "方法: [比较法/成本法/基准地价法] 4.4.6条"),
-    (7,  2, "建设成本",            "BLUE",    "如: 3500",   "方法: [单位比较法/分部分项法/工料测量法] 4.4.6条"),
-    (8,  3, "管理费用",            "FORMULA", '=ROUND(C7*管理费率,0)', "公式: 管理费率 × 建设成本. 管理费率填在C8旁"),
-    (9,  4, "销售费用",            "FORMULA", '=ROUND(售价*销售费率,0)', "公式: 销售费率 × 售价. 销售费率填在C9旁"),
-    (10, 5, "投资利息",            "FORMULA", '=ROUND(C6*利率*计息期+C7*利率*计息期/2,0)', "利率填在C10旁. 不含C9/C11. 4.4.6条第2款"),
-    (11, 6, "销售税费",            "FORMULA", '=ROUND(售价*税率,0)', "公式: 税率 × 售价. 税率填在C11旁"),
-    (12, 7, "开发利润",            "BLUE_Y",  "如: 800",    "计算基数×利润率. 4.4.6条. 黄底=关键参数"),
+    (6,  1, "土地成本",            "BLUE",    None,     "方法: [比较法/成本法/基准地价法] 4.4.6条"),
+    (7,  2, "建设成本",            "BLUE",    None,     "方法: [单位比较法/分部分项法/工料测量法] 4.4.6条"),
+    (8,  3, "管理费用",            "FORMULA", '=ROUND(C7*$F$8,0)', "公式: 管理费率($F$8) × 建设成本"),
+    (9,  4, "销售费用",            "FORMULA", '=ROUND(C14*$F$9,0)', "公式: 售价参考行C14 × 销售费率($F$9)"),
+    (10, 5, "投资利息",            "FORMULA", '=ROUND((C6+C7)*$F$10,0)', "公式: (土地成本+建设成本) × 年利率($F$10). 不含C9/C11. 4.4.6条第2款"),
+    (11, 6, "销售税费",            "FORMULA", '=ROUND(C14*$F$11,0)', "公式: 售价参考行C14 × 税率($F$11)"),
+    (12, 7, "开发利润",            "BLUE_Y",  None,     "计算基数×利润率($F$12). 4.4.6条. 黄底=关键参数"),
 ]
 
 for row, seq, name, style, default, basis in s1_data:
@@ -93,13 +93,13 @@ for row, seq, name, style, default, basis in s1_data:
     ws1.cell(row=row, column=4, value=basis).font = Font(name="Arial", size=9, color="666666", italic=True)
     ws1.cell(row=row, column=4).alignment = LEFT_WRAP; ws1.cell(row=row, column=4).border = THIN_BORDER
 
-# 附加参数行 (管理费率/销售费率/利率/税率/利润率)
+# 附加参数行 (管理费率/销售费率/利率/税率/利润率) — F列存放实际参数值供公式引用
 param_data = [
-    (8,  "管理费率", "0.03", "0.0%"),
-    (9,  "销售费率", "0.02", "0.0%"),
-    (10, "利率",     "0.04", "0.00%"),
-    (11, "税率",     "0.05", "0.0%"),
-    (12, "利润率",   "0.12", "0.0%"),
+    (8,  "管理费率", 0.03, "0.0%"),
+    (9,  "销售费率", 0.02, "0.0%"),
+    (10, "利率",     0.04, "0.00%"),
+    (11, "税率",     0.05, "0.0%"),
+    (12, "利润率",   0.12, "0.0%"),
 ]
 # 在E列放参数标签，F列放参数值
 ws1.column_dimensions['E'].width = 14
@@ -108,8 +108,7 @@ for row, pname, pdefault, fmt in param_data:
     ws1.cell(row=row, column=5, value=pname).font = Font(name="Arial", size=9, color="FF0000")
     ws1.cell(row=row, column=5).alignment = CENTER
     c = ws1.cell(row=row, column=6)
-    c.font = BLUE_FONT; c.number_format = fmt
-    # Leave default blank so user must fill in
+    c.font = BLUE_FONT; c.value = pdefault; c.number_format = fmt
 
 # 合计行
 row_total = 14

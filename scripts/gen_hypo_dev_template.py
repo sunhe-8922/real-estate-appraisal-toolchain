@@ -132,7 +132,7 @@ ws1.cell(row=row, column=4).font = BLUE_FONT; ws1.cell(row=row, column=4).border
 row += 1
 
 val_items = [
-    ("单价 (元/m²)", "BLUE_Y", "如: 25000", "总价 (元)", f"=ROUND(B{row}*B7,0)", "公式; 单价×规模"),
+    ("单价 (元/m²)", "BLUE_Y", 25000, "总价 (元)", f"=ROUND(B{row}*B7,0)", "公式; 单价×规模"),
     ("信源等级", "DV_LIST_SRC", "T0/T1/T2", "建筑面积 (m²)", "=B7", "引用一、节的规模"),
 ]
 for label, style, hint, label2, formula, note in val_items:
@@ -140,6 +140,7 @@ for label, style, hint, label2, formula, note in val_items:
     c = ws1.cell(row=row, column=2)
     if style == "BLUE_Y":
         c.font = BLUE_FONT; c.fill = YELLOW_FILL; c.number_format = '#,##0'; c.border = THIN_BORDER
+        c.value = hint
         c.comment = Comment("4.5.7条第1款: 开发完成后价值不得用成本法。必须用比较法或收益法测算。", "GB/T 50291-2015")
     elif style == "DV_LIST_SRC":
         c.font = BLUE_FONT; c.border = THIN_BORDER

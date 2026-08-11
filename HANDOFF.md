@@ -29,11 +29,11 @@
 |------|------|---------------|------|
 | 技能 | `appraisal-data-collection` | `skills/appraisal-data-collection/SKILL.md` | 203 |
 | 技能 | `web-research-methodology` | `skills/web-research-methodology/SKILL.md` | 146 |
-| 技能 | `comps-method` | `skills/comps-method/SKILL.md` | 376 |
-| 技能 | `income-method` | `skills/income-method/SKILL.md` | 387 |
-| 技能 | `cost-method` | `skills/cost-method/SKILL.md` | 370 |
-| 技能 | `hypothetical-dev-method` | `skills/hypothetical-dev-method/SKILL.md` | 390 |
-| 技能 | `appraisal-report` | `skills/appraisal-report/SKILL.md` | 748 |
+| 技能 | `comps-method` | `skills/comps-method/SKILL.md` | 434 |
+| 技能 | `income-method` | `skills/income-method/SKILL.md` | 436 |
+| 技能 | `cost-method` | `skills/cost-method/SKILL.md` | 424 |
+| 技能 | `hypothetical-dev-method` | `skills/hypothetical-dev-method/SKILL.md` | 439 |
+| 技能 | `appraisal-report` | `skills/appraisal-report/SKILL.md` | 838 |
 | 专家 | `re-appraisal-expert` | `experts/re-appraisal-expert/` | 202 |
 | 报告 | 测试案例 | `outputs/武汉洪山住宅_抵押估价报告.md` | 697 |
 | 文档 | README | `README.md` | — |
@@ -212,7 +212,7 @@ outputs/     ← 示例报告
 - **已定义** `schema/appraisal-result.schema.json`（JSON Schema draft 2020-12，394行）
 - 各方法技能新增「结构化输出」章节，输出符合 Schema 的 JSON 片段
 - 报告技能新增「结构化输入」章节，含组装流程 + 模板变量映射表 + 7项自动校验 + 降级策略
-- 完整示例：`schema/example-武汉洪山住宅.json`（基于测试案例）
+- 完整示例：`schema/example-武汉洪山住宅.json`（独立示例，非硬编码）
 - **端到端验证完成**（2026-08-08）：
   - Schema 修复 4 个缺陷：`sourceMode` 字段缺失、`crossMethodConsistency`/`weightSum` 未设为必需、缺 `additionalProperties: false`
   - 验证脚本 `scripts/validate_appraisal_json.py`：完整对象/单方法片段/降级模式三种入口
