@@ -13,7 +13,7 @@ validate_appraisal_json.py — 房地产估价 JSON Schema 验证工具
   python validate_appraisal_json.py --degraded path/to/result.json
 
   # 作为模块导入
-  from validate_appraisal_json import validate_full, validate_fragment, format_errors
+  from validate_appraisal_json import validate_full, validate_fragment, format_errors, detect_version
 """
 
 import json
@@ -22,7 +22,14 @@ from pathlib import Path
 
 import jsonschema
 
-SCHEMA_PATH = Path(__file__).parent.parent / "schema" / "appraisal-result.schema.json"
+SCHEMA_DIR = Path(__file__).parent.parent / "schema"
+SCHEMA_PATH = SCHEMA_DIR / "appraisal-result.schema.json"
+
+# 版本 → schema 路径映射
+VERSION_SCHEMA_MAP = {
+    "1.0": SCHEMA_DIR / "v1.0" / "appraisal-result.schema.json",
+    "1.1": SCHEMA_DIR / "v1.1" / "appraisal-result.schema.json",
+}
 
 # 方法片段 → schema 内的路径
 METHOD_FRAGMENTS = {
@@ -33,9 +40,28 @@ METHOD_FRAGMENTS = {
 }
 
 
-def _load_schema():
-    with open(SCHEMA_PATH, encoding="utf-8") as f:
+def _load_schema(version: str = None) -> dict:
+    """
+    加载指定版本的 schema。
+    version=None → 使用默认（最新）schema。
+    version="1.0" → 使用 v1.0 历史 schema（不可变）。
+    version="1.1" → 使用 v1.1 schema。
+    """
+    if version is None:
+        path = SCHEMA_PATH
+    else:
+        path = VERSION_SCHEMA_MAP.get(version, SCHEMA_PATH)
+    with open(path, encoding="utf-8") as f:
         return json.load(f)
+
+
+def detect_version(data: dict) -> str:
+    """
+    从数据中检测 schema 版本号。
+    返回 "1.0" / "1.1" / "unknown"。
+    """
+    v = data.get("schemaVersion", "unknown")
+    return v if v in VERSION_SCHEMA_MAP else "unknown"
 
 
 def _extract_subschema(schema, path):
@@ -46,13 +72,17 @@ def _extract_subschema(schema, path):
     return node
 
 
-def validate_full(data: dict) -> list:
+def validate_full(data: dict, version: str = None) -> list:
     """
     验证完整的 AppraisalCalculationResult 对象。
     返回错误列表，空列表=通过。
     启用 FormatChecker 以支持 format: "date" 等格式校验。
+
+    version: 指定 schema 版本（None = 自动检测，unknown = 使用默认最新 schema）。
     """
-    schema = _load_schema()
+    if version is None:
+        version = detect_version(data)
+    schema = _load_schema(version)
     validator = jsonschema.Draft202012Validator(
         schema,
         format_checker=jsonschema.FormatChecker(),
@@ -61,16 +91,19 @@ def validate_full(data: dict) -> list:
     return errors
 
 
-def validate_fragment(data: dict, method: str) -> list:
+def validate_fragment(data: dict, method: str, version: str = None) -> list:
     """
     验证单个方法片段（不含外层 project/property/result 等）。
     method: comps / income / cost / hypotheticalDev
+    version: 指定 schema 版本（None = 自动检测）。
     返回错误列表，空列表=通过。
     """
     if method not in METHOD_FRAGMENTS:
         raise ValueError(f"未知方法: {method}. 可选: {list(METHOD_FRAGMENTS)}")
 
-    schema = _load_schema()
+    if version is None:
+        version = detect_version(data) if isinstance(data, dict) else None
+    schema = _load_schema(version)
     subschema = _extract_subschema(schema, METHOD_FRAGMENTS[method])
 
     # type: ["object", "null"] — 如果 data 是 None，直接通过

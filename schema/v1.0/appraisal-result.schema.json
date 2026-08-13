@@ -1,0 +1,858 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sunhe-8922/real-estate-appraisal-toolchain/schema/v1.0/appraisal-result.schema.json",
+  "title": "AppraisalCalculationResult",
+  "description": "房地产估价测算结果标准格式（GB/T 50291-2015）。四大方法技能各输出自己部分，报告技能读取组装后的完整对象。",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "project",
+    "property",
+    "valuation",
+    "methods",
+    "result",
+    "crossMethodConsistency"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Schema 版本号，当前 1.0"
+    },
+    "sourceMode": {
+      "type": "string",
+      "enum": [
+        "json",
+        "naturalLanguage"
+      ],
+      "default": "json",
+      "description": "数据来源模式：json=各方法技能直接输出结构化JSON；naturalLanguage=从自然语言解析提取（降级模式，需在报告假设中声明）"
+    },
+    "project": {
+      "type": "object",
+      "description": "估价项目基本信息（对应报告封面 + 致函抬头）",
+      "required": [
+        "name",
+        "purpose",
+        "client",
+        "agency",
+        "appraiser",
+        "reportDate",
+        "reportNumber"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "估价项目名称"
+        },
+        "purpose": {
+          "type": "string",
+          "description": "估价目的（抵押/转让/征收/拍卖等）"
+        },
+        "client": {
+          "type": "string",
+          "description": "估价委托人"
+        },
+        "agency": {
+          "type": "string",
+          "description": "估价机构名称"
+        },
+        "appraiser": {
+          "type": "object",
+          "required": [
+            "name",
+            "registrationNumber"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "注册房地产估价师姓名"
+            },
+            "registrationNumber": {
+              "type": "string",
+              "description": "注册号"
+            }
+          }
+        },
+        "coAppraiser": {
+          "type": "object",
+          "description": "第二估价师（如有）",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "registrationNumber": {
+              "type": "string"
+            }
+          }
+        },
+        "reportDate": {
+          "type": "string",
+          "format": "date",
+          "description": "出具日期 YYYY-MM-DD"
+        },
+        "reportNumber": {
+          "type": "string",
+          "description": "估价报告编号"
+        }
+      }
+    },
+    "property": {
+      "type": "object",
+      "description": "估价对象基本信息 — 跨方法一致性校验基准。所有方法必须使用相同的 property 数据。",
+      "required": [
+        "area",
+        "usage",
+        "address",
+        "propertyType",
+        "completionYear",
+        "remainingUsefulLife",
+        "landUseRightYears"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "area": {
+          "type": "number",
+          "description": "建筑面积（m²）"
+        },
+        "usage": {
+          "type": "string",
+          "description": "用途（住宅/商业/办公/工业等）"
+        },
+        "address": {
+          "type": "string",
+          "description": "坐落地址"
+        },
+        "propertyType": {
+          "type": "string",
+          "description": "房地产类型（商品房/房改房/自建房等）"
+        },
+        "completionYear": {
+          "type": "integer",
+          "description": "建成年代（年份）"
+        },
+        "remainingUsefulLife": {
+          "type": "number",
+          "description": "剩余经济寿命（年）"
+        },
+        "landUseRightYears": {
+          "type": "number",
+          "description": "剩余土地使用权年限（年）"
+        },
+        "floor": {
+          "type": "string",
+          "description": "所在楼层/总楼层"
+        },
+        "orientation": {
+          "type": "string",
+          "description": "朝向"
+        },
+        "decoration": {
+          "type": "string",
+          "description": "装修标准"
+        },
+        "ownershipType": {
+          "type": "string",
+          "description": "权属类型（出让/划拨等）"
+        }
+      }
+    },
+    "valuation": {
+      "type": "object",
+      "description": "估价参数",
+      "required": [
+        "valueDate",
+        "valueType",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "valueDate": {
+          "type": "string",
+          "format": "date",
+          "description": "价值时点 YYYY-MM-DD"
+        },
+        "valueType": {
+          "type": "string",
+          "description": "价值类型（市场价值/抵押价值/快速变现价值等）"
+        },
+        "currency": {
+          "type": "string",
+          "const": "CNY",
+          "description": "币种：人民币"
+        }
+      }
+    },
+    "methods": {
+      "type": "object",
+      "description": "各方法测算结果。不使用的方法设为 null 并在 notApplicableReason 中说明。",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "comps": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "比较法结果（4.2节）",
+          "additionalProperties": false,
+          "required": [
+            "applicable",
+            "finalValue",
+            "weight",
+            "redLineChecks"
+          ],
+          "properties": {
+            "applicable": {
+              "type": "boolean",
+              "description": "是否选用比较法"
+            },
+            "notApplicableReason": {
+              "type": "string",
+              "description": "不适用的理由（applicable=false 时必填）"
+            },
+            "comparableInstances": {
+              "type": "array",
+              "minItems": 3,
+              "description": "可比实例列表（applicable=true 时必填，≥3个）",
+              "items": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "transactionDate",
+                  "transactionPrice",
+                  "unitPrice",
+                  "adjustedUnitPrice"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "可比实例名称/编号"
+                  },
+                  "location": {
+                    "type": "string",
+                    "description": "位置"
+                  },
+                  "area": {
+                    "type": "number",
+                    "description": "面积（m²）"
+                  },
+                  "transactionDate": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "成交日期"
+                  },
+                  "transactionPrice": {
+                    "type": "number",
+                    "description": "成交总价（元）"
+                  },
+                  "unitPrice": {
+                    "type": "number",
+                    "description": "成交单价（元/m²）"
+                  },
+                  "adjustments": {
+                    "type": "object",
+                    "description": "各项修正/调整系数",
+                    "properties": {
+                      "transactionSituation": {
+                        "type": "number",
+                        "description": "交易情况修正系数"
+                      },
+                      "marketCondition": {
+                        "type": "number",
+                        "description": "市场状况调整系数"
+                      },
+                      "location": {
+                        "type": "number",
+                        "description": "区位状况调整系数"
+                      },
+                      "physical": {
+                        "type": "number",
+                        "description": "实物状况调整系数"
+                      },
+                      "interest": {
+                        "type": "number",
+                        "description": "权益状况调整系数"
+                      }
+                    }
+                  },
+                  "adjustedUnitPrice": {
+                    "type": "number",
+                    "description": "修正调整后单价（元/m²）"
+                  },
+                  "sourceGrade": {
+                    "type": "string",
+                    "enum": [
+                      "T0",
+                      "T1",
+                      "T2"
+                    ],
+                    "description": "成交数据信源等级"
+                  }
+                }
+              }
+            },
+            "finalValue": {
+              "type": "object",
+              "description": "比较法最终估值",
+              "required": [
+                "total",
+                "unit"
+              ],
+              "properties": {
+                "total": {
+                  "type": "number",
+                  "description": "总价（元）"
+                },
+                "unit": {
+                  "type": "number",
+                  "description": "单价（元/m²）"
+                }
+              }
+            },
+            "weight": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "权重（0-1）"
+            },
+            "weightRationale": {
+              "type": "string",
+              "description": "权重分配理由"
+            },
+            "redLineChecks": {
+              "type": "array",
+              "minItems": 1,
+              "description": "比较法红线检查（至少一条）",
+              "items": {
+                "$ref": "#/$defs/redLineCheck"
+              }
+            }
+          }
+        },
+        "income": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "收益法结果（4.3节）",
+          "additionalProperties": false,
+          "required": [
+            "applicable",
+            "finalValue",
+            "weight",
+            "redLineChecks"
+          ],
+          "properties": {
+            "applicable": {
+              "type": "boolean"
+            },
+            "notApplicableReason": {
+              "type": "string"
+            },
+            "calculationMode": {
+              "type": "string",
+              "enum": [
+                "fullRemainingLife",
+                "holdAndResale",
+                "directCapitalization"
+              ],
+              "description": "计算模式：全剩余寿命折现 / 持有加转售 / 直接资本化"
+            },
+            "incomeType": {
+              "type": "string",
+              "enum": [
+                "rentalIncome",
+                "operatingIncome"
+              ],
+              "description": "收入类型：租赁收入法 / 经营收入法"
+            },
+            "netOperatingIncome": {
+              "type": "object",
+              "description": "净收益（有效毛收入 - 运营费用）",
+              "required": [
+                "annualAmount"
+              ],
+              "properties": {
+                "effectiveGrossIncome": {
+                  "type": "number",
+                  "description": "有效毛收入（元/年）"
+                },
+                "operatingExpenses": {
+                  "type": "number",
+                  "description": "运营费用（元/年）"
+                },
+                "annualAmount": {
+                  "type": "number",
+                  "description": "年净收益（元/年）"
+                },
+                "growthRate": {
+                  "type": "number",
+                  "description": "净收益年增长率 g（如适用）"
+                },
+                "historicalDataYears": {
+                  "type": "integer",
+                  "description": "历史数据调查年数（≥3）"
+                }
+              }
+            },
+            "rate": {
+              "type": "object",
+              "description": "报酬率或资本化率",
+              "required": [
+                "type",
+                "value"
+              ],
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "yieldRate",
+                    "capitalizationRate"
+                  ],
+                  "description": "报酬率 Y / 资本化率 R"
+                },
+                "value": {
+                  "type": "number",
+                  "description": "数值（小数，如 0.045 = 4.5%）"
+                },
+                "determinationMethod": {
+                  "type": "string",
+                  "description": "确定方法（市场提取/累加/投资收益率排序等）"
+                }
+              }
+            },
+            "holdingPeriod": {
+              "type": "integer",
+              "description": "持有期（年），仅 holdAndResale 模式"
+            },
+            "resaleValue": {
+              "type": "number",
+              "description": "期末转售价值（元），仅 holdAndResale 模式"
+            },
+            "finalValue": {
+              "type": "object",
+              "required": [
+                "total",
+                "unit"
+              ],
+              "properties": {
+                "total": {
+                  "type": "number"
+                },
+                "unit": {
+                  "type": "number"
+                }
+              }
+            },
+            "weight": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "weightRationale": {
+              "type": "string"
+            },
+            "redLineChecks": {
+              "type": "array",
+              "minItems": 1,
+              "description": "收益法红线检查（至少一条）",
+              "items": {
+                "$ref": "#/$defs/redLineCheck"
+              }
+            }
+          }
+        },
+        "cost": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "成本法结果（4.4节）",
+          "additionalProperties": false,
+          "required": [
+            "applicable",
+            "finalValue",
+            "weight",
+            "redLineChecks"
+          ],
+          "properties": {
+            "applicable": {
+              "type": "boolean"
+            },
+            "notApplicableReason": {
+              "type": "string"
+            },
+            "pathType": {
+              "type": "string",
+              "enum": [
+                "combined",
+                "separated"
+              ],
+              "description": "路径：房地合估 / 房地分估"
+            },
+            "costComponents": {
+              "type": "object",
+              "description": "7项必要支出（4.4.4条）",
+              "properties": {
+                "landCost": {
+                  "type": "number",
+                  "description": "土地取得成本（元）"
+                },
+                "constructionCost": {
+                  "type": "number",
+                  "description": "建设成本（元）"
+                },
+                "managementFee": {
+                  "type": "number",
+                  "description": "管理费用（元）"
+                },
+                "investmentInterest": {
+                  "type": "number",
+                  "description": "投资利息（元）"
+                },
+                "salesTax": {
+                  "type": "number",
+                  "description": "销售税费（元）"
+                },
+                "developerProfit": {
+                  "type": "number",
+                  "description": "开发利润（元）"
+                },
+                "other": {
+                  "type": "number",
+                  "description": "其他必要支出（元）"
+                }
+              }
+            },
+            "reproductionCost": {
+              "type": "number",
+              "description": "重置成本或重建成本（元）"
+            },
+            "depreciation": {
+              "type": "object",
+              "description": "折旧",
+              "properties": {
+                "method": {
+                  "type": "string",
+                  "enum": [
+                    "ageLife",
+                    "marketExtraction",
+                    "breakdown"
+                  ],
+                  "description": "折旧方法：年龄-寿命法 / 市场提取法 / 分解法"
+                },
+                "physical": {
+                  "type": "number",
+                  "description": "物质折旧（元）"
+                },
+                "functional": {
+                  "type": "number",
+                  "description": "功能折旧（元）"
+                },
+                "external": {
+                  "type": "number",
+                  "description": "外部折旧（元）"
+                },
+                "total": {
+                  "type": "number",
+                  "description": "折旧合计（元）"
+                }
+              }
+            },
+            "finalValue": {
+              "type": "object",
+              "required": [
+                "total",
+                "unit"
+              ],
+              "properties": {
+                "total": {
+                  "type": "number"
+                },
+                "unit": {
+                  "type": "number"
+                }
+              }
+            },
+            "weight": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "weightRationale": {
+              "type": "string"
+            },
+            "redLineChecks": {
+              "type": "array",
+              "minItems": 1,
+              "description": "成本法红线检查（至少一条）",
+              "items": {
+                "$ref": "#/$defs/redLineCheck"
+              }
+            }
+          }
+        },
+        "hypotheticalDev": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "假设开发法结果（4.5节）",
+          "additionalProperties": false,
+          "required": [
+            "applicable",
+            "finalValue",
+            "weight",
+            "redLineChecks"
+          ],
+          "properties": {
+            "applicable": {
+              "type": "boolean"
+            },
+            "notApplicableReason": {
+              "type": "string"
+            },
+            "analysisMethod": {
+              "type": "string",
+              "enum": [
+                "dynamic",
+                "static"
+              ],
+              "description": "分析法：动态（折现）/ 静态（计算利息和利润）"
+            },
+            "premise": {
+              "type": "string",
+              "enum": [
+                "ownerInitiated",
+                "voluntaryTransfer",
+                "forcedTransfer"
+              ],
+              "description": "估价前提：业主自行开发 / 自愿转让开发 / 被迫转让开发"
+            },
+            "developmentValue": {
+              "type": "number",
+              "description": "开发完成后价值（元）— 不得用成本法测算（4.5.7条红线）"
+            },
+            "subsequentCosts": {
+              "type": "object",
+              "description": "后续必要支出",
+              "properties": {
+                "construction": {
+                  "type": "number",
+                  "description": "续建成本（元）"
+                },
+                "management": {
+                  "type": "number",
+                  "description": "管理费用（元）"
+                },
+                "investmentInterest": {
+                  "type": "number",
+                  "description": "投资利息（元）— 仅静态法，动态法不另算"
+                },
+                "salesTax": {
+                  "type": "number",
+                  "description": "销售税费（元）"
+                },
+                "developerProfit": {
+                  "type": "number",
+                  "description": "开发利润（元）— 仅静态法，动态法不另算"
+                }
+              }
+            },
+            "discountRate": {
+              "type": "number",
+              "description": "折现率（小数）— 仅动态法"
+            },
+            "developmentPeriod": {
+              "type": "number",
+              "description": "后续开发经营期（年）"
+            },
+            "finalValue": {
+              "type": "object",
+              "required": [
+                "total",
+                "unit"
+              ],
+              "properties": {
+                "total": {
+                  "type": "number"
+                },
+                "unit": {
+                  "type": "number"
+                }
+              }
+            },
+            "weight": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "weightRationale": {
+              "type": "string"
+            },
+            "redLineChecks": {
+              "type": "array",
+              "minItems": 1,
+              "description": "假设开发法红线检查（至少一条）",
+              "items": {
+                "$ref": "#/$defs/redLineCheck"
+              }
+            }
+          }
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "description": "估价结果汇总（7.0.15条 结果确定）",
+      "required": [
+        "finalTotalValue",
+        "finalUnitValue",
+        "determinationMethod",
+        "weightAllocation",
+        "weightSum"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "finalTotalValue": {
+          "type": "number",
+          "description": "最终估价结果总价（元）"
+        },
+        "finalUnitValue": {
+          "type": "number",
+          "description": "最终估价结果单价（元/m²）"
+        },
+        "finalTotalValueInWords": {
+          "type": "string",
+          "description": "总价大写"
+        },
+        "determinationMethod": {
+          "type": "string",
+          "description": "结果确定方式（加权平均/简单算术平均/以某方法为主等）"
+        },
+        "weightAllocation": {
+          "type": "object",
+          "description": "权重分配表",
+          "properties": {
+            "comps": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "income": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "cost": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "hypotheticalDev": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        },
+        "weightSum": {
+          "type": "number",
+          "const": 1.0,
+          "description": "权重合计必须等于 1.0"
+        },
+        "crossMethodDifference": {
+          "type": "object",
+          "description": "各方法结果差异分析",
+          "properties": {
+            "maxValue": {
+              "type": "number",
+              "description": "最高估值（元）"
+            },
+            "minValue": {
+              "type": "number",
+              "description": "最低估值（元）"
+            },
+            "ratio": {
+              "type": "number",
+              "description": "最高/最低比值"
+            },
+            "analysis": {
+              "type": "string",
+              "description": "差异原因分析"
+            }
+          }
+        }
+      }
+    },
+    "crossMethodConsistency": {
+      "type": "array",
+      "description": "跨方法数据一致性检查（每项必须通过）",
+      "items": {
+        "type": "object",
+        "required": [
+          "checkItem",
+          "passed"
+        ],
+        "properties": {
+          "checkItem": {
+            "type": "string",
+            "enum": [
+              "area",
+              "usage",
+              "valueDate",
+              "propertyType",
+              "remainingYears",
+              "landUseRight",
+              "rate"
+            ],
+            "description": "检查项：面积/用途/时点/类型/剩余年限/土地使用权/报酬率"
+          },
+          "passed": {
+            "type": "boolean",
+            "description": "是否一致"
+          },
+          "detail": {
+            "type": "string",
+            "description": "不一致时的详情说明"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "redLineCheck": {
+      "type": "object",
+      "description": "单条红线检查结果",
+      "required": [
+        "rule",
+        "passed"
+      ],
+      "properties": {
+        "rule": {
+          "type": "string",
+          "description": "红线规则名称"
+        },
+        "threshold": {
+          "type": "string",
+          "description": "阈值描述（如 ≥3 / ≤20% / ≤1.2）"
+        },
+        "actualValue": {
+          "type": "string",
+          "description": "实际值"
+        },
+        "passed": {
+          "type": "boolean",
+          "description": "是否通过"
+        },
+        "explanation": {
+          "type": "string",
+          "description": "超标时的说明和理由"
+        }
+      }
+    }
+  }
+}
