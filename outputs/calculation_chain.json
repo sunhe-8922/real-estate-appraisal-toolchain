@@ -1,0 +1,110 @@
+{
+  "version": "1.2",
+  "nodes": [
+    {
+      "id": "comps.adjustedUnitPrice.instance1",
+      "target": "methods.comps.comparableInstances[0].adjustedUnitPrice",
+      "formula": "=ROUND({{unitPrice}}*{{txAdj}}*{{mktAdj}}*100/(SUM({{locFactors0}})-1100)*100/(SUM({{intFactors0}})-400)*100/(SUM({{phyFactors0}})-700),0)",
+      "refs": {
+        "locFactors0": "methods.comps.comparableInstances[0].adjustments.locationDetails",
+        "intFactors0": "methods.comps.comparableInstances[0].adjustments.interestDetails",
+        "phyFactors0": "methods.comps.comparableInstances[0].adjustments.physicalDetails",
+        "txAdj": "methods.comps.comparableInstances[0].adjustments.transactionSituation",
+        "mktAdj": "methods.comps.comparableInstances[0].adjustments.marketCondition",
+        "unitPrice": "methods.comps.comparableInstances[0].unitPrice"
+      },
+      "excelSource": "市场价比较法!T32",
+      "description": "比准单价（实例1）= 成交单价 × 交易情况 × 市场状况 × 区位偏差合并 × 权益偏差合并 × 实物偏差合并。子项合并为偏差加总法：系数=100/(100+Σ(f-100))，Excel 展开式 100/(Σf-(n-1)*100)。"
+    },
+    {
+      "id": "comps.adjustedUnitPrice.instance2",
+      "target": "methods.comps.comparableInstances[1].adjustedUnitPrice",
+      "formula": "=ROUND({{unitPrice}}*{{txAdj}}*{{mktAdj}}*100/(SUM({{locFactors1}})-1100)*100/(SUM({{intFactors1}})-400)*100/(SUM({{phyFactors1}})-700),0)",
+      "refs": {
+        "locFactors1": "methods.comps.comparableInstances[1].adjustments.locationDetails",
+        "intFactors1": "methods.comps.comparableInstances[1].adjustments.interestDetails",
+        "phyFactors1": "methods.comps.comparableInstances[1].adjustments.physicalDetails",
+        "txAdj": "methods.comps.comparableInstances[1].adjustments.transactionSituation",
+        "mktAdj": "methods.comps.comparableInstances[1].adjustments.marketCondition",
+        "unitPrice": "methods.comps.comparableInstances[1].unitPrice"
+      },
+      "excelSource": "市场价比较法!W32",
+      "description": "比准单价（实例2），同上结构"
+    },
+    {
+      "id": "comps.adjustedUnitPrice.instance3",
+      "target": "methods.comps.comparableInstances[2].adjustedUnitPrice",
+      "formula": "=ROUND({{unitPrice}}*{{txAdj}}*{{mktAdj}}*100/(SUM({{locFactors2}})-1100)*100/(SUM({{intFactors2}})-400)*100/(SUM({{phyFactors2}})-700),0)",
+      "refs": {
+        "locFactors2": "methods.comps.comparableInstances[2].adjustments.locationDetails",
+        "intFactors2": "methods.comps.comparableInstances[2].adjustments.interestDetails",
+        "phyFactors2": "methods.comps.comparableInstances[2].adjustments.physicalDetails",
+        "txAdj": "methods.comps.comparableInstances[2].adjustments.transactionSituation",
+        "mktAdj": "methods.comps.comparableInstances[2].adjustments.marketCondition",
+        "unitPrice": "methods.comps.comparableInstances[2].unitPrice"
+      },
+      "excelSource": "市场价比较法!Z32",
+      "description": "比准单价（实例3），同上结构"
+    },
+    {
+      "id": "comps.finalUnitPrice",
+      "target": "methods.comps.finalValue.unit",
+      "formula": "ROUND(({{adjPrice0}}*0.5+{{adjPrice1}}*0.3+{{adjPrice2}}*0.2),-1)",
+      "refs": {
+        "adjPrice0": "methods.comps.comparableInstances[0].adjustedUnitPrice",
+        "adjPrice1": "methods.comps.comparableInstances[1].adjustedUnitPrice",
+        "adjPrice2": "methods.comps.comparableInstances[2].adjustedUnitPrice"
+      },
+      "excelSource": "市场价比较法!T34",
+      "description": "比准单价加权平均 = 实例1×0.5 + 实例2×0.3 + 实例3×0.2，四舍五入到十位。权重为模板常量 0.5/0.3/0.2（Excel T33/W33/Z33 数值单元格）。"
+    },
+    {
+      "id": "income.noi",
+      "target": "methods.income.netOperatingIncome.annualAmount",
+      "formula": "={{egi}}-{{oe}}",
+      "refs": {
+        "egi": "methods.income.netOperatingIncome.effectiveGrossIncome",
+        "oe": "methods.income.netOperatingIncome.operatingExpenses"
+      },
+      "excelSource": "住宅-收益法测算!G4",
+      "description": "年净收益 = 有效毛收入 − 运营费用"
+    },
+    {
+      "id": "income.value",
+      "target": "methods.income.finalValue.total",
+      "formula": "=ROUND(({{noi}}/({{rate}}-{{growth}})*(1-((1+{{growth}})/(1+{{rate}}))^{{forwardPeriod}})+({{noi}}*(1+{{growth}})^({{forwardPeriod}}-1))/{{rate}}/(1+{{rate}})^{{forwardPeriod}}*(1-1/(1+{{rate}})^G23)),-1)",
+      "refs": {
+        "noi": "methods.income.netOperatingIncome.annualAmount",
+        "rate": "methods.income.rate.value",
+        "growth": "methods.income.netOperatingIncome.growthRate",
+        "forwardPeriod": "methods.income.holdingPeriod"
+      },
+      "excelSource": "住宅-收益法测算!G27",
+      "description": "收益价值（报酬资本化分段折现：前 forwardPeriod 年递增折现 + 剩余年限折现）。G23（剩余年限 = 收益期−前段）为 Excel 局部中间量，schema 无对应字段，cells 重建时还原为 G23 引用。"
+    },
+    {
+      "id": "result.finalTotalValue",
+      "target": "result.finalTotalValue",
+      "formula": "=ROUND(+{{incomeValue}}*{{incomeWeight}}+{{compsValue}}*{{compsWeight}},-1)",
+      "refs": {
+        "incomeValue": "methods.income.finalValue.total",
+        "incomeWeight": "result.weightAllocation.income",
+        "compsValue": "methods.comps.finalValue.total",
+        "compsWeight": "result.weightAllocation.comps"
+      },
+      "excelSource": "住宅-收益法测算!J29",
+      "description": "最终结果 = 收益价值 × 收益权重 + 比较法价值 × 比较权重（四舍五入到十位）"
+    },
+    {
+      "id": "result.totalValue",
+      "target": "result.finalTotalValue",
+      "formula": "ROUND({{area}}*{{unitValue}},0)",
+      "refs": {
+        "area": "property.area",
+        "unitValue": "result.finalUnitValue"
+      },
+      "excelSource": "评估明细表!O6",
+      "description": "评估总价 = 面积 × 单价（四舍五入到元）"
+    }
+  ]
+}

@@ -1,0 +1,434 @@
+{
+  "project": {
+    "client": "XX投资有限公司",
+    "agency": "XX土地房地产与资产评估有限公司",
+    "appraiser": {
+      "name": "评估师A、评估师B"
+    },
+    "reportDate": "2028-08-11"
+  },
+  "property": {
+    "area": 580,
+    "usage": "成套住宅",
+    "address": "XX市XX区XX路XX号XX小区XX栋XX房",
+    "completionYear": 2011,
+    "floor": "第1-5层/钢混5层",
+    "decoration": "精致",
+    "orientation": "南",
+    "_remainingUsefulLife_formula": "==J8-J10",
+    "_landUseRightYears_formula": "==ROUND((J5-J4)/365,2)"
+  },
+  "valuation": {
+    "valueDate": "2017-05-24",
+    "currency": "CNY"
+  },
+  "methods": {
+    "comps": {
+      "applicable": true,
+      "comparableInstances": [
+        {
+          "name": "可比实例1",
+          "location": "XX苑住宅",
+          "area": 450,
+          "unitPrice": 31000,
+          "transactionPrice": 13950000,
+          "transactionDate": "2017-03-27",
+          "adjustments": {
+            "transactionSituation": 1.0,
+            "marketCondition": 1.0,
+            "location": 1.0,
+            "physical": 1.204819,
+            "interest": 1.0,
+            "locationDetails": [
+              {
+                "name": "距香洲区政府约11公里，位置较好。",
+                "factor": 100
+              },
+              {
+                "name": "临近干道XX大道",
+                "factor": 100
+              },
+              {
+                "name": "南北向",
+                "factor": 100
+              },
+              {
+                "name": "共5层/位于第1-5层",
+                "factor": 100
+              },
+              {
+                "name": "临近干道XX大道，道路通达度较好",
+                "factor": 100
+              },
+              {
+                "name": "距离“XX站”公交站约500米，附近有K1路、10A路、69路、3A路、3路等多数公交线路，公共交通便利度较好",
+                "factor": 100
+              },
+              {
+                "name": "设地上及地下停车场，车位数量较多，停车便利程度较好",
+                "factor": 100
+              },
+              {
+                "name": "无特别交通管制",
+                "factor": 100
+              },
+              {
+                "name": "已达到“五通”一平，基础设施完善",
+                "factor": 100
+              },
+              {
+                "name": "周围公共、生活配套设施齐全，附近有XX幼儿园、XX小学及幼儿园、XX超市、XX森林公园等，生活便利度较好。",
+                "factor": 100
+              },
+              {
+                "name": "自然环境、人文环境良好。",
+                "factor": 100
+              },
+              {
+                "name": "小区园景",
+                "factor": 100
+              }
+            ],
+            "physicalDetails": [
+              {
+                "name": "==评估明细表!M8",
+                "factor": 100
+              },
+              {
+                "name": "外观档次较高档",
+                "factor": 100
+              },
+              {
+                "name": "钢混结构",
+                "factor": 100
+              },
+              {
+                "name": "1部电梯，水、电、消防设施齐备",
+                "factor": 95
+              },
+              {
+                "name": "精装",
+                "factor": 90
+              },
+              {
+                "name": "建筑性能较好",
+                "factor": 100
+              },
+              {
+                "name": "双拼别墅，空间布局合理",
+                "factor": 95
+              },
+              {
+                "name": "建成于2011年7月",
+                "factor": 103
+              }
+            ],
+            "interestDetails": [
+              {
+                "name": "住宅",
+                "factor": 100
+              },
+              {
+                "name": "权益2",
+                "factor": 100
+              },
+              {
+                "name": "权益3",
+                "factor": 100
+              },
+              {
+                "name": "无限制",
+                "factor": 100
+              },
+              {
+                "name": "物业管理良好",
+                "factor": 100
+              }
+            ]
+          },
+          "adjustedUnitPrice_formula": "==ROUND(T4*T5/V5*T6/V6*100/(V7+V8+V9+V10+V11+V12+V13+V14+V15+V16+V17+V18-1100)*100/(V19+V20+V21+V22+V23-400)*100/(V24+V25+V26+V27+V28+V29+V30+V31-700),0)"
+        },
+        {
+          "name": "可比实例2",
+          "location": "XX湾山庄住宅",
+          "area": 200,
+          "unitPrice": 30000,
+          "transactionPrice": 6000000,
+          "transactionDate": "2017-05-06",
+          "adjustments": {
+            "transactionSituation": 1.0,
+            "marketCondition": 1.0,
+            "location": 1.0,
+            "physical": 1.282051,
+            "interest": 1.0,
+            "locationDetails": [
+              {
+                "name": "距香洲区政府约11公里，位置较好。",
+                "factor": 100
+              },
+              {
+                "name": "临近干道XX大道",
+                "factor": 100
+              },
+              {
+                "name": "南北向",
+                "factor": 100
+              },
+              {
+                "name": "共5层/位于第1-5层",
+                "factor": 100
+              },
+              {
+                "name": "临近干道XX大道，道路通达度较好",
+                "factor": 100
+              },
+              {
+                "name": "距离“XX站”公交站约500米，附近有K1路、10A路、69路、3A路、3路等多数公交线路，公共交通便利度较好",
+                "factor": 100
+              },
+              {
+                "name": "设地上及地下停车场，车位数量较多，停车便利程度较好",
+                "factor": 100
+              },
+              {
+                "name": "无特别交通管制",
+                "factor": 100
+              },
+              {
+                "name": "已达到“五通”一平，基础设施完善",
+                "factor": 100
+              },
+              {
+                "name": "周围公共、生活配套设施齐全，附近有XX幼儿园、XX小学及幼儿园、XX超市、XX森林公园等，生活便利度较好。",
+                "factor": 100
+              },
+              {
+                "name": "自然环境、人文环境良好。",
+                "factor": 100
+              },
+              {
+                "name": "小区园景",
+                "factor": 100
+              }
+            ],
+            "physicalDetails": [
+              {
+                "name": "==评估明细表!M8",
+                "factor": 100
+              },
+              {
+                "name": "外观档次较高档",
+                "factor": 100
+              },
+              {
+                "name": "钢混结构",
+                "factor": 100
+              },
+              {
+                "name": "1部电梯，水、电、消防设施齐备",
+                "factor": 95
+              },
+              {
+                "name": "精装",
+                "factor": 90
+              },
+              {
+                "name": "建筑性能较好",
+                "factor": 100
+              },
+              {
+                "name": "双拼别墅，空间布局合理",
+                "factor": 100
+              },
+              {
+                "name": "建成于2011年7月",
+                "factor": 93
+              }
+            ],
+            "interestDetails": [
+              {
+                "name": "住宅",
+                "factor": 100
+              },
+              {
+                "name": "权益2",
+                "factor": 100
+              },
+              {
+                "name": "权益3",
+                "factor": 100
+              },
+              {
+                "name": "无限制",
+                "factor": 100
+              },
+              {
+                "name": "物业管理良好",
+                "factor": 100
+              }
+            ]
+          },
+          "adjustedUnitPrice_formula": "==ROUND(W4*W5/Y5*W6/Y6*100/(Y7+Y8+Y9+Y10+Y11+Y12+Y13+Y14+Y15+Y16+Y17+Y18-1100)*100/(Y19+Y20+Y21+Y22+Y23-400)*100/(Y24+Y25+Y26+Y27+Y28+Y29+Y30+Y31-700),0)"
+        },
+        {
+          "name": "可比实例3",
+          "location": "XX市XX路XX山庄XX栋别墅",
+          "area": 270,
+          "unitPrice": 28000,
+          "transactionPrice": 7560000,
+          "transactionDate": "2016-11-15",
+          "adjustments": {
+            "transactionSituation": 1.176471,
+            "marketCondition": 1.0,
+            "location": 1.0,
+            "physical": 1.149425,
+            "interest": 1.0,
+            "locationDetails": [
+              {
+                "name": "距香洲区政府约11公里，位置较好。",
+                "factor": 100
+              },
+              {
+                "name": "临近干道XX大道",
+                "factor": 100
+              },
+              {
+                "name": "南北向",
+                "factor": 100
+              },
+              {
+                "name": "共5层/位于第1-5层",
+                "factor": 100
+              },
+              {
+                "name": "临近干道XX大道，道路通达度较好",
+                "factor": 100
+              },
+              {
+                "name": "距离“XX站”公交站约500米，附近有K1路、10A路、69路、3A路、3路等多数公交线路，公共交通便利度较好",
+                "factor": 100
+              },
+              {
+                "name": "设地上及地下停车场，车位数量较多，停车便利程度较好",
+                "factor": 100
+              },
+              {
+                "name": "无特别交通管制",
+                "factor": 100
+              },
+              {
+                "name": "已达到“五通”一平，基础设施完善",
+                "factor": 100
+              },
+              {
+                "name": "周围公共、生活配套设施齐全，附近有XX幼儿园、XX小学及幼儿园、XX超市、XX森林公园等，生活便利度较好。",
+                "factor": 100
+              },
+              {
+                "name": "自然环境、人文环境良好。",
+                "factor": 100
+              },
+              {
+                "name": "小区园景",
+                "factor": 100
+              }
+            ],
+            "physicalDetails": [
+              {
+                "name": "==评估明细表!M8",
+                "factor": 100
+              },
+              {
+                "name": "外观档次较高档",
+                "factor": 95
+              },
+              {
+                "name": "钢混结构",
+                "factor": 100
+              },
+              {
+                "name": "1部电梯，水、电、消防设施齐备",
+                "factor": 95
+              },
+              {
+                "name": "精装",
+                "factor": 93
+              },
+              {
+                "name": "建筑性能较好",
+                "factor": 100
+              },
+              {
+                "name": "双拼别墅，空间布局合理",
+                "factor": 115
+              },
+              {
+                "name": "建成于2011年7月",
+                "factor": 89
+              }
+            ],
+            "interestDetails": [
+              {
+                "name": "住宅",
+                "factor": 100
+              },
+              {
+                "name": "权益2",
+                "factor": 100
+              },
+              {
+                "name": "权益3",
+                "factor": 100
+              },
+              {
+                "name": "无限制",
+                "factor": 100
+              },
+              {
+                "name": "物业管理良好",
+                "factor": 100
+              }
+            ]
+          },
+          "adjustedUnitPrice_formula": "==ROUND(Z4*Z5/AB5*Z6/AB6*100/(AB7+AB8+AB9+AB10+AB11+AB12+AB13+AB14+AB15+AB16+AB17+AB18-1100)*100/(AB19+AB20+AB21+AB22+AB23-400)*100/(AB24+AB25+AB26+AB27+AB28+AB29+AB30+AB31-700),0)"
+        }
+      ],
+      "finalValue": {
+        "unit_formula": "==ROUND((T32*T33+W32*W33+Z32*Z33),-1)",
+        "total_formula": "=T34 * 评估明细表!M6"
+      },
+      "weight": [
+        0.5,
+        0.3,
+        0.2
+      ],
+      "_weight_note": "权重在 T33/W33/Z33，方法间权重在 住宅-收益法!I27/I28"
+    },
+    "income": {
+      "applicable": true,
+      "calculationMode": "fullRemainingLife",
+      "incomeType": "rentalIncome",
+      "netOperatingIncome": {
+        "effectiveGrossIncome_formula": "==G6*(1-G9)*(1-G10)",
+        "operatingExpenses_formula": "==SUM(G12:G20)",
+        "annualAmount_formula": "==G5-G11",
+        "growthRate": 0.015
+      },
+      "rate": {
+        "type": "yieldRate",
+        "value_formula": "==+'住宅-收益率'!O14",
+        "determinationMethod": "累加法（安全利率+风险补偿+管理负担补偿）"
+      },
+      "finalValue": {
+        "unit_formula": "==ROUND((G4/(G24-G25)*(1-((1+G25)/(1+G24))^G26)+(G4*(1+G25)^(G26-1))/G24/(1+G24)^G26*(1-1/(1+G24)^G23)),-1)"
+      }
+    },
+    "cost": null,
+    "hypotheticalDev": null
+  },
+  "result": {
+    "finalUnitValue": 38000,
+    "finalTotalValue_formula": "==ROUND(M6*N6,0)"
+  },
+  "crossMethodConsistency": []
+}

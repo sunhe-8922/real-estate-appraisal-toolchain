@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0",
+  "schemaVersion": "1.2",
   "sourceMode": "naturalLanguage",
   "project": {
     "name": "武昌区中南路某写字楼抵押估价",
@@ -14,7 +14,7 @@
     "reportNumber": "××房估字〔2026〕第0820号"
   },
   "property": {
-    "area": 500.00,
+    "area": 500.0,
     "usage": "办公",
     "address": "武汉市武昌区中南路××大厦12层",
     "propertyType": "写字楼",
@@ -36,16 +36,16 @@
         {
           "name": "可比实例A",
           "location": "武昌区中南路",
-          "area": 480.00,
+          "area": 480.0,
           "transactionDate": "2026-05-01",
           "transactionPrice": 12000000,
           "unitPrice": 25000,
           "adjustments": {
-            "transactionSituation": 1.00,
+            "transactionSituation": 1.0,
             "marketCondition": 1.02,
             "location": 0.98,
-            "physical": 1.00,
-            "interest": 1.00
+            "physical": 1.0,
+            "interest": 1.0
           },
           "adjustedUnitPrice": 24990,
           "sourceGrade": "T2"
@@ -53,16 +53,16 @@
         {
           "name": "可比实例B",
           "location": "武昌区中南路",
-          "area": 510.00,
+          "area": 510.0,
           "transactionDate": "2026-06-15",
           "transactionPrice": 13260000,
           "unitPrice": 26000,
           "adjustments": {
-            "transactionSituation": 1.00,
+            "transactionSituation": 1.0,
             "marketCondition": 1.01,
-            "location": 1.00,
+            "location": 1.0,
             "physical": 0.97,
-            "interest": 1.00
+            "interest": 1.0
           },
           "adjustedUnitPrice": 25522,
           "sourceGrade": "T2"
@@ -70,30 +70,63 @@
         {
           "name": "可比实例C",
           "location": "武昌区中南路",
-          "area": 495.00,
+          "area": 495.0,
           "transactionDate": "2026-07-01",
           "transactionPrice": 12375000,
           "unitPrice": 25000,
           "adjustments": {
-            "transactionSituation": 1.00,
-            "marketCondition": 1.00,
+            "transactionSituation": 1.0,
+            "marketCondition": 1.0,
             "location": 0.99,
             "physical": 1.02,
-            "interest": 1.00
+            "interest": 1.0
           },
           "adjustedUnitPrice": 25245,
           "sourceGrade": "T2"
         }
       ],
-      "finalValue": { "total": 12650000, "unit": 25300 },
+      "finalValue": {
+        "total": 12650000,
+        "unit": 25300
+      },
       "weight": 0.6,
       "weightRationale": "写字楼交易活跃，比较法为主。注意：sourceGrade=T2，数据来自中介报价未经交叉验证",
       "redLineChecks": [
-        { "rule": "可比实例数量", "threshold": "≥3个", "actualValue": "3个", "passed": true, "explanation": "" },
-        { "rule": "成交距价值时点", "threshold": "≤2年", "actualValue": "最远92天", "passed": true, "explanation": "" },
-        { "rule": "单项修正幅度", "threshold": "≤20%", "actualValue": "最大3%（实物状况）", "passed": true, "explanation": "" },
-        { "rule": "综合修正幅度", "threshold": "≤30%", "actualValue": "最大2.1%", "passed": true, "explanation": "" },
-        { "rule": "最高价/最低价比", "threshold": "≤1.2", "actualValue": "1.018", "passed": true, "explanation": "" }
+        {
+          "rule": "可比实例数量",
+          "threshold": "≥3个",
+          "actualValue": "3个",
+          "passed": true,
+          "explanation": ""
+        },
+        {
+          "rule": "成交距价值时点",
+          "threshold": "≤2年",
+          "actualValue": "最远92天",
+          "passed": true,
+          "explanation": ""
+        },
+        {
+          "rule": "单项修正幅度",
+          "threshold": "≤20%",
+          "actualValue": "最大3%（实物状况）",
+          "passed": true,
+          "explanation": ""
+        },
+        {
+          "rule": "综合修正幅度",
+          "threshold": "≤30%",
+          "actualValue": "最大2.1%",
+          "passed": true,
+          "explanation": ""
+        },
+        {
+          "rule": "最高价/最低价比",
+          "threshold": "≤1.2",
+          "actualValue": "1.018",
+          "passed": true,
+          "explanation": ""
+        }
       ]
     },
     "income": {
@@ -111,12 +144,27 @@
         "value": 0.095,
         "determinationMethod": "市场提取法"
       },
-      "finalValue": { "total": 12631579, "unit": 25263 },
+      "finalValue": {
+        "total": 12631579,
+        "unit": 25263
+      },
       "weight": 0.4,
       "weightRationale": "写字楼有稳定租金收益，收益法辅助验证",
       "redLineChecks": [
-        { "rule": "历史数据调查年数", "threshold": "≥3年", "actualValue": "3年", "passed": true, "explanation": "" },
-        { "rule": "净收益客观性", "threshold": "取正常客观值", "actualValue": "已扣空置+运营费用", "passed": true, "explanation": "" }
+        {
+          "rule": "历史数据调查年数",
+          "threshold": "≥3年",
+          "actualValue": "3年",
+          "passed": true,
+          "explanation": ""
+        },
+        {
+          "rule": "净收益客观性",
+          "threshold": "取正常客观值",
+          "actualValue": "已扣空置+运营费用",
+          "passed": true,
+          "explanation": ""
+        }
       ]
     },
     "cost": null,
@@ -142,12 +190,40 @@
     }
   },
   "crossMethodConsistency": [
-    { "checkItem": "area", "passed": true, "detail": "两方法均使用 500.00 m²" },
-    { "checkItem": "usage", "passed": true, "detail": "两方法均为办公用途" },
-    { "checkItem": "valueDate", "passed": true, "detail": "两方法价值时点均为 2026-08-01" },
-    { "checkItem": "propertyType", "passed": true, "detail": "两方法均为写字楼" },
-    { "checkItem": "remainingYears", "passed": true, "detail": "两方法均使用 39.0 年剩余经济寿命" },
-    { "checkItem": "landUseRight", "passed": true, "detail": "两方法均使用 34.5 年剩余土地使用权" },
-    { "checkItem": "rate", "passed": true, "detail": "比较法不涉及报酬率；收益法资本化率9.5%" }
+    {
+      "checkItem": "area",
+      "passed": true,
+      "detail": "两方法均使用 500.00 m²"
+    },
+    {
+      "checkItem": "usage",
+      "passed": true,
+      "detail": "两方法均为办公用途"
+    },
+    {
+      "checkItem": "valueDate",
+      "passed": true,
+      "detail": "两方法价值时点均为 2026-08-01"
+    },
+    {
+      "checkItem": "propertyType",
+      "passed": true,
+      "detail": "两方法均为写字楼"
+    },
+    {
+      "checkItem": "remainingYears",
+      "passed": true,
+      "detail": "两方法均使用 39.0 年剩余经济寿命"
+    },
+    {
+      "checkItem": "landUseRight",
+      "passed": true,
+      "detail": "两方法均使用 34.5 年剩余土地使用权"
+    },
+    {
+      "checkItem": "rate",
+      "passed": true,
+      "detail": "比较法不涉及报酬率；收益法资本化率9.5%"
+    }
   ]
 }

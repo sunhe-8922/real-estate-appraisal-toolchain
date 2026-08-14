@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0",
+  "schemaVersion": "1.2",
   "sourceMode": "json",
   "project": {
     "name": "武汉市洪山区珞狮路某小区3栋2单元1804室住宅房地产抵押估价",
@@ -17,9 +17,8 @@
     "reportDate": "2026-08-03",
     "reportNumber": "××房估字〔2026〕第0817号"
   },
-
   "property": {
-    "area": 128.50,
+    "area": 128.5,
     "usage": "住宅",
     "address": "武汉市洪山区珞狮路某小区3栋2单元1804室",
     "propertyType": "商品房",
@@ -31,13 +30,11 @@
     "decoration": "精装修",
     "ownershipType": "出让"
   },
-
   "valuation": {
     "valueDate": "2026-08-01",
     "valueType": "抵押价值（等于市场价值）",
     "currency": "CNY"
   },
-
   "methods": {
     "comps": {
       "applicable": true,
@@ -45,58 +42,151 @@
         {
           "name": "可比实例A — 珞狮路1号小区",
           "location": "洪山区珞狮路",
-          "area": 125.00,
+          "area": 125.0,
           "transactionDate": "2026-05-15",
           "transactionPrice": 3125000,
           "unitPrice": 25000,
           "adjustments": {
-            "transactionSituation": 1.00,
+            "transactionSituation": 1.0,
             "marketCondition": 1.02,
-            "location": 0.98,
-            "physical": 1.03,
-            "interest": 1.00
+            "location": 0.980392,
+            "physical": 1.030928,
+            "interest": 1.0,
+            "locationDetails": [
+              { "name": "与有关重要场所的距离", "factor": 102 },
+              { "name": "临街（路、巷）状况", "factor": 100 },
+              { "name": "朝向", "factor": 100 },
+              { "name": "楼层", "factor": 100 },
+              { "name": "道路状况", "factor": 100 },
+              { "name": "出入可用的公共交通工具及便利程度", "factor": 100 },
+              { "name": "停车便利程度", "factor": 100 },
+              { "name": "交通管理情况", "factor": 100 },
+              { "name": "基础设施", "factor": 100 },
+              { "name": "公共服务设施", "factor": 100 },
+              { "name": "环境质量", "factor": 100 },
+              { "name": "景观", "factor": 100 }
+            ],
+            "interestDetails": [
+              { "name": "规划用途", "factor": 100 },
+              { "name": "土地使用年限", "factor": 100 },
+              { "name": "容积率", "factor": 100 },
+              { "name": "租约限制", "factor": 100 },
+              { "name": "物业管理状况", "factor": 100 }
+            ],
+            "physicalDetails": [
+              { "name": "建筑规模（㎡）", "factor": 97 },
+              { "name": "建筑外观", "factor": 100 },
+              { "name": "建筑结构", "factor": 100 },
+              { "name": "设施设备", "factor": 100 },
+              { "name": "装饰装修", "factor": 100 },
+              { "name": "建筑性能", "factor": 100 },
+              { "name": "空间布局", "factor": 100 },
+              { "name": "新旧程度", "factor": 100 }
+            ]
           },
-          "adjustedUnitPrice": 25096,
+          "adjustedUnitPrice": 25773,
           "sourceGrade": "T1"
         },
         {
           "name": "可比实例B — 珞狮路2号小区",
           "location": "洪山区珞狮路",
-          "area": 130.00,
+          "area": 130.0,
           "transactionDate": "2026-06-10",
           "transactionPrice": 3380000,
           "unitPrice": 26000,
           "adjustments": {
-            "transactionSituation": 1.00,
+            "transactionSituation": 1.0,
             "marketCondition": 1.01,
-            "location": 1.00,
-            "physical": 0.96,
-            "interest": 1.00
+            "location": 0.990099,
+            "physical": 0.980392,
+            "interest": 1.0,
+            "locationDetails": [
+              { "name": "与有关重要场所的距离", "factor": 101 },
+              { "name": "临街（路、巷）状况", "factor": 100 },
+              { "name": "朝向", "factor": 100 },
+              { "name": "楼层", "factor": 100 },
+              { "name": "道路状况", "factor": 100 },
+              { "name": "出入可用的公共交通工具及便利程度", "factor": 100 },
+              { "name": "停车便利程度", "factor": 100 },
+              { "name": "交通管理情况", "factor": 100 },
+              { "name": "基础设施", "factor": 100 },
+              { "name": "公共服务设施", "factor": 100 },
+              { "name": "环境质量", "factor": 100 },
+              { "name": "景观", "factor": 100 }
+            ],
+            "interestDetails": [
+              { "name": "规划用途", "factor": 100 },
+              { "name": "土地使用年限", "factor": 100 },
+              { "name": "容积率", "factor": 100 },
+              { "name": "租约限制", "factor": 100 },
+              { "name": "物业管理状况", "factor": 100 }
+            ],
+            "physicalDetails": [
+              { "name": "建筑规模（㎡）", "factor": 102 },
+              { "name": "建筑外观", "factor": 100 },
+              { "name": "建筑结构", "factor": 100 },
+              { "name": "设施设备", "factor": 100 },
+              { "name": "装饰装修", "factor": 100 },
+              { "name": "建筑性能", "factor": 100 },
+              { "name": "空间布局", "factor": 100 },
+              { "name": "新旧程度", "factor": 100 }
+            ]
           },
-          "adjustedUnitPrice": 25098,
+          "adjustedUnitPrice": 25490,
           "sourceGrade": "T1"
         },
         {
           "name": "可比实例C — 珞狮路3号小区",
           "location": "洪山区珞狮路",
-          "area": 127.00,
+          "area": 127.0,
           "transactionDate": "2026-06-20",
           "transactionPrice": 3238500,
           "unitPrice": 25500,
           "adjustments": {
-            "transactionSituation": 1.00,
-            "marketCondition": 1.00,
-            "location": 0.99,
-            "physical": 1.00,
-            "interest": 1.00
+            "transactionSituation": 1.0,
+            "marketCondition": 1.0,
+            "location": 1.020408,
+            "physical": 1.010101,
+            "interest": 1.0,
+            "locationDetails": [
+              { "name": "与有关重要场所的距离", "factor": 98 },
+              { "name": "临街（路、巷）状况", "factor": 100 },
+              { "name": "朝向", "factor": 100 },
+              { "name": "楼层", "factor": 100 },
+              { "name": "道路状况", "factor": 100 },
+              { "name": "出入可用的公共交通工具及便利程度", "factor": 100 },
+              { "name": "停车便利程度", "factor": 100 },
+              { "name": "交通管理情况", "factor": 100 },
+              { "name": "基础设施", "factor": 100 },
+              { "name": "公共服务设施", "factor": 100 },
+              { "name": "环境质量", "factor": 100 },
+              { "name": "景观", "factor": 100 }
+            ],
+            "interestDetails": [
+              { "name": "规划用途", "factor": 100 },
+              { "name": "土地使用年限", "factor": 100 },
+              { "name": "容积率", "factor": 100 },
+              { "name": "租约限制", "factor": 100 },
+              { "name": "物业管理状况", "factor": 100 }
+            ],
+            "physicalDetails": [
+              { "name": "建筑规模（㎡）", "factor": 99 },
+              { "name": "建筑外观", "factor": 100 },
+              { "name": "建筑结构", "factor": 100 },
+              { "name": "设施设备", "factor": 100 },
+              { "name": "装饰装修", "factor": 100 },
+              { "name": "建筑性能", "factor": 100 },
+              { "name": "空间布局", "factor": 100 },
+              { "name": "新旧程度", "factor": 100 }
+            ]
           },
-          "adjustedUnitPrice": 25245,
+          "adjustedUnitPrice": 26283,
           "sourceGrade": "T1"
         }
       ],
       "finalValue": {
-        "total": 3205000,
-        "unit": 24942
+        "total": 3314015,
+        "unit": 25790
       },
       "weight": 0.6,
       "weightRationale": "住宅交易活跃，可比实例成交时间近、修正幅度小，比较法结果最可靠",
@@ -118,27 +208,26 @@
         {
           "rule": "单项修正幅度",
           "threshold": "≤20%",
-          "actualValue": "最大4%（实物状况）",
+          "actualValue": "最大3.1%（实物状况）",
           "passed": true,
           "explanation": ""
         },
         {
           "rule": "综合修正幅度",
           "threshold": "≤30%",
-          "actualValue": "最大3.6%",
+          "actualValue": "最大3.1%",
           "passed": true,
           "explanation": ""
         },
         {
           "rule": "最高价/最低价比",
           "threshold": "≤1.2",
-          "actualValue": "25245/25096=1.006",
+          "actualValue": "26283/25490=1.031",
           "passed": true,
           "explanation": ""
         }
       ]
     },
-
     "income": {
       "applicable": true,
       "calculationMode": "directCapitalization",
@@ -177,15 +266,13 @@
         }
       ]
     },
-
     "cost": null,
     "hypotheticalDev": null
   },
-
   "result": {
-    "finalTotalValue": 3205000,
-    "finalUnitValue": 24942,
-    "finalTotalValueInWords": "人民币叁佰贰拾万零伍仟元整",
+    "finalTotalValue": 3271720,
+    "finalUnitValue": 25461,
+    "finalTotalValueInWords": "人民币叁佰贰拾柒万壹仟柒佰贰拾元整",
     "determinationMethod": "加权平均（比较法60% + 收益法40%）",
     "weightAllocation": {
       "comps": 0.6,
@@ -195,13 +282,12 @@
     },
     "weightSum": 1.0,
     "crossMethodDifference": {
-      "maxValue": 3208267,
-      "minValue": 3205000,
-      "ratio": 1.001,
-      "analysis": "两方法结果差异<0.1%，高度收敛。收益法直接资本化法结果略高于比较法，原因在于当前市场租金回报率偏低（1.5%），资本化率取值偏保守。报酬资本化法全剩余寿命模式（59.5年折现）测算结果约146万元，严重低估住宅资产价值，故不采用。"
+      "maxValue": 3314015,
+      "minValue": 3208267,
+      "ratio": 1.033,
+      "analysis": "两方法结果差异3.3%，收敛良好。收益法直接资本化法结果略低于比较法，原因在于当前市场租金回报率偏低（1.5%），资本化率取值偏保守。报酬资本化法全剩余寿命模式（59.5年折现）测算结果约146万元，严重低估住宅资产价值，故不采用。"
     }
   },
-
   "crossMethodConsistency": [
     {
       "checkItem": "area",
@@ -238,5 +324,115 @@
       "passed": true,
       "detail": "比较法不涉及报酬率；收益法资本化率1.5%，来源为市场提取法"
     }
-  ]
+  ],
+  "calculationChain": {
+    "version": "1.2",
+    "nodes": [
+      {
+        "id": "comps.adjustedUnitPrice.instance1",
+        "target": "methods.comps.comparableInstances[0].adjustedUnitPrice",
+        "formula": "=ROUND({{unitPrice}}*{{txAdj}}*{{mktAdj}}*100/(SUM({{locFactors0}})-1100)*100/(SUM({{intFactors0}})-400)*100/(SUM({{phyFactors0}})-700),0)",
+        "refs": {
+          "locFactors0": "methods.comps.comparableInstances[0].adjustments.locationDetails",
+          "intFactors0": "methods.comps.comparableInstances[0].adjustments.interestDetails",
+          "phyFactors0": "methods.comps.comparableInstances[0].adjustments.physicalDetails",
+          "txAdj": "methods.comps.comparableInstances[0].adjustments.transactionSituation",
+          "mktAdj": "methods.comps.comparableInstances[0].adjustments.marketCondition",
+          "unitPrice": "methods.comps.comparableInstances[0].unitPrice"
+        },
+        "excelSource": "市场价比较法!T32",
+        "description": "比准单价（实例1）= 成交单价 × 交易情况 × 市场状况 × 区位偏差合并 × 权益偏差合并 × 实物偏差合并。子项合并为偏差加总法：系数=100/(100+Σ(f-100))，Excel 展开式 100/(Σf-(n-1)*100)。"
+      },
+      {
+        "id": "comps.adjustedUnitPrice.instance2",
+        "target": "methods.comps.comparableInstances[1].adjustedUnitPrice",
+        "formula": "=ROUND({{unitPrice}}*{{txAdj}}*{{mktAdj}}*100/(SUM({{locFactors1}})-1100)*100/(SUM({{intFactors1}})-400)*100/(SUM({{phyFactors1}})-700),0)",
+        "refs": {
+          "locFactors1": "methods.comps.comparableInstances[1].adjustments.locationDetails",
+          "intFactors1": "methods.comps.comparableInstances[1].adjustments.interestDetails",
+          "phyFactors1": "methods.comps.comparableInstances[1].adjustments.physicalDetails",
+          "txAdj": "methods.comps.comparableInstances[1].adjustments.transactionSituation",
+          "mktAdj": "methods.comps.comparableInstances[1].adjustments.marketCondition",
+          "unitPrice": "methods.comps.comparableInstances[1].unitPrice"
+        },
+        "excelSource": "市场价比较法!W32",
+        "description": "比准单价（实例2），同上结构"
+      },
+      {
+        "id": "comps.adjustedUnitPrice.instance3",
+        "target": "methods.comps.comparableInstances[2].adjustedUnitPrice",
+        "formula": "=ROUND({{unitPrice}}*{{txAdj}}*{{mktAdj}}*100/(SUM({{locFactors2}})-1100)*100/(SUM({{intFactors2}})-400)*100/(SUM({{phyFactors2}})-700),0)",
+        "refs": {
+          "locFactors2": "methods.comps.comparableInstances[2].adjustments.locationDetails",
+          "intFactors2": "methods.comps.comparableInstances[2].adjustments.interestDetails",
+          "phyFactors2": "methods.comps.comparableInstances[2].adjustments.physicalDetails",
+          "txAdj": "methods.comps.comparableInstances[2].adjustments.transactionSituation",
+          "mktAdj": "methods.comps.comparableInstances[2].adjustments.marketCondition",
+          "unitPrice": "methods.comps.comparableInstances[2].unitPrice"
+        },
+        "excelSource": "市场价比较法!Z32",
+        "description": "比准单价（实例3），同上结构"
+      },
+      {
+        "id": "comps.finalUnitPrice",
+        "target": "methods.comps.finalValue.unit",
+        "formula": "ROUND(({{adjPrice0}}*0.5+{{adjPrice1}}*0.3+{{adjPrice2}}*0.2),-1)",
+        "refs": {
+          "adjPrice0": "methods.comps.comparableInstances[0].adjustedUnitPrice",
+          "adjPrice1": "methods.comps.comparableInstances[1].adjustedUnitPrice",
+          "adjPrice2": "methods.comps.comparableInstances[2].adjustedUnitPrice"
+        },
+        "excelSource": "市场价比较法!T34",
+        "description": "比准单价加权平均 = 实例1×0.5 + 实例2×0.3 + 实例3×0.2，四舍五入到十位。权重为模板常量 0.5/0.3/0.2（Excel T33/W33/Z33 数值单元格）。"
+      },
+      {
+        "id": "income.noi",
+        "target": "methods.income.netOperatingIncome.annualAmount",
+        "formula": "={{egi}}-{{oe}}",
+        "refs": {
+          "egi": "methods.income.netOperatingIncome.effectiveGrossIncome",
+          "oe": "methods.income.netOperatingIncome.operatingExpenses"
+        },
+        "excelSource": "住宅-收益法测算!G4",
+        "description": "年净收益 = 有效毛收入 − 运营费用"
+      },
+      {
+        "id": "income.value",
+        "target": "methods.income.finalValue.total",
+        "formula": "=ROUND(({{noi}}/({{rate}}-{{growth}})*(1-((1+{{growth}})/(1+{{rate}}))^{{forwardPeriod}})+({{noi}}*(1+{{growth}})^({{forwardPeriod}}-1))/{{rate}}/(1+{{rate}})^{{forwardPeriod}}*(1-1/(1+{{rate}})^G23)),-1)",
+        "refs": {
+          "noi": "methods.income.netOperatingIncome.annualAmount",
+          "rate": "methods.income.rate.value",
+          "growth": "methods.income.netOperatingIncome.growthRate",
+          "forwardPeriod": "methods.income.holdingPeriod"
+        },
+        "excelSource": "住宅-收益法测算!G27",
+        "description": "收益价值（报酬资本化分段折现：前 forwardPeriod 年递增折现 + 剩余年限折现）。G23（剩余年限 = 收益期−前段）为 Excel 局部中间量，schema 无对应字段，cells 重建时还原为 G23 引用。"
+      },
+      {
+        "id": "result.finalTotalValue",
+        "target": "result.finalTotalValue",
+        "formula": "=ROUND(+{{incomeValue}}*{{incomeWeight}}+{{compsValue}}*{{compsWeight}},-1)",
+        "refs": {
+          "incomeValue": "methods.income.finalValue.total",
+          "incomeWeight": "result.weightAllocation.income",
+          "compsValue": "methods.comps.finalValue.total",
+          "compsWeight": "result.weightAllocation.comps"
+        },
+        "excelSource": "住宅-收益法测算!J29",
+        "description": "最终结果 = 收益价值 × 收益权重 + 比较法价值 × 比较权重（四舍五入到十位）"
+      },
+      {
+        "id": "result.totalValue",
+        "target": "result.finalTotalValue",
+        "formula": "ROUND({{area}}*{{unitValue}},0)",
+        "refs": {
+          "area": "property.area",
+          "unitValue": "result.finalUnitValue"
+        },
+        "excelSource": "评估明细表!O6",
+        "description": "评估总价 = 面积 × 单价（四舍五入到元）"
+      }
+    ]
+  }
 }
