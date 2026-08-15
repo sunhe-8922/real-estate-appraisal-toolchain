@@ -138,8 +138,10 @@ def resolve_ref_value(data: dict, path: str):
 
 # ── 安全求值器（AST 白名单，替代裸 eval）──────────────────────────
 # calculationChain 是外部 JSON（可由 AI/他人提供），必须按不可信输入处理。
-# 白名单：数字/列表字面量、+ - * / ** 二元运算、一元 + -、
-# 以及 round/sum/SUM 三个内置函数调用。其余一律拒绝。
+# 白名单：数字/列表字面量、算术(+ - * / **)与比较(= <> < <= > >=)运算、
+# 一元 ±、IF（惰性求值，只计算匹配分支）+
+# round/sum/max/min/abs/average/power/int/sqrt/and/or。
+# 其余一律拒绝（属性访问/下标/推导式/名称引用/lambda/布尔运算符 and/or 等）。
 _SAFE_BINOPS = {
     ast.Add: operator.add,
     ast.Sub: operator.sub,
@@ -148,7 +150,27 @@ _SAFE_BINOPS = {
     ast.Pow: operator.pow,
 }
 _SAFE_UNARYOPS = {ast.UAdd: operator.pos, ast.USub: operator.neg}
-_SAFE_FUNCS = {"round": round, "sum": sum, "SUM": sum}
+_SAFE_CMPOPS = {
+    ast.Eq: operator.eq,
+    ast.NotEq: operator.ne,
+    ast.Lt: operator.lt,
+    ast.LtE: operator.le,
+    ast.Gt: operator.gt,
+    ast.GtE: operator.ge,
+}
+_SAFE_FUNCS = {
+    "round": round, "ROUND": round,
+    "sum": sum, "SUM": sum,
+    "max": max, "MAX": max,
+    "min": min, "MIN": min,
+    "abs": abs, "ABS": abs,
+    "AVERAGE": lambda *a: sum(a) / len(a) if a else 0,
+    "POWER": pow,
+    "INT": lambda x: int(x),
+    "SQRT": lambda x: x ** 0.5,
+    "AND": lambda *a: all(a),
+    "OR": lambda *a: any(a),
+}
 
 
 def safe_eval(expr: str):
@@ -168,12 +190,30 @@ def safe_eval(expr: str):
             return _SAFE_BINOPS[type(node.op)](walk(node.left), walk(node.right))
         if isinstance(node, ast.UnaryOp) and type(node.op) in _SAFE_UNARYOPS:
             return _SAFE_UNARYOPS[type(node.op)](walk(node.operand))
+        if isinstance(node, ast.Compare):
+            if len(node.ops) != 1:
+                raise ValueError("不支持链式比较")
+            op_type = type(node.ops[0])
+            if op_type not in _SAFE_CMPOPS:
+                raise ValueError(f"非法比较运算符: {op_type.__name__}")
+            return _SAFE_CMPOPS[op_type](walk(node.left), walk(node.comparators[0]))
         if isinstance(node, ast.Call):
-            if not isinstance(node.func, ast.Name) or node.func.id not in _SAFE_FUNCS:
-                raise ValueError("仅允许调用 round/sum")
-            if node.keywords:
-                raise ValueError("不支持关键字参数")
-            return _SAFE_FUNCS[node.func.id](*[walk(a) for a in node.args])
+            if not isinstance(node.func, ast.Name) or node.keywords:
+                raise ValueError("仅允许无关键字参数的白名单函数调用")
+            fname = node.func.id
+            # IF 惰性求值：只计算匹配分支（Excel 语义，避免未取分支的副作用）
+            if fname in ("IF", "if"):
+                if len(node.args) < 2:
+                    raise ValueError("IF 需要 ≥2 个参数")
+                cond = walk(node.args[0])
+                if cond:
+                    return walk(node.args[1])
+                if len(node.args) >= 3:
+                    return walk(node.args[2])
+                return False
+            if fname not in _SAFE_FUNCS:
+                raise ValueError(f"函数不在白名单: {fname}")
+            return _SAFE_FUNCS[fname](*[walk(a) for a in node.args])
         raise ValueError(f"非法语法节点: {type(node).__name__}")
 
     return walk(tree)
@@ -205,9 +245,9 @@ def rebuild_values(chain: dict, data: dict) -> list[dict]:
             return str(val)
         body = re.sub(r"\{\{(\w+)\}\}", repl, expr)
         body = body.lstrip("=")  # 公式模板可能带前导 =
-        # 语言转换：ROUND→round、^→**
-        body = re.sub(r"\bROUND\b", "round", body)
+        # 语言转换：^→**、<>→!=（Excel 语法 → Python）
         body = body.replace("^", "**")
+        body = body.replace("<>", "!=")
         # 安全求值：AST 白名单，拒绝一切非数值结构（防御恶意 formula/注入值）
         return safe_eval(body)
 

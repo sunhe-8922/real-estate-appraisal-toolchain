@@ -58,6 +58,94 @@ def test_safe_eval_accepts_legit_formulas():
 
 
 # ════════════════════════════════════════════════════════
+# safe_eval：扩展函数白名单（IF/MAX/MIN/ABS/AVERAGE/POWER/INT/SQRT/AND/OR）
+# ════════════════════════════════════════════════════════
+class TestSafeEvalExtendedFuncs:
+    def test_max_min(self):
+        assert safe_eval("MAX(1, 5, 3)") == 5
+        assert safe_eval("MIN(1, 5, 3)") == 1
+
+    def test_abs(self):
+        assert safe_eval("ABS(-42)") == 42
+        assert safe_eval("ABS(42)") == 42
+
+    def test_average(self):
+        assert safe_eval("AVERAGE(10, 20, 30)") == pytest.approx(20.0)
+
+    def test_power(self):
+        assert safe_eval("POWER(2, 10)") == 1024
+
+    def test_int(self):
+        assert safe_eval("INT(3.7)") == 3
+        assert safe_eval("INT(-3.7)") == -3
+
+    def test_sqrt(self):
+        assert safe_eval("SQRT(144)") == pytest.approx(12.0)
+
+    def test_and_or(self):
+        assert safe_eval("AND(1, 1, 1)") is True
+        assert safe_eval("AND(1, 0)") is False
+        assert safe_eval("OR(0, 0, 1)") is True
+        assert safe_eval("OR(0, 0)") is False
+
+    def test_round_still_works(self):
+        assert safe_eval("ROUND(3.14159, 2)") == 3.14
+        assert safe_eval("round(3.14159, 2)") == 3.14
+
+
+# ════════════════════════════════════════════════════════
+# safe_eval：IF 惰性求值
+# ════════════════════════════════════════════════════════
+class TestSafeEvalIf:
+    def test_if_true_branch(self):
+        assert safe_eval("IF(1 > 0, 100, 200)") == 100
+
+    def test_if_false_branch(self):
+        assert safe_eval("IF(1 < 0, 100, 200)") == 200
+
+    def test_if_no_third_arg(self):
+        assert safe_eval("IF(0, 100)") is False
+
+    def test_if_nested(self):
+        assert safe_eval("IF(1, IF(0, 10, 20), 30)") == 20
+
+    def test_if_lazy_no_side_effect(self):
+        """未取分支不得被求值（惰性语义）。"""
+        # 未取分支含除零——若被求值会抛 ZeroDivisionError
+        result = safe_eval("IF(1, 42, 1 / 0)")
+        assert result == 42
+
+    def test_if_with_comparison_ops(self):
+        assert safe_eval("IF(5 >= 5, 1, 0)") == 1
+        assert safe_eval("IF(5 != 5, 1, 0)") == 0
+        assert safe_eval("IF(5 <= 4, 1, 0)") == 0
+
+
+# ════════════════════════════════════════════════════════
+# safe_eval：比较运算符
+# ════════════════════════════════════════════════════════
+class TestSafeEvalComparisons:
+    def test_eq(self):
+        assert safe_eval("1 == 1") is True
+        assert safe_eval("1 == 2") is False
+
+    def test_ne(self):
+        assert safe_eval("1 != 2") is True
+
+    def test_lt_le(self):
+        assert safe_eval("3 < 5") is True
+        assert safe_eval("5 <= 5") is True
+
+    def test_gt_ge(self):
+        assert safe_eval("5 > 3") is True
+        assert safe_eval("5 >= 5") is True
+
+    def test_chained_comparison_rejected(self):
+        with pytest.raises(ValueError, match="链式比较"):
+            safe_eval("1 < 2 < 3")
+
+
+# ════════════════════════════════════════════════════════
 # 端到端：恶意 calculationChain 不能产生副作用
 # ════════════════════════════════════════════════════════
 def test_malicious_chain_no_side_effect(tmp_path):
