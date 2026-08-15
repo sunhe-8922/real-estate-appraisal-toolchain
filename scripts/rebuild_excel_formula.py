@@ -363,12 +363,41 @@ def normalize_excel_formula(formula: str, sheet: str, wb, keep_refs: set, depth:
             return str(val)
         if isinstance(val, str) and val.startswith("="):
             # 简单中转 =+X 或 ==+X → 目标单元格（递归展开）
-            target = val.lstrip("=").lstrip("+").strip()
-            if re.fullmatch(r"([A-Z]{1,2}\d+)", target):
-                return normalize_excel_formula(target, sheet, wb, keep_refs, depth + 1)
+            # 只处理形如 =G27 / =+G27 / ==G27 / ==+G27 的纯中转引用；
+            # 若值本身是公式（含 ROUND/SUM 等函数），保持原样不展开
+            body = val.lstrip("=").lstrip("+").strip()
+            if re.fullmatch(r"([A-Z]{1,2}\d+)", body):
+                return normalize_excel_formula(body, sheet, wb, keep_refs, depth + 1)
         return m.group(0)
 
-    return re.sub(r"(?<![A-Z])(\$?[A-Z]{1,2}\$?\d+)", repl, formula)
+    # 匹配可选的一元 + 前缀 + 单元格引用（如 +J27、J27）
+    CELL_RE = re.compile(r"\+?([A-Z]{1,2}\d+)")
+
+    def repl(m):
+        prefix = m.group(0)[:1] if m.group(0).startswith("+") else ""
+        cell = m.group(1).replace("$", "")
+        # 带 sheet 前缀的引用（如 市场价比较法!T32）保持原样——重建公式用本 sheet 名
+        if "!" in cell:
+            return m.group(0)
+        ws = wb[sheet]
+        val = ws[cell].value
+        if val is None or cell in keep_refs:
+            return m.group(0)
+        if isinstance(val, (int, float)):
+            # 数值常量 → 字面量
+            if isinstance(val, float) and val.is_integer():
+                return str(int(val))
+            return str(val)
+        if isinstance(val, str) and val.startswith("="):
+            # 简单中转 =+X 或 ==+X → 目标单元格（递归展开）
+            # 只处理形如 =G27 / =+G27 / ==G27 / ==+G27 的纯中转引用；
+            # 若值本身是公式（含 ROUND/SUM 等函数），保持原样不展开
+            body = val.lstrip("=").lstrip("+").strip()
+            if re.fullmatch(r"([A-Z]{1,2}\d+)", body):
+                return normalize_excel_formula(body, sheet, wb, keep_refs, depth + 1)
+        return m.group(0)
+
+    return CELL_RE.sub(repl, formula)
 
 
 def main():
