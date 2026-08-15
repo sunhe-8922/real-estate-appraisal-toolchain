@@ -22,3 +22,6 @@ RH文件夹/
 # Python cache
 __pycache__/
 *.pyc
+
+# Attack test payloads (adversarial review, never commit)
+_attack/

@@ -60,6 +60,8 @@ def _migrate_1_0_to_1_1(data: dict) -> tuple[dict, list[str]]:
 
     # 3. result.calculationMode — 可选，根据 determinationMethod 推断默认值
     result = data.get("result") or {}
+    if not isinstance(data.get("result"), dict):
+        data["result"] = result  # result 缺失/为 null 时写回，避免推断值丢失
     det_method = result.get("determinationMethod", "")
     if "calculationMode" not in result:
         if "加权平均" in det_method:

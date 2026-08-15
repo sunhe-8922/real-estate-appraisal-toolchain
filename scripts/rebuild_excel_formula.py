@@ -24,7 +24,9 @@ values 模式求值规则：
 """
 
 import argparse
+import ast
 import json
+import operator
 import re
 import sys
 from pathlib import Path
@@ -134,6 +136,49 @@ def resolve_ref_value(data: dict, path: str):
     return val
 
 
+# ── 安全求值器（AST 白名单，替代裸 eval）──────────────────────────
+# calculationChain 是外部 JSON（可由 AI/他人提供），必须按不可信输入处理。
+# 白名单：数字/列表字面量、+ - * / ** 二元运算、一元 + -、
+# 以及 round/sum/SUM 三个内置函数调用。其余一律拒绝。
+_SAFE_BINOPS = {
+    ast.Add: operator.add,
+    ast.Sub: operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div: operator.truediv,
+    ast.Pow: operator.pow,
+}
+_SAFE_UNARYOPS = {ast.UAdd: operator.pos, ast.USub: operator.neg}
+_SAFE_FUNCS = {"round": round, "sum": sum, "SUM": sum}
+
+
+def safe_eval(expr: str):
+    """AST 白名单求值。非法结构（属性访问/下标/推导式/名称引用等）抛 ValueError。"""
+    tree = ast.parse(expr, mode="eval")
+
+    def walk(node):
+        if isinstance(node, ast.Expression):
+            return walk(node.body)
+        if isinstance(node, ast.Constant):
+            if isinstance(node.value, (int, float)):
+                return node.value
+            raise ValueError(f"非法常量: {node.value!r}")
+        if isinstance(node, ast.List):
+            return [walk(e) for e in node.elts]
+        if isinstance(node, ast.BinOp) and type(node.op) in _SAFE_BINOPS:
+            return _SAFE_BINOPS[type(node.op)](walk(node.left), walk(node.right))
+        if isinstance(node, ast.UnaryOp) and type(node.op) in _SAFE_UNARYOPS:
+            return _SAFE_UNARYOPS[type(node.op)](walk(node.operand))
+        if isinstance(node, ast.Call):
+            if not isinstance(node.func, ast.Name) or node.func.id not in _SAFE_FUNCS:
+                raise ValueError("仅允许调用 round/sum")
+            if node.keywords:
+                raise ValueError("不支持关键字参数")
+            return _SAFE_FUNCS[node.func.id](*[walk(a) for a in node.args])
+        raise ValueError(f"非法语法节点: {type(node).__name__}")
+
+    return walk(tree)
+
+
 def rebuild_values(chain: dict, data: dict) -> list[dict]:
     """values 模式：数值公式求值验证。返回每个节点的验证结果。"""
     # 节点级容差：默认 ±1；ROUND(...,-1) 到十位 → ±10；
@@ -163,9 +208,8 @@ def rebuild_values(chain: dict, data: dict) -> list[dict]:
         # 语言转换：ROUND→round、^→**
         body = re.sub(r"\bROUND\b", "round", body)
         body = body.replace("^", "**")
-        # 受控求值（公式来自本模板，只含数字/round/sum/运算符）
-        ns = {"round": round, "sum": sum, "SUM": sum, "__builtins__": {}}
-        return eval(body, ns)  # noqa: S307 — 公式为本工具生成，非外部输入
+        # 安全求值：AST 白名单，拒绝一切非数值结构（防御恶意 formula/注入值）
+        return safe_eval(body)
 
     for node in chain["nodes"]:
         formula = node["formula"]
