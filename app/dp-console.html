@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>估价决策点控制台 · Decision Point Console</title>
+<style>
+  :root {
+    --p0: #C0392B;   /* P0 红：不可逆/高代价 */
+    --p1: #E67E22;   /* P1 橙：可修正/中等代价 */
+    --p2: #7F8C8D;   /* P2 灰：低风险/监控 */
+    --ok: #27AE60;
+    --info: #2980B9;
+    --warn: #F39C12;
+    --bg: #F5F6FA;
+    --card: #FFFFFF;
+    --line: #E1E4EA;
+    --text: #2C3E50;
+    --muted: #7F8C8D;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6;
+  }
+  header {
+    background: #1F4E79; color: #fff; padding: 12px 20px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  header h1 { font-size: 17px; font-weight: 600; margin-right: auto; white-space: nowrap; }
+  header .btn { background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.35); color: #fff; }
+  header .btn:hover { background: rgba(255,255,255,.26); }
+  .btn {
+    padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px;
+    border: 1px solid transparent; transition: background .15s; white-space: nowrap;
+  }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn-ok    { background: var(--ok);   color: #fff; }
+  .btn-ok:hover { filter: brightness(1.08); }
+  .btn-mod   { background: var(--info); color: #fff; }
+  .btn-mod:hover { filter: brightness(1.08); }
+  .btn-rej   { background: var(--p0);   color: #fff; }
+  .btn-rej:hover { filter: brightness(1.08); }
+  .btn-plain { background: #fff; border-color: var(--line); color: var(--text); }
+  .btn-plain:hover { background: #EEF1F6; }
+  #statusbar {
+    display: flex; align-items: center; gap: 10px; padding: 6px 20px;
+    background: #fff; border-bottom: 1px solid var(--line); font-size: 12.5px; flex-wrap: wrap;
+  }
+  .chip { padding: 2px 10px; border-radius: 12px; font-size: 12px; }
+  .chip.ok { background: #E8F8F0; color: var(--ok); }
+  .chip.err { background: #FDECEA; color: var(--p0); }
+  .chip.info { background: #EAF2FB; color: var(--info); }
+  main { display: grid; grid-template-columns: 340px 1fr; gap: 0; height: calc(100vh - 104px); }
+  aside {
+    background: var(--card); border-right: 1px solid var(--line); overflow-y: auto; padding: 14px;
+  }
+  aside h2 { font-size: 13px; color: var(--muted); margin: 14px 0 8px; font-weight: 600; }
+  aside h2:first-child { margin-top: 0; }
+  #chainviz { background: #FAFBFC; border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+  .chain-row { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+  .chain-arrow { color: var(--muted); font-weight: 700; }
+  .chain-node {
+    display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 6px;
+    font-size: 12.5px; border: 1.5px solid; cursor: pointer; background: #fff;
+  }
+  .chain-node .st { width: 8px; height: 8px; border-radius: 50%; }
+  .chain-node .att { font-size: 11px; background: #ECEEF3; border-radius: 8px; padding: 0 6px; }
+  .chain-node.sel { outline: 2px solid var(--info); outline-offset: 1px; }
+  .dp-list { display: flex; flex-direction: column; gap: 6px; }
+  .dp-item {
+    display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid var(--line);
+    border-radius: 8px; cursor: pointer; background: #fff; transition: border-color .15s;
+  }
+  .dp-item:hover { border-color: var(--info); }
+  .dp-item.sel { border-color: var(--info); background: #F4F9FE; }
+  .dp-item .badge {
+    font-size: 11px; font-weight: 700; color: #fff; border-radius: 4px; padding: 1px 7px; min-width: 26px; text-align: center;
+  }
+  .dp-item .meta { flex: 1; min-width: 0; }
+  .dp-item .meta .nm { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dp-item .meta .sub { font-size: 11.5px; color: var(--muted); }
+  .dp-item .lvl { font-size: 11px; font-weight: 700; border-radius: 4px; padding: 1px 6px; color: #fff; }
+  section#detail { overflow-y: auto; padding: 20px 26px; }
+  .empty-hint { color: var(--muted); text-align: center; margin-top: 80px; font-size: 14px; }
+  .dp-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+  .dp-head h2 { font-size: 19px; }
+  .dp-sub { color: var(--muted); font-size: 12.5px; margin-bottom: 14px; }
+  .seg { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
+  .seg h3 { font-size: 13px; color: var(--muted); margin-bottom: 8px; font-weight: 600; }
+  .conclusion { font-size: 16px; font-weight: 600; color: #1F4E79; }
+  .seg ul, .seg ol { padding-left: 20px; }
+  .seg li { margin: 3px 0; }
+  .ev-item { padding: 6px 10px; border-left: 3px solid var(--info); background: #F8FBFE; border-radius: 0 6px 6px 0; margin: 6px 0; }
+  .ev-src { font-size: 12px; color: var(--muted); }
+  .risk-item {
+    display: flex; gap: 10px; align-items: flex-start; padding: 8px 12px;
+    border-radius: 8px; margin: 6px 0; background: #fff; border: 1px solid var(--line);
+  }
+  .risk-lvl {
+    font-size: 11px; font-weight: 700; color: #fff; border-radius: 4px;
+    padding: 2px 8px; flex-shrink: 0; margin-top: 1px;
+  }
+  .risk-lvl.P0 { background: var(--p0); } .risk-lvl.P1 { background: var(--p1); } .risk-lvl.P2 { background: var(--p2); }
+  .risk-mit { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  table.cmp { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.cmp th, table.cmp td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; }
+  table.cmp th { background: #F0F3F8; font-weight: 600; }
+  .hd-record { background: #F7F9FB; border: 1px dashed var(--line); border-radius: 8px; padding: 10px 14px; font-size: 13px; }
+  .hd-record b { color: var(--info); }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+  .action-panel { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-top: 12px; background: #FCFDFE; }
+  .action-panel label { font-size: 12.5px; color: var(--muted); display: block; margin-bottom: 4px; }
+  .action-panel textarea {
+    width: 100%; min-height: 64px; border: 1px solid var(--line); border-radius: 6px;
+    padding: 8px 10px; font-family: inherit; font-size: 13px; resize: vertical;
+  }
+  .action-panel .row { display: flex; gap: 10px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+  .action-panel input[type=text] {
+    border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; font-size: 13px; width: 160px;
+  }
+  .successor-preview { background: #FFF8E6; border: 1px solid #F5D9A8; border-radius: 8px; padding: 10px 14px; margin-top: 10px; font-size: 13px; }
+  .successor-preview code { background: #FFF3D6; border-radius: 4px; padding: 1px 6px; font-size: 12.5px; }
+  .decision-tag { font-size: 11.5px; font-weight: 700; border-radius: 4px; padding: 2px 8px; color: #fff; }
+  .decision-tag.approved { background: var(--ok); }
+  .decision-tag.modified { background: var(--info); }
+  .decision-tag.rejected { background: var(--p0); }
+  .decision-tag.pending  { background: var(--warn); }
+  .lvl.P0 { background: var(--p0); } .lvl.P1 { background: var(--p1); } .lvl.P2 { background: var(--p2); }
+  .st.pending { background: var(--warn); } .st.approved { background: var(--ok); }
+  .st.modified { background: var(--info); } .st.rejected { background: var(--p0); }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .err-list { color: var(--p0); font-size: 12.5px; padding-left: 18px; }
+  footer { display: none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>估价决策点控制台</h1>
+  <button class="btn" id="btn-example">载入示例</button>
+  <button class="btn" id="btn-file">打开工程 JSON</button>
+  <input type="file" id="file-input" accept=".json,application/json" hidden>
+  <button class="btn" id="btn-export" disabled>导出决策响应 JSON</button>
+</header>
+<div id="statusbar">
+  <span class="chip info" id="st-version">未加载</span>
+  <span class="chip" id="st-project">—</span>
+  <span class="chip" id="st-count">—</span>
+  <span id="chain-valid"></span>
+</div>
+<main>
+  <aside>
+    <h2>决策链</h2>
+    <div id="chainviz"><span class="empty-hint" style="margin-top:0;display:block">加载工程后显示</span></div>
+    <h2>决策点列表</h2>
+    <div class="dp-list" id="dp-list"></div>
+  </aside>
+  <section id="detail">
+    <div class="empty-hint">← 选择左侧决策点查看决策包<br>或点击「载入示例」体验完整流程</div>
+  </section>
+</main>
+
+<script src="js/dp-core.js"></script>
+<script src="js/example-data.js"></script>
+<script>
+"use strict";
+
+var state = { data: null, selectedId: null, pendingAction: null };
+
+/* ── 加载 ─────────────────────────────────────────── */
+function loadData(obj) {
+  if (!obj || typeof obj !== "object") { alert("无效的 JSON"); return; }
+  state.data = obj;
+  state.selectedId = null;
+  state.pendingAction = null;
+  renderAll();
+}
+
+document.getElementById("btn-example").addEventListener("click", function () {
+  loadData(JSON.parse(JSON.stringify(window.EXAMPLE_DATA)));
+});
+document.getElementById("btn-file").addEventListener("click", function () {
+  document.getElementById("file-input").click();
+});
+document.getElementById("file-input").addEventListener("change", function (e) {
+  var f = e.target.files && e.target.files[0];
+  if (!f) return;
+  var r = new FileReader();
+  r.onload = function () {
+    try { loadData(JSON.parse(r.result)); }
+    catch (err) { alert("解析失败：" + err.message); }
+  };
+  r.readAsText(f, "utf-8");
+  e.target.value = "";
+});
+
+/* ── 渲染 ─────────────────────────────────────────── */
+function riskColor(level) {
+  return level === "P0" ? "var(--p0)" : level === "P1" ? "var(--p1)" : "var(--p2)";
+}
+function statusLabel(s) {
+  return { pending: "待决策", approved: "已批准", modified: "已调整", rejected: "已驳回" }[s] || s;
+}
+
+function renderAll() {
+  var d = state.data;
+  document.getElementById("btn-export").disabled = !d;
+  if (!d) {
+    document.getElementById("st-version").textContent = "未加载";
+    document.getElementById("st-project").textContent = "—";
+    document.getElementById("st-count").textContent = "—";
+    document.getElementById("chain-valid").innerHTML = "";
+    document.getElementById("chainviz").innerHTML = '<span class="empty-hint" style="margin-top:0;display:block">加载工程后显示</span>';
+    document.getElementById("dp-list").innerHTML = "";
+    document.getElementById("detail").innerHTML = '<div class="empty-hint">← 选择左侧决策点查看决策包<br>或点击「载入示例」体验完整流程</div>';
+    return;
+  }
+  var dps = d.decisionPoints || [];
+  if (!d.decisionPoints) { d.decisionPoints = dps; }
+  document.getElementById("st-version").textContent = "schema v" + d.schemaVersion;
+  document.getElementById("st-project").textContent = (d.project && d.project.name) || "未命名工程";
+  document.getElementById("st-count").textContent = "决策点 " + dps.length + " 个";
+  renderChain(d, dps);
+  renderList(dps);
+  renderDetail();
+}
+
+function renderChain(d, dps) {
+  var el = document.getElementById("chainviz");
+  if (!dps.length) { el.innerHTML = '<span style="color:var(--muted)">无决策点</span>'; return; }
+  var out = DPCore.resolveChain(dps);
+  var html = "";
+  if (out.chains.length) {
+    out.chains.forEach(function (chain) {
+      html += '<div class="chain-row">';
+      chain.forEach(function (node, i) {
+        if (i > 0) html += '<span class="chain-arrow">→</span>';
+        html += chainNodeHtml(node);
+      });
+      html += "</div>";
+    });
+  }
+  // 单节点（无链）决策点
+  var singletons = dps.filter(function (x) { return !x.supersedes && !dps.some(function (y) { return y.supersedes === x.id; }); });
+  if (singletons.length) {
+    var row = '<div class="chain-row">';
+    singletons.forEach(function (node) {
+      row += chainNodeHtml(node) + "&nbsp;";
+    });
+    row += "</div>";
+    html += row;
+  }
+  // C1-C6 校验
+  var errors = DPCore.validateChain(dps);
+  var v = document.getElementById("chain-valid");
+  v.innerHTML = errors.length
+    ? '<span class="chip err">决策链 C1-C6: ' + errors.length + ' 项违规</span>'
+    : '<span class="chip ok">决策链 C1-C6 校验通过</span>';
+  el.innerHTML = html;
+}
+
+function chainNodeHtml(node) {
+  var sel = state.selectedId === node.id ? " sel" : "";
+  return '<span class="chain-node' + sel + '" data-id="' + node.id + '" style="border-color:' + riskColor(node.riskLevel) + '">' +
+    '<span class="st ' + node.status + '"></span>' + node.id +
+    '<span class="lvl ' + node.riskLevel + '">' + node.riskLevel + "</span>" +
+    (node.attempt ? '<span class="att">#' + node.attempt + "</span>" : "") +
+    "</span>";
+}
+
+function renderList(dps) {
+  var el = document.getElementById("dp-list");
+  if (!dps.length) { el.innerHTML = '<span style="color:var(--muted)">无决策点</span>'; return; }
+  var order = { pending: 0, rejected: 1, modified: 2, approved: 3 };
+  var sorted = dps.slice().sort(function (a, b) {
+    return (order[a.status] - order[b.status]) || a.id.localeCompare(b.id);
+  });
+  el.innerHTML = sorted.map(function (dp) {
+    var sel = state.selectedId === dp.id ? " sel" : "";
+    var phase = { preCalculation: "计算前", inMethod: "方法内", postMethod: "方法后", postReport: "报告后" }[dp.phase] || dp.phase;
+    return '<div class="dp-item' + sel + '" data-id="' + dp.id + '">' +
+      '<span class="badge decision-tag ' + dp.status + '">' + statusLabel(dp.status) + "</span>" +
+      '<div class="meta"><div class="nm">' + dp.id + " · " + dp.name + "</div>" +
+      '<div class="sub">' + phase + " · " + dp.trigger + "</div></div>" +
+      '<span class="lvl ' + dp.riskLevel + '">' + dp.riskLevel + "</span>" +
+      "</div>";
+  }).join("");
+}
+
+/* ── 决策包详情 ───────────────────────────────────── */
+function renderDetail() {
+  var el = document.getElementById("detail");
+  var dp = state.data.decisionPoints.find(function (x) { return x.id === state.selectedId; });
+  if (!dp) { el.innerHTML = '<div class="empty-hint">← 选择左侧决策点查看决策包</div>'; return; }
+
+  var html = "";
+  html += '<div class="dp-head"><h2>' + dp.id + " · " + dp.name + "</h2>" +
+    '<span class="decision-tag ' + dp.status + '">' + statusLabel(dp.status) + "</span>" +
+    '<span class="lvl ' + dp.riskLevel + '">' + dp.riskLevel + "</span></div>";
+  html += '<div class="dp-sub">' + phaseText(dp) + " · trigger: " + dp.trigger +
+    (dp.supersedes ? " · 取代 " + dp.supersedes : "") +
+    (dp.attempt ? " · attempt " + dp.attempt : "") + "</div>";
+
+  // 五段式
+  html += seg("结论（先行）", '<div class="conclusion">' + esc(dp.conclusion || "（待 AI 生成）") + "</div>");
+  html += seg("证据", evHtml(dp.evidence));
+  html += seg("理由", '<div>' + esc(dp.reasoning || "（待 AI 生成）") + "</div>");
+  html += seg("风险（" + (dp.risks || []).length + " 项）", risksHtml(dp.risks));
+  if (dp.comparison && dp.comparison.length) {
+    html += seg("与估价对象差异", cmpHtml(dp.comparison));
+  }
+
+  // 人类决策记录
+  if (dp.humanDecision) {
+    html += seg("决策记录", hdHtml(dp.humanDecision));
+  }
+
+  // 操作区（仅 pending）
+  if (dp.status === "pending") {
+    html += actionAreaHtml(dp);
+  } else if (dp.status === "rejected") {
+    // 驳回后提示建链说明
+    var succ = DPCore.buildSuccessorShell(state.data.decisionPoints, dp);
+    if (succ.ok) {
+      html += '<div class="successor-preview">已驳回，决策链将创建后继决策点 <code>' + succ.successor.id +
+        "</code>（supersedes=<code>" + dp.id + "</code>, attempt=<code>" + succ.successor.attempt +
+        '</code>）。由编排层 AI 重新生成决策包内容以回应否决原因。</div>';
+    }
+  }
+  el.innerHTML = html;
+  bindActions();
+}
+
+function phaseText(dp) {
+  var m = { preCalculation: "计算前", inMethod: "方法执行中", postMethod: "方法完成后", postReport: "报告生成后" };
+  return (m[dp.phase] || dp.phase) + (dp.method ? " · 方法: " + dp.method : "");
+}
+function seg(title, inner) {
+  return '<div class="seg"><h3>' + title + "</h3>" + inner + "</div>";
+}
+function esc(s) {
+  return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+function evHtml(ev) {
+  if (!ev || !ev.length) return '<span style="color:var(--muted)">（无）</span>';
+  return ev.map(function (e) {
+    return '<div class="ev-item">' + esc(e.item) +
+      (e.source ? '<div class="ev-src">信源：' + esc(e.source) + "</div>" : "") + "</div>";
+  }).join("");
+}
+function risksHtml(risks) {
+  if (!risks || !risks.length) return '<span style="color:var(--muted)">（无）</span>';
+  return risks.map(function (r) {
+    return '<div class="risk-item"><span class="risk-lvl ' + (r.level || "P2") + '">' + (r.level || "P2") + "</span>" +
+      "<div>" + esc(r.description) +
+      (r.mitigation ? '<div class="risk-mit">缓解：' + esc(r.mitigation) + "</div>" : "") + "</div></div>";
+  }).join("");
+}
+function cmpHtml(cmp) {
+  var rows = cmp.map(function (c) {
+    return "<tr><td>" + esc(c.instance) + "</td><td>" + esc(c.differences || "") + "</td></tr>";
+  }).join("");
+  return '<table class="cmp"><tr><th style="width:90px">可比实例</th><th>与估价对象差异（须可溯源）</th></tr>' + rows + "</table>";
+}
+function hdHtml(hd) {
+  var act = { approved: "批准", modified: "调整", rejected: "驳回" }[hd.action] || hd.action;
+  var s = '<div class="hd-record"><b>' + act + "</b> · " + esc(hd.decidedBy || "") +
+    (hd.timestamp ? " · " + esc(hd.timestamp) : "");
+  if (hd.modifications) s += "<br>调整内容：" + esc(hd.modifications);
+  if (hd.comment) s += "<br>备注：" + esc(hd.comment);
+  return s + "</div>";
+}
+
+/* ── 操作区 ───────────────────────────────────────── */
+function actionAreaHtml(dp) {
+  var h = '<div class="actions">' +
+    '<button class="btn btn-ok" id="act-approved">✓ 批准</button>' +
+    '<button class="btn btn-mod" id="act-modified">✎ 调整</button>' +
+    '<button class="btn btn-rej" id="act-rejected">✕ 驳回</button>' +
+    '<span style="margin-left:auto"></span>' +
+    '<label style="font-size:12.5px;color:var(--muted)">决策人 ' +
+    '<input type="text" id="decided-by" value="估价师" style="border:1px solid var(--line);border-radius:6px;padding:5px 8px;font-size:13px;width:120px"></label>' +
+    "</div>";
+  h += '<div class="action-panel" id="action-panel" style="display:none">';
+  h += '<label id="ap-label"></label><textarea id="ap-text" placeholder=""></textarea>';
+  h += '<div class="row"><button class="btn btn-ok" id="ap-confirm">确认提交</button>' +
+    '<button class="btn btn-plain" id="ap-cancel">取消</button></div>';
+  h += '<div id="ap-successor"></div></div>';
+  return h;
+}
+
+function bindActions() {
+  var dp = state.data.decisionPoints.find(function (x) { return x.id === state.selectedId; });
+  if (!dp || dp.status !== "pending") return;
+
+  var panel = document.getElementById("action-panel");
+  var label = document.getElementById("ap-label");
+  var text = document.getElementById("ap-text");
+  var succBox = document.getElementById("ap-successor");
+  var decidedBy = document.getElementById("decided-by");
+
+  function open(action) {
+    state.pendingAction = action;
+    if (action === "approved") {
+      panel.style.display = "none";
+      submit(action, { comment: "" });
+      return;
+    }
+    panel.style.display = "block";
+    if (action === "modified") {
+      label.textContent = "调整内容（必填，AI 将按此落地后继续，不产生新决策点）：";
+      text.placeholder = "例如：实例 B 换为同小区 D 栋 1203；权重调整为 0.6/0.4";
+      succBox.innerHTML = "";
+    } else {
+      label.textContent = "否决原因（必填，决策链模型 4.2 要求新决策点回应此原因）：";
+      text.placeholder = "例如：实例 C 信源等级 T2 不可靠，请换同小区实例并升级信源";
+      var rejectedPreview = Object.assign({}, dp, { status: "rejected" });
+      var succ = DPCore.buildSuccessorShell(state.data.decisionPoints, rejectedPreview);
+      if (succ.ok) {
+        succBox.innerHTML = '<div class="successor-preview">驳回后将创建 <code>' + succ.successor.id +
+          "</code>（supersedes=<code>" + dp.id + "</code>, attempt=<code>" + succ.successor.attempt +
+          '），旧决策点保留为审计记录。</div>';
+      }
+    }
+    text.value = "";
+    text.focus();
+  }
+  function submit(action, opts) {
+    var r = DPCore.applyDecision(dp, action, Object.assign({ decidedBy: decidedBy.value || "估价师" }, opts));
+    if (!r.ok) { alert(r.error); return; }
+    // 写回 data.decisionPoints
+    var idx = state.data.decisionPoints.findIndex(function (x) { return x.id === dp.id; });
+    state.data.decisionPoints[idx] = r.dp;
+    // 驳回后按决策链模型 4.2 自动创建后继决策点（status=pending，五段式占位）
+    if (action === "rejected") {
+      var succ = DPCore.buildSuccessorShell(state.data.decisionPoints, r.dp);
+      if (succ.ok) {
+        state.data.decisionPoints.push(succ.successor);
+      }
+    }
+    state.pendingAction = null;
+    renderAll();
+  }
+
+  document.getElementById("act-approved").addEventListener("click", function () { open("approved"); });
+  document.getElementById("act-modified").addEventListener("click", function () { open("modified"); });
+  document.getElementById("act-rejected").addEventListener("click", function () { open("rejected"); });
+  document.getElementById("ap-confirm").addEventListener("click", function () {
+    if (!state.pendingAction) return;
+    submit(state.pendingAction, { comment: text.value, modifications: text.value });
+  });
+  document.getElementById("ap-cancel").addEventListener("click", function () {
+    state.pendingAction = null;
+    panel.style.display = "none";
+  });
+}
+
+/* ── 事件委托（链节点 + 列表点击） ────────────────── */
+document.addEventListener("click", function (e) {
+  var node = e.target.closest ? e.target.closest("[data-id]") : null;
+  if (node && state.data) {
+    state.selectedId = node.getAttribute("data-id");
+    renderAll();
+  }
+});
+
+/* ── 导出 ─────────────────────────────────────────── */
+document.getElementById("btn-export").addEventListener("click", function () {
+  if (!state.data) return;
+  var name = (state.data.project && state.data.project.name) || "估价工程";
+  var blob = new Blob([JSON.stringify(state.data, null, 2)], { type: "application/json" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name + "-决策响应.json";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); }, 500);
+});
+
+// 启动即载入示例
+loadData(JSON.parse(JSON.stringify(window.EXAMPLE_DATA)));
+</script>
+</body>
+</html>

@@ -792,13 +792,13 @@
     },
     {
       "id": "DP-income",
-      "name": "资本化率确定",
+      "name": "收益率确定",
       "phase": "inMethod",
       "trigger": "method:income",
       "method": "income",
       "riskLevel": "P1",
       "status": "approved",
-      "conclusion": "资本化率取 1.5%，采用市场提取法，来源为同区域同类住宅租金回报率中位数",
+      "conclusion": "收益率（资本化率）取 1.5%，采用市场提取法，来源为同区域同类住宅租金回报率中位数",
       "evidence": [
         {
           "item": "洪山区珞狮路周边住宅租金回报率采样：1.2%-1.8%，中位数 1.5%",

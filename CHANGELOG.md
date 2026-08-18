@@ -41,6 +41,24 @@ JSON Schema 无法表达数组级约束，由业务校验强制：
 
 - `tests/test_schema_v14.py` 新增 27 个用例：TestV14Schema（9）/ TestDecisionChainValidation（11，C1-C6 反面 + 4 正例）/ TestVersionRoutingV14（3）/ TestMigrationV14（4）/ TestChangelogV14（1）
 
+### Phase 3 编排层接入（2026-08-18）
+
+| 变更 | 说明 |
+|------|------|
+| 编排层 skill | `skills/appraisal-orchestrator/SKILL.md`：估价任务总编排（调用 7 个现有技能的时序 + 8 个 DP 暂停点 + 决策包五段式生成规范 + 三分支响应处理 + 驳回自动建链规则） |
+| 决策核心库 | `app/js/dp-core.js`：决策状态机、applyDecision、buildSuccessorShell、validateChain（C1-C6 JS 等价实现）、resolveChain；浏览器 + Node 双模，配 `tests/test_dp_core.js` 27 个 Node 单测 |
+| 决策包控制台 | `app/dp-console.html`：离线零构建前端，渲染决策包（结论优先 + 风险颜色编码 P0红/P1橙/P2灰）、批准/调整（必填 modifications）/驳回（必填 comment + 后继预览）、决策链可视化、导出决策响应 JSON |
+| 前端示例数据 | `app/js/example-data.js` 内嵌示例工程决策链部分；`example-武汉洪山住宅.json` DP-income 命名统一为"收益率确定" |
+| 合规 fixture | `tests/fixtures/orchestrator_pending_comps.json` 用于前端流程验证 |
+| 安装脚本 | `install.sh` 补录 `appraisal-orchestrator`；skill 三处同步（`skills/`、`G:/gujia开发/.workbuddy/skills/`、`~/.workbuddy/skills/`） |
+| 对抗式审查 | `outputs/对抗式审查报告（第三轮）.md`：发现并修复 2 个前端缺陷（驳回预览/驳回建链），前端产物 JSON 通过 schema v1.4 + C1-C6 验证 |
+
+### 测试
+
+- Python 全量回归：`273 passed`
+- Node 单测：`tests/test_dp_core.js` `27 pass / 0 fail`
+- 前端产物验证：`scripts/validate_appraisal_json.py` 对驳回→建链→批准后的 JSON **✅ 验证通过**
+
 ---
 
 ## [1.3.1] — 2026-08-18（对抗式审查修复）
