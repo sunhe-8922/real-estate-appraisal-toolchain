@@ -4,6 +4,46 @@
 
 ---
 
+## [1.3.1] — 2026-08-18（对抗式审查修复）
+
+### 修复：decisionPoint 跨字段条件约束（P0-1 ~ P0-8）
+
+v1.3 初版的条件约束只写在 `description` 文本里，验证器不执行。v1.3.1 起由 `allOf` 内的 8 组 `if/then/else` 强制：
+
+| 编号 | 约束 | 违反示例 | 拒绝方式 |
+|------|------|----------|----------|
+| P0-1 | 非 pending 状态必须有人类决策记录 | `status=approved` 但无 `humanDecision` | `then: required humanDecision` |
+| P0-2 | `action=modified` 必须填写非空 `modifications` | `action=modified` 无/空 `modifications` | `if/then + minLength: 1` |
+| P0-3 | `trigger=method:xxx` 必须填写 `method` | `trigger=method:comps` 无 `method` | `then: required method` |
+| P0-4 | `status=pending` 禁止有人类决策记录 | `status=pending` 却有 `humanDecision` | `else: not required humanDecision` |
+| P0-5 | `trigger` 限定枚举：`always` 或 `method:(comps\|income\|cost\|hypotheticalDev)` | `trigger="whatever"` | `pattern` 约束 |
+| P0-6 | `status` 与 `humanDecision.action` 必须一致 | `status=rejected` + `action=approved` | 3 组 `if/then` 分别锁定 approved/modified/rejected |
+| P0-7 | `riskLevel` 必须等于 `risks[]` 中的最高等级 | `riskLevel=P0` 但 risks 全为 P2 | 嵌套 `if/then/else` + `contains` |
+| P0-8 | `trigger=always` → 阶段非 `inMethod`；`trigger=method:xxx` → 阶段必须 `inMethod` | `phase=postReport` + `trigger=method:comps` | `if/then/else` 锁定 phase |
+
+### 修复：业务校验（P0-9）
+
+- `scripts/validate_appraisal_json.py` 新增 `_check_decision_point_uniqueness()`：`decisionPoints[].id` 必须唯一（JSON Schema 无法表达数组元素唯一性）
+
+### 修复：测试假阳性（P1-1）
+
+- `test_migrated_data_passes_v13_schema` 原先直接用 v1.3 示例数据迁移（no-op 假阳性）；现先剥离 `decisionPoints` 并还原 `schemaVersion=1.2` 再走迁移路径，真实覆盖 1.2→1.3
+
+### 修复：示例数据（P1-4 / P1-5）
+
+- `example-武汉洪山住宅.json` 的 DP-comp `comparison` 移除无法从结构化数据溯源的虚构信息（"楼层差 2 层"、"装修标准略高"、"距地铁站 200m"）和语义矛盾（"同栋" 但实例实际位于不同小区）；改用可溯源差异：小区名、面积差（area 字段）、建筑规模/区位修正指数（physicalDetails/locationDetails）
+
+### 修复：文档（P2-1）
+
+- `outputs/人工决策点架构设计.md` 移除 `"comparison": null`（schema 类型为 array，null 不合法，固定 DP 应省略字段）；`humanDecision` 描述改为"pending 时不存在，null 不合法"
+
+### 测试
+
+- `tests/test_schema_v13.py` 新增 16 个用例（`TestConditionalConstraints` 13 个 + `TestBusinessValidation` 3 个），v1.3 套件 44 → 60
+- `scripts/adversarial_review.py` 升级为可持续回归验证工具（第 10/14 条改为验证修复结果）
+
+---
+
 ## [1.3] — 2026-08-18
 
 ### 新增（兼容 v1.2，全部可选）
@@ -142,7 +182,7 @@
 ## 迁移路径
 
 ```
-v1.0 (2026-08-11) ──▶ v1.1 (2026-08-13) ──▶ v1.2 (2026-08-14) ──▶ v1.3 (2026-08-18)
+v1.0 (2026-08-11) ──▶ v1.1 (2026-08-13) ──▶ v1.2 (2026-08-14) ──▶ v1.3 (2026-08-18) ──▶ v1.3.1 (2026-08-18)
 ```
 
 迁移命令：

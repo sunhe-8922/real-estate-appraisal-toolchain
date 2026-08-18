@@ -1021,11 +1021,18 @@
         },
         "trigger": {
           "type": "string",
-          "description": "触发条件：always（固定决策点）或 method:xxx（条件决策点，xxx 为方法名）"
+          "pattern": "^(always|method:(comps|income|cost|hypotheticalDev))$",
+          "description": "触发条件：always（固定决策点）或 method:xxx（条件决策点，xxx ∈ comps/income/cost/hypotheticalDev）。v1.3.1 起由 pattern 限定枚举值"
         },
         "method": {
           "type": "string",
-          "description": "方法标识（trigger=method:xxx 时必填，如 comps/income/cost/hypotheticalDev）"
+          "enum": [
+            "comps",
+            "income",
+            "cost",
+            "hypotheticalDev"
+          ],
+          "description": "方法标识（trigger=method:xxx 时必填，如 comps/income/cost/hypotheticalDev）。v1.3.1 起限定枚举值"
         },
         "riskLevel": {
           "type": "string",
@@ -1079,7 +1086,7 @@
         },
         "humanDecision": {
           "type": "object",
-          "description": "人类决策记录（status=pending 时为 null/不存在）",
+          "description": "人类决策记录（status=pending 时不存在，null 不合法）。v1.3.1 起强制 type=object 防止 null 绕过条件约束",
           "required": [
             "action"
           ],
@@ -1113,7 +1120,220 @@
             }
           }
         }
-      }
+      },
+      "allOf": [
+        {
+          "description": "P0-1/P0-4: 非 pending 状态必须有人类决策记录；pending 状态禁止有人类决策记录",
+          "if": {
+            "properties": {
+              "status": {
+                "not": {
+                  "const": "pending"
+                }
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "humanDecision"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "humanDecision"
+              ]
+            }
+          }
+        },
+        {
+          "description": "P0-6a: status=approved → humanDecision.action 必须为 approved",
+          "if": {
+            "properties": {
+              "status": {
+                "const": "approved"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "humanDecision": {
+                "properties": {
+                  "action": {
+                    "const": "approved"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "description": "P0-6b: status=modified → humanDecision.action 必须为 modified",
+          "if": {
+            "properties": {
+              "status": {
+                "const": "modified"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "humanDecision": {
+                "properties": {
+                  "action": {
+                    "const": "modified"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "description": "P0-6c: status=rejected → humanDecision.action 必须为 rejected",
+          "if": {
+            "properties": {
+              "status": {
+                "const": "rejected"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "humanDecision": {
+                "properties": {
+                  "action": {
+                    "const": "rejected"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "description": "P0-2: action=modified → 必须填写 modifications（非空）",
+          "if": {
+            "required": [
+              "humanDecision"
+            ],
+            "properties": {
+              "humanDecision": {
+                "properties": {
+                  "action": {
+                    "const": "modified"
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "humanDecision": {
+                "required": [
+                  "modifications"
+                ],
+                "properties": {
+                  "modifications": {
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "description": "P0-3: trigger=method:xxx → 必须填写 method",
+          "if": {
+            "properties": {
+              "trigger": {
+                "pattern": "^method:"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "method"
+            ]
+          }
+        },
+        {
+          "description": "P0-7: riskLevel 必须等于 risks 数组中的最高风险等级（max level）",
+          "if": {
+            "properties": {
+              "risks": {
+                "contains": {
+                  "properties": {
+                    "level": {
+                      "const": "P0"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "riskLevel": {
+                "const": "P0"
+              }
+            }
+          },
+          "else": {
+            "if": {
+              "properties": {
+                "risks": {
+                  "contains": {
+                    "properties": {
+                      "level": {
+                        "const": "P1"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "riskLevel": {
+                  "const": "P1"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "riskLevel": {
+                  "const": "P2"
+                }
+              }
+            }
+          }
+        },
+        {
+          "description": "P0-8: trigger=always → 阶段不能是 inMethod；trigger=method:xxx → 阶段必须为 inMethod",
+          "if": {
+            "properties": {
+              "trigger": {
+                "const": "always"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "phase": {
+                "not": {
+                  "const": "inMethod"
+                }
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "phase": {
+                "const": "inMethod"
+              }
+            }
+          }
+        }
+      ]
     },
     "evidenceItem": {
       "type": "object",

@@ -74,6 +74,30 @@ def _extract_subschema(schema, path):
     return node
 
 
+def _check_decision_point_uniqueness(data: dict) -> list:
+    """
+    业务校验：decisionPoints 的 id 必须唯一（v1.3.1 新增）。
+    JSON Schema 无法表达数组元素唯一性，由本函数补充。
+    """
+    dps = data.get("decisionPoints")
+    if not isinstance(dps, list):
+        return []
+    seen = {}
+    errors = []
+    for i, dp in enumerate(dps):
+        if not isinstance(dp, dict):
+            continue  # 非对象元素由 schema 层拒绝
+        dp_id = dp.get("id")
+        if dp_id in seen:
+            errors.append(_make_error(
+                f"decisionPoints[{i}] 的 id '{dp_id}' 重复（与 decisionPoints[{seen[dp_id]}] 冲突），id 必须唯一",
+                ["decisionPoints", i, "id"],
+            ))
+        else:
+            seen[dp_id] = i
+    return errors
+
+
 def validate_full(data: dict, version: str = None) -> list:
     """
     验证完整的 AppraisalCalculationResult 对象。
@@ -90,6 +114,8 @@ def validate_full(data: dict, version: str = None) -> list:
         format_checker=jsonschema.FormatChecker(),
     )
     errors = sorted(validator.iter_errors(data), key=lambda e: list(e.path))
+    # 追加业务校验（schema 表达不了的跨字段/集合约束）
+    errors = list(errors) + _check_decision_point_uniqueness(data)
     return errors
 
 

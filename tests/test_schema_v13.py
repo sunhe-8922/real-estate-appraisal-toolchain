@@ -405,8 +405,16 @@ class TestMigrationV13:
         assert "decisionPoints" not in migrated
 
     def test_migrated_data_passes_v13_schema(self, example_data):
+        """v1.2 数据（剥离 v1.3 字段）迁移到 v1.3 后应通过 v1.3 schema 验证。
+
+        注意：示例数据已是 v1.3，直接迁移是 no-op（假阳性）。
+        必须先剥离 decisionPoints 并还原版本号为 1.2，再走迁移路径。
+        """
         data = json.loads(json.dumps(example_data))
+        data.pop("decisionPoints", None)
+        data["schemaVersion"] = "1.2"
         migrated, _ = _migrate_1_2_to_1_3(data)
+        assert migrated["schemaVersion"] == "1.3"
         errors = validate_full(migrated, version="1.3")
         assert not errors, f"迁移后应通过 v1.3 schema: {[e.message for e in errors]}"
 
@@ -460,6 +468,172 @@ class TestFullDecisionPackage:
         ]
         errors = validate_full(data)
         assert not errors, f"多 DP 应通过: {[e.message for e in errors]}"
+
+
+# ════════════════════════════════════════════════════════
+# 6b. 条件约束（P0-1 ~ P0-8，v1.3.1 新增 if/then/else）
+# ════════════════════════════════════════════════════════
+class TestConditionalConstraints:
+    """跨字段一致性约束：由 decisionPoint 的 allOf if/then/else 强制。"""
+
+    @staticmethod
+    def _validate(example_data, dp):
+        data = json.loads(json.dumps(example_data))
+        data["schemaVersion"] = "1.3"
+        data["decisionPoints"] = [dp]
+        return validate_full(data)
+
+    def test_status_approved_requires_human_decision(self, example_data):
+        """P0-1: status=approved 必须有人类决策记录。"""
+        dp = _make_minimal_decision_point(status="pending")
+        dp["status"] = "approved"
+        errors = self._validate(example_data, dp)
+        assert errors, "approved 无 humanDecision 应被拒绝"
+
+    def test_status_modified_requires_human_decision(self, example_data):
+        """status=modified 必须有人类决策记录。"""
+        dp = _make_minimal_decision_point(status="pending")
+        dp["status"] = "modified"
+        errors = self._validate(example_data, dp)
+        assert errors, "modified 无 humanDecision 应被拒绝"
+
+    def test_status_rejected_requires_human_decision(self, example_data):
+        """status=rejected 必须有人类决策记录。"""
+        dp = _make_minimal_decision_point(status="pending")
+        dp["status"] = "rejected"
+        errors = self._validate(example_data, dp)
+        assert errors, "rejected 无 humanDecision 应被拒绝"
+
+    def test_action_modified_requires_modifications(self, example_data):
+        """P0-2: action=modified 必须填写 modifications。"""
+        dp = _make_minimal_decision_point(status="modified")
+        del dp["humanDecision"]["modifications"]
+        errors = self._validate(example_data, dp)
+        assert errors, "modified 无 modifications 应被拒绝"
+
+    def test_action_modified_empty_modifications_rejected(self, example_data):
+        """action=modified 但 modifications 为空字符串应被拒绝。"""
+        dp = _make_minimal_decision_point(status="modified")
+        dp["humanDecision"]["modifications"] = ""
+        errors = self._validate(example_data, dp)
+        assert errors, "空 modifications 应被拒绝（minLength: 1）"
+
+    def test_method_trigger_requires_method(self, example_data):
+        """P0-3: trigger=method:xxx 必须填写 method。"""
+        dp = _make_comp_decision_point()
+        del dp["method"]
+        errors = self._validate(example_data, dp)
+        assert errors, "method: 触发无 method 应被拒绝"
+
+    def test_pending_rejects_human_decision(self, example_data):
+        """P0-4: status=pending 不允许有人类决策记录。"""
+        dp = _make_minimal_decision_point(status="approved")
+        dp["status"] = "pending"
+        errors = self._validate(example_data, dp)
+        assert errors, "pending 有 humanDecision 应被拒绝"
+
+    def test_trigger_pattern_restricted(self, example_data):
+        """P0-5: trigger 只能是 always 或 method:comps|income|cost|hypotheticalDev。"""
+        for bad in ["whatever", "method:foo", "Method:comps", "always "]:
+            dp = _make_minimal_decision_point()
+            dp["trigger"] = bad
+            errors = self._validate(example_data, dp)
+            assert errors, f"非法 trigger '{bad}' 应被拒绝"
+
+    def test_status_rejected_rejects_approved_action(self, example_data):
+        """P0-6: status=rejected 时 action 必须也是 rejected（矛盾拒绝）。"""
+        dp = _make_minimal_decision_point(status="approved")
+        dp["status"] = "rejected"
+        dp["humanDecision"]["action"] = "approved"
+        errors = self._validate(example_data, dp)
+        assert errors, "rejected+approved 矛盾应被拒绝"
+
+    def test_status_approved_rejects_modified_action(self, example_data):
+        """status=approved 时 action 必须也是 approved。"""
+        dp = _make_minimal_decision_point(status="approved")
+        dp["humanDecision"]["action"] = "modified"
+        errors = self._validate(example_data, dp)
+        assert errors, "approved+modified 矛盾应被拒绝"
+
+    def test_risk_level_matches_max_risk(self, example_data):
+        """P0-7: riskLevel 必须等于 risks 的最高等级。"""
+        # riskLevel=P0 但 risks 全 P2 → 拒绝
+        dp = _make_minimal_decision_point(status="approved")
+        dp["riskLevel"] = "P0"
+        dp["risks"] = [{"description": "low risk", "level": "P2"}]
+        errors = self._validate(example_data, dp)
+        assert errors, "riskLevel=P0 但 risks 全 P2 应被拒绝"
+        # riskLevel=P1 但 risks 含 P0 → 拒绝（P0 必须提升 riskLevel）
+        dp2 = _make_minimal_decision_point(status="approved")
+        dp2["riskLevel"] = "P1"
+        dp2["risks"] = [{"description": "high risk", "level": "P0"}]
+        errors2 = self._validate(example_data, dp2)
+        assert errors2, "riskLevel=P1 但 risks 含 P0 应被拒绝"
+        # riskLevel=P2 但 risks 含 P1 → 拒绝
+        dp3 = _make_minimal_decision_point(status="approved")
+        dp3["riskLevel"] = "P2"
+        dp3["risks"] = [{"description": "mid risk", "level": "P1"}]
+        errors3 = self._validate(example_data, dp3)
+        assert errors3, "riskLevel=P2 但 risks 含 P1 应被拒绝"
+
+    def test_phase_trigger_combo_restricted(self, example_data):
+        """P0-8: always → 非 inMethod；method:xxx → inMethod。"""
+        dp = _make_comp_decision_point()
+        dp["phase"] = "postReport"
+        errors = self._validate(example_data, dp)
+        assert errors, "postReport+method:comps 应被拒绝"
+
+        dp2 = _make_minimal_decision_point(status="approved")
+        dp2["phase"] = "inMethod"  # always 触发不应出现在 inMethod
+        errors2 = self._validate(example_data, dp2)
+        assert errors2, "always+inMethod 应被拒绝"
+
+    def test_rejected_dp_with_rejected_action_accepted(self, example_data):
+        """rejected 状态 + rejected 动作应通过（正例）。"""
+        dp = _make_minimal_decision_point(status="approved")
+        dp["status"] = "rejected"
+        dp["humanDecision"]["action"] = "rejected"
+        dp["humanDecision"]["comment"] = "理由不足，需补充证据"
+        errors = self._validate(example_data, dp)
+        assert not errors, f"合法 rejected DP 应通过: {[e.message for e in errors]}"
+
+
+# ════════════════════════════════════════════════════════
+# 6c. 业务校验（P0-9，validate 脚本补充）
+# ════════════════════════════════════════════════════════
+class TestBusinessValidation:
+    def test_duplicate_dp_ids_rejected(self, example_data):
+        """P0-9: decisionPoints 的 id 必须唯一（业务校验）。"""
+        data = json.loads(json.dumps(example_data))
+        data["schemaVersion"] = "1.3"
+        data["decisionPoints"] = [
+            _make_minimal_decision_point("DP1", "approved"),
+            _make_minimal_decision_point("DP1", "approved"),
+        ]
+        errors = validate_full(data)
+        assert errors, "重复 DP id 应被业务校验拒绝"
+        messages = [e.message for e in errors]
+        assert any("重复" in m for m in messages), "错误信息应指出 id 重复"
+
+    def test_unique_dp_ids_accepted(self, example_data):
+        """id 唯一时业务校验应放行。"""
+        data = json.loads(json.dumps(example_data))
+        data["schemaVersion"] = "1.3"
+        data["decisionPoints"] = [
+            _make_minimal_decision_point("DP1", "approved"),
+            _make_minimal_decision_point("DP2", "approved"),
+        ]
+        errors = validate_full(data)
+        assert not errors, f"唯一 DP id 应通过: {[e.message for e in errors]}"
+
+    def test_duplicate_ids_detected_even_with_schema_errors(self, example_data):
+        """业务校验独立于 schema 校验：即使存在其它 schema 错误也应报告重复。"""
+        data = json.loads(json.dumps(example_data))
+        data["schemaVersion"] = "1.3"
+        dp = _make_minimal_decision_point("DPX", "approved")
+        data["decisionPoints"] = [dp, dict(dp, name="另一个")]
+        errors = validate_full(data)
+        assert any("重复" in e.message for e in errors), "应同时报告重复 id"
 
 
 # ════════════════════════════════════════════════════════
