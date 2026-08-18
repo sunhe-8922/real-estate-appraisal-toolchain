@@ -2,7 +2,7 @@
 """
 migrate_schema.py — 估价 JSON Schema 版本迁移工具
 
-支持 v1.0 → v1.1 → v1.2 的自动迁移，补充各版本新增的可选字段默认值。
+支持 v1.0 → v1.1 → v1.2 → v1.3 的自动迁移，补充各版本新增的可选字段默认值。
 
 用法:
   # 迁移数据文件
@@ -23,6 +23,7 @@ SCHEMA_DIR = Path(__file__).parent.parent / "schema"
 MIGRATIONS = {
     "1.0": "1.1",
     "1.1": "1.2",
+    "1.2": "1.3",
 }
 
 
@@ -44,6 +45,8 @@ def migrate(data: dict, from_version: str, to_version: str) -> tuple[dict, list[
         return _migrate_1_0_to_1_1(data)
     if from_version == "1.1" and to_version == "1.2":
         return _migrate_1_1_to_1_2(data)
+    if from_version == "1.2" and to_version == "1.3":
+        return _migrate_1_2_to_1_3(data)
     raise ValueError(f"不支持的迁移路径: {from_version} → {to_version}")
 
 
@@ -100,6 +103,25 @@ def _migrate_1_1_to_1_2(data: dict) -> tuple[dict, list[str]]:
 
     # 2. 可选字段（locationDetails/physicalDetails/interestDetails/calculationChain）
     #    不自动填充 — 需要 Excel 子项粒度数据，由用户按需补充
+
+    return data, notes
+
+
+def _migrate_1_2_to_1_3(data: dict) -> tuple[dict, list[str]]:
+    """
+    v1.2 → v1.3 迁移。
+    v1.3 新增（全部可选）：
+      - decisionPoints（人工决策点列表）
+    迁移策略：仅更新 schemaVersion。decisionPoints 为运行时字段，
+    由 AI 在执行估价工作流时按需生成，不从历史数据推断。
+    """
+    notes = []
+
+    if data.get("schemaVersion") == "1.2":
+        data["schemaVersion"] = "1.3"
+        notes.append("schemaVersion: 1.2 → 1.3")
+
+    # decisionPoints 不自动填充 — 运行时由 AI 生成
 
     return data, notes
 

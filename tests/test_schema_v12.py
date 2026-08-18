@@ -49,7 +49,7 @@ def v11_schema():
 
 @pytest.fixture(scope="session")
 def root_schema():
-    """根目录 schema 应始终等于最新版（v1.2）。"""
+    """根目录 schema 应始终等于最新版（当前 v1.3）。"""
     with open(ROOT_SCHEMA_PATH, encoding="utf-8") as f:
         return json.load(f)
 
@@ -67,12 +67,18 @@ def chain_data():
 
 
 def _strip_v12_fields(data: dict) -> None:
-    """移除 v1.2 新增字段，还原为干净 v1.1 数据。"""
+    """移除 v1.2 及 v1.3 新增字段，还原为干净 v1.1 数据。"""
     data.pop("calculationChain", None)
+    data.pop("decisionPoints", None)
     for inst in data.get("methods", {}).get("comps", {}).get("comparableInstances", []):
         adj = inst.get("adjustments", {})
         for key in ("locationDetails", "physicalDetails", "interestDetails"):
             adj.pop(key, None)
+
+
+def _strip_v13_fields(data: dict) -> None:
+    """移除 v1.3 新增字段（decisionPoints），还原为干净 v1.2 数据。"""
+    data.pop("decisionPoints", None)
 
 
 # ════════════════════════════════════════════════════════
@@ -113,11 +119,11 @@ class TestV12Schema:
         assert "id" in cn["required"] and "formula" in cn["required"] and "refs" in cn["required"]
         assert cn["additionalProperties"] is False
 
-    def test_root_schema_matches_v12(self, root_schema, v12_schema):
-        """根目录 schema 与 v1.2 版本化副本内容一致（仅 $id 按所在路径不同）。"""
+    def test_root_schema_upgraded_beyond_v12(self, root_schema, v12_schema):
+        """根目录 schema 已升级到 v1.3（不再等于 v1.2 版本化副本）。"""
         r, v = dict(root_schema), dict(v12_schema)
         r.pop("$id"), v.pop("$id")
-        assert r == v
+        assert r != v, "root schema 应已升级到 v1.3，不再等于 v1.2"
 
     def test_v12_backward_compatible_with_v11(self, v11_schema, v12_schema):
         """v1.2 是 v1.1 的超集：v1.1 的所有 required 字段在 v1.2 中也 required。"""
@@ -169,14 +175,22 @@ class TestVersionRoutingV12:
         assert detect_version({"schemaVersion": "1.2"}) == "1.2"
 
     def test_example_detects_1_2(self, example_data):
-        assert detect_version(example_data) == "1.2"
+        """示例数据剥离 v1.3 字段后应检测为 v1.2。"""
+        data = json.loads(json.dumps(example_data))
+        _strip_v13_fields(data)
+        data["schemaVersion"] = "1.2"
+        assert detect_version(data) == "1.2"
 
     def test_example_validates_under_v12(self, example_data):
         errors = validate_full(example_data)
         assert not errors, f"v1.2 示例应通过 v1.2 schema，错误: {[e.message for e in errors]}"
 
     def test_example_validates_under_explicit_1_2(self, example_data):
-        errors = validate_full(example_data, version="1.2")
+        """示例数据剥离 v1.3 字段后应通过 v1.2 schema。"""
+        data = json.loads(json.dumps(example_data))
+        _strip_v13_fields(data)
+        data["schemaVersion"] = "1.2"
+        errors = validate_full(data, version="1.2")
         assert not errors
 
     def test_v12_fields_rejected_by_v11_schema(self, example_data):

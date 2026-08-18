@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/sunhe-8922/real-estate-appraisal-toolchain/schema/appraisal-result.schema.json",
+  "$id": "https://github.com/sunhe-8922/real-estate-appraisal-toolchain/schema/v1.3/appraisal-result.schema.json",
   "title": "AppraisalCalculationResult",
   "description": "房地产估价测算结果标准格式（GB/T 50291-2015）。四大方法技能各输出自己部分，报告技能读取组装后的完整对象。",
   "type": "object",

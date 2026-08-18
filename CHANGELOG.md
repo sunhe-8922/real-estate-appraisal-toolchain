@@ -4,6 +4,61 @@
 
 ---
 
+## [1.3] — 2026-08-18
+
+### 新增（兼容 v1.2，全部可选）
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `decisionPoints` | `array` ($ref: decisionPoint) | 人工决策点列表：AI 在关键专业判断节点暂停，呈现"决策包"等待估价师批准/调整/驳回 |
+
+- 新增 `$defs.decisionPoint`：`required: [id, name, phase, trigger, riskLevel, status, conclusion, evidence, reasoning, risks]`，`additionalProperties: false`
+- 新增 `$defs.evidenceItem`：`required: [item, source]`，`additionalProperties: false`
+- 新增 `$defs.riskItem`：`required: [description, level]`，`additionalProperties: false`
+- 新增 `$defs.comparisonItem`：`required: [instance, differences]`，`additionalProperties: false`（方法特定 DP 使用）
+
+### decisionPoint 结构
+
+| 属性 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `id` | `string` | 是 | 决策点标识（DP1 / DP-comp 等） |
+| `name` | `string` | 是 | 决策点名称 |
+| `phase` | `enum` | 是 | `preCalculation` / `inMethod` / `postMethod` / `postReport` |
+| `trigger` | `string` | 是 | 触发条件描述（`always` 或 `method:comps` 等） |
+| `method` | `string` | 否 | 关联方法（条件 DP 使用） |
+| `riskLevel` | `enum` | 是 | `P0`（必须人工确认）/ `P1`（建议人工确认）/ `P2`（知会即可） |
+| `status` | `enum` | 是 | `pending` / `approved` / `modified` / `rejected` |
+| `conclusion` | `string` | 是 | AI 结论（结论先行） |
+| `evidence` | `array` (minItems: 1) | 是 | 证据列表，每项含 `item` + `source` |
+| `reasoning` | `string` | 是 | 推理过程 |
+| `risks` | `array` (minItems: 1) | 是 | 风险列表，每项含 `description` + `level` + 可选 `mitigation` |
+| `comparison` | `array` | 否 | 与估价对象差异（方法特定 DP 使用） |
+| `humanDecision` | `object` | 否 | 人类决策记录（pending 时可不存在） |
+
+### 设计原则
+
+- **结论先行**：每个决策点必须先给结论，再展开证据和理由
+- **风险分级**：P0 = 错误代价不可逆（必须人工确认），P1 = 建议确认，P2 = 知会即可
+- **向后兼容**：`decisionPoints` 为可选字段，v1.2 数据迁移到 v1.3 仅更新版本号，不自动填充
+
+### 变更
+
+| 字段 | 旧约束 | 新约束 | 原因 |
+|------|--------|--------|------|
+| `schemaVersion` | `pattern: "^1\\.2$"` | `pattern: "^1\\.3$"` | 版本号升级 |
+
+### 迁移
+
+- 运行 `python scripts/migrate_schema.py --input <file.json>` 自动将 v1.2 升级为 v1.3（仅更新版本号）
+- `decisionPoints` 为运行时字段，由 AI 在估价流程中动态生成，不通过迁移填充
+
+### 测试
+
+- 新增 `tests/test_schema_v13.py`：44 个测试用例（7 个测试类）
+- 覆盖维度：schema 合法性 / decisionPoint 约束 / 子项约束 / 版本路由 / 迁移 / 完整决策包 / CHANGELOG
+
+---
+
 ## [1.2] — 2026-08-14
 
 ### 新增（兼容 v1.1，全部可选）
@@ -87,7 +142,7 @@
 ## 迁移路径
 
 ```
-v1.0 (2026-08-11) ──▶ v1.1 (2026-08-13) ──▶ v1.2 (2026-08-14)
+v1.0 (2026-08-11) ──▶ v1.1 (2026-08-13) ──▶ v1.2 (2026-08-14) ──▶ v1.3 (2026-08-18)
 ```
 
 迁移命令：

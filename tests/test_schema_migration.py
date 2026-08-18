@@ -43,9 +43,11 @@ def v11_schema():
 
 
 def _strip_v12_fields(data: dict) -> None:
-    """从数据中移除 v1.2 新增字段，还原为干净 v1.1 数据。"""
+    """从数据中移除 v1.2 及 v1.3 新增字段，还原为干净 v1.1 数据。"""
     # 顶层 calculationChain（v1.2 新增）
     data.pop("calculationChain", None)
+    # 顶层 decisionPoints（v1.3 新增）
+    data.pop("decisionPoints", None)
     # adjustments 子项 details 数组（v1.2 新增）
     for inst in data.get("methods", {}).get("comps", {}).get("comparableInstances", []):
         adj = inst.get("adjustments", {})
