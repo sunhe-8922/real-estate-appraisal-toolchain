@@ -4,6 +4,45 @@
 
 ---
 
+## [1.4] — 2026-08-18（决策链建模）
+
+### 新增（兼容 v1.3，全部可选）
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `decisionPoint.supersedes` | `string` | 被本决策点取代的前一个决策点 id。仅驳回后继决策点使用：`status=rejected` 的旧 DP 保留为不可变审计记录，AI 创建新 DP 时通过 `supersedes` 指向它形成决策链 |
+| `decisionPoint.attempt` | `integer` (min 1) | 决策链内尝试序号（1 起）。首个 DP 可省略或 1；有 `supersedes` 时须等于被取代 DP 的 `attempt+1` |
+
+### 决策链业务校验（C1-C6，`scripts/validate_appraisal_json.py` `_check_decision_chain()`）
+
+JSON Schema 无法表达数组级约束，由业务校验强制：
+
+| 编号 | 约束 | 说明 |
+|------|------|------|
+| C1 | `supersedes` 存在性 | 引用的 DP id 必须存在于 decisionPoints |
+| C2 | 不自引用 | `supersedes` 不得指向自身 |
+| C3 | 被取代者必须 rejected | 链上前驱必须 `status=rejected` |
+| C4 | 1:1 后继 | 同一 DP 最多被一个后继取代（防分叉） |
+| C5 | 不得成环 | 沿 supersedes 回溯不得回到自身 |
+| C6 | attempt 一致性 | 后继 attempt = 前驱 attempt + 1 |
+
+### 配套更新
+
+| 变更 | 说明 |
+|------|------|
+| 根目录 schema 升级 | `schema/appraisal-result.schema.json` v1.3.1 → v1.4 |
+| 版本化副本 | `schema/v1.4/appraisal-result.schema.json`（root 一致性验证 PASS） |
+| 迁移脚本 | `migrate_schema.py` 新增 1.3→1.4 路径（仅更新 schemaVersion，supersedes/attempt 不自动填充） |
+| 示例数据 | `example-武汉洪山住宅.json` 升级 v1.4，新增完整驳回链演示：DP-comp（rejected，comment 记录驳回理由）→ DP-comp-2（approved，supersedes=DP-comp，attempt=2） |
+| 决策点规格文档 | `outputs/决策点规格定义.md`：8 个 DP 全规格 + 决策链模型（4.2 规则 / 4.3 状态机 / 4.4 Schema 建模 / 5 章场景演练） |
+| 文档一致性 | `outputs/人工决策点架构设计.md`：sourceGrade 统一（链家/贝壳=T1）、DP-income 命名统一为"收益率确定"、Phase 1-2 标记完成、驳回行为表更新为决策链模型 |
+
+### 测试
+
+- `tests/test_schema_v14.py` 新增 27 个用例：TestV14Schema（9）/ TestDecisionChainValidation（11，C1-C6 反面 + 4 正例）/ TestVersionRoutingV14（3）/ TestMigrationV14（4）/ TestChangelogV14（1）
+
+---
+
 ## [1.3.1] — 2026-08-18（对抗式审查修复）
 
 ### 修复：decisionPoint 跨字段条件约束（P0-1 ~ P0-8）
@@ -182,7 +221,7 @@ v1.3 初版的条件约束只写在 `description` 文本里，验证器不执行
 ## 迁移路径
 
 ```
-v1.0 (2026-08-11) ──▶ v1.1 (2026-08-13) ──▶ v1.2 (2026-08-14) ──▶ v1.3 (2026-08-18) ──▶ v1.3.1 (2026-08-18)
+v1.0 (2026-08-11) ──▶ v1.1 (2026-08-13) ──▶ v1.2 (2026-08-14) ──▶ v1.3 (2026-08-18) ──▶ v1.3.1 (2026-08-18) ──▶ v1.4 (2026-08-18)
 ```
 
 迁移命令：

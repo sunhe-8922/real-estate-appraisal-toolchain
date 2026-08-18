@@ -31,6 +31,7 @@ VERSION_SCHEMA_MAP = {
     "1.1": SCHEMA_DIR / "v1.1" / "appraisal-result.schema.json",
     "1.2": SCHEMA_DIR / "v1.2" / "appraisal-result.schema.json",
     "1.3": SCHEMA_DIR / "v1.3" / "appraisal-result.schema.json",
+    "1.4": SCHEMA_DIR / "v1.4" / "appraisal-result.schema.json",
 }
 
 # 方法片段 → schema 内的路径
@@ -60,7 +61,7 @@ def _load_schema(version: str = None) -> dict:
 def detect_version(data: dict) -> str:
     """
     从数据中检测 schema 版本号。
-    返回 "1.0" / "1.1" / "1.2" / "1.3" / "unknown"。
+    返回 "1.0" / "1.1" / "1.2" / "1.3" / "1.4" / "unknown"。
     """
     v = data.get("schemaVersion", "unknown")
     return v if v in VERSION_SCHEMA_MAP else "unknown"
@@ -98,6 +99,101 @@ def _check_decision_point_uniqueness(data: dict) -> list:
     return errors
 
 
+def _check_decision_chain(data: dict) -> list:
+    """
+    业务校验：驳回后决策链约束（v1.4 新增，P2-2 决策链模型）。
+
+    规则（对应《决策点规格定义》第四章）：
+    C1. supersedes 引用的 id 必须存在于 decisionPoints 中
+    C2. 不得自引用
+    C3. 被取代的 DP 必须 status=rejected（只有被否决的决策点才会被取代）
+    C4. 1:1 后继：同一 DP id 最多被一个其它 DP 取代（防分叉）
+    C5. 不得成环（沿 supersedes 链不得回到自己）
+    C6. attempt 一致性：若提供 attempt，须 = 被取代 DP 的 attempt + 1
+    """
+    dps = data.get("decisionPoints")
+    if not isinstance(dps, list):
+        return []
+
+    by_id = {}
+    errors = []
+    for i, dp in enumerate(dps):
+        if isinstance(dp, dict) and dp.get("id") is not None:
+            by_id[dp["id"]] = (i, dp)
+
+    for i, dp in enumerate(dps):
+        if not isinstance(dp, dict):
+            continue
+        dp_id = dp.get("id")
+        supersedes = dp.get("supersedes")
+        if supersedes is None:
+            continue
+        base = ["decisionPoints", i]
+
+        # C2: 自引用
+        if supersedes == dp_id:
+            errors.append(_make_error(
+                f"decisionPoints[{i}] 的 supersedes 引用了自身 '{dp_id}'，不得自引用",
+                base + ["supersedes"],
+            ))
+            continue
+
+        # C1: 存在性
+        if supersedes not in by_id:
+            errors.append(_make_error(
+                f"decisionPoints[{i}] 的 supersedes 引用了不存在的决策点 '{supersedes}'",
+                base + ["supersedes"],
+            ))
+            continue
+
+        prev_idx, prev = by_id[supersedes]
+
+        # C3: 被取代者必须被驳回
+        if prev.get("status") != "rejected":
+            errors.append(_make_error(
+                f"decisionPoints[{i}] 的 supersedes 指向 '{supersedes}'（status={prev.get('status')}），"
+                f"只有 status=rejected 的决策点才能被取代",
+                base + ["supersedes"],
+            ))
+
+        # C4: 1:1 后继（防分叉）
+        for j, other in enumerate(dps):
+            if j != i and isinstance(other, dict) and other.get("supersedes") == supersedes:
+                errors.append(_make_error(
+                    f"decisionPoints[{j}] 与 decisionPoints[{i}] 都声明 supersedes='{supersedes}'，"
+                    f"同一决策点只能被一个后继取代",
+                    base + ["supersedes"],
+                ))
+                break
+
+        # C5: 不得成环（沿链走，若回到自己则成环）
+        visited = set()
+        cursor = supersedes
+        while cursor in by_id and cursor not in visited:
+            if cursor == dp_id:
+                break  # 回到起点，成环
+            visited.add(cursor)
+            cursor = by_id[cursor][1].get("supersedes")
+        if cursor == dp_id:
+            errors.append(_make_error(
+                f"decisionPoints[{i}] 的决策链存在环（{dp_id} → … → {dp_id}）",
+                base + ["supersedes"],
+            ))
+
+        # C6: attempt 一致性
+        attempt = dp.get("attempt")
+        if attempt is not None:
+            prev_attempt = prev.get("attempt", 1)
+            if attempt != prev_attempt + 1:
+                errors.append(_make_error(
+                    f"decisionPoints[{i}] 的 attempt={attempt} 与 supersedes '{supersedes}'（attempt={prev_attempt}）"
+                    f"不一致，应为 {prev_attempt + 1}",
+                    base + ["attempt"],
+                ))
+
+    return errors
+
+
 def validate_full(data: dict, version: str = None) -> list:
     """
     验证完整的 AppraisalCalculationResult 对象。
@@ -115,7 +211,7 @@ def validate_full(data: dict, version: str = None) -> list:
     )
     errors = sorted(validator.iter_errors(data), key=lambda e: list(e.path))
     # 追加业务校验（schema 表达不了的跨字段/集合约束）
-    errors = list(errors) + _check_decision_point_uniqueness(data)
+    errors = list(errors) + _check_decision_point_uniqueness(data) + _check_decision_chain(data)
     return errors
 
 

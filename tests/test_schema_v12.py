@@ -49,7 +49,7 @@ def v11_schema():
 
 @pytest.fixture(scope="session")
 def root_schema():
-    """根目录 schema 应始终等于最新版（当前 v1.3）。"""
+    """根目录 schema 应始终等于最新版（当前 v1.4）。"""
     with open(ROOT_SCHEMA_PATH, encoding="utf-8") as f:
         return json.load(f)
 
@@ -120,10 +120,10 @@ class TestV12Schema:
         assert cn["additionalProperties"] is False
 
     def test_root_schema_upgraded_beyond_v12(self, root_schema, v12_schema):
-        """根目录 schema 已升级到 v1.3（不再等于 v1.2 版本化副本）。"""
+        """根目录 schema 已升级到 v1.4（不再等于 v1.2 版本化副本）。"""
         r, v = dict(root_schema), dict(v12_schema)
         r.pop("$id"), v.pop("$id")
-        assert r != v, "root schema 应已升级到 v1.3，不再等于 v1.2"
+        assert r != v, "root schema 应已升级到 v1.4，不再等于 v1.2"
 
     def test_v12_backward_compatible_with_v11(self, v11_schema, v12_schema):
         """v1.2 是 v1.1 的超集：v1.1 的所有 required 字段在 v1.2 中也 required。"""

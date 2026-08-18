@@ -2,7 +2,7 @@
 """
 migrate_schema.py — 估价 JSON Schema 版本迁移工具
 
-支持 v1.0 → v1.1 → v1.2 → v1.3 的自动迁移，补充各版本新增的可选字段默认值。
+支持 v1.0 → v1.1 → v1.2 → v1.3 → v1.4 的自动迁移，补充各版本新增的可选字段默认值。
 
 用法:
   # 迁移数据文件
@@ -24,6 +24,7 @@ MIGRATIONS = {
     "1.0": "1.1",
     "1.1": "1.2",
     "1.2": "1.3",
+    "1.3": "1.4",
 }
 
 
@@ -47,6 +48,8 @@ def migrate(data: dict, from_version: str, to_version: str) -> tuple[dict, list[
         return _migrate_1_1_to_1_2(data)
     if from_version == "1.2" and to_version == "1.3":
         return _migrate_1_2_to_1_3(data)
+    if from_version == "1.3" and to_version == "1.4":
+        return _migrate_1_3_to_1_4(data)
     raise ValueError(f"不支持的迁移路径: {from_version} → {to_version}")
 
 
@@ -122,6 +125,26 @@ def _migrate_1_2_to_1_3(data: dict) -> tuple[dict, list[str]]:
         notes.append("schemaVersion: 1.2 → 1.3")
 
     # decisionPoints 不自动填充 — 运行时由 AI 生成
+
+    return data, notes
+
+
+def _migrate_1_3_to_1_4(data: dict) -> tuple[dict, list[str]]:
+    """
+    v1.3 → v1.4 迁移。
+    v1.4 新增（全部可选）：
+      - decisionPoint.supersedes（被取代的决策点 id，驳回后继使用）
+      - decisionPoint.attempt（决策链内尝试序号）
+    迁移策略：仅更新 schemaVersion。supersedes/attempt 为运行时字段，
+    由 AI 在驳回后创建新决策点时填写，不从历史数据推断。
+    """
+    notes = []
+
+    if data.get("schemaVersion") == "1.3":
+        data["schemaVersion"] = "1.4"
+        notes.append("schemaVersion: 1.3 → 1.4")
+
+    # supersedes/attempt 不自动填充 — 运行时由 AI 生成（历史 DP 无决策链）
 
     return data, notes
 

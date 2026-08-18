@@ -176,10 +176,11 @@ class TestV13Schema:
         hd = v13_schema["$defs"]["decisionPoint"]["properties"]["humanDecision"]
         assert set(hd["properties"]["action"]["enum"]) == {"approved", "modified", "rejected"}
 
-    def test_root_schema_matches_v13(self, root_schema, v13_schema):
+    def test_root_schema_upgraded_beyond_v13(self, root_schema, v13_schema):
+        """根目录 schema 已升级到 v1.4（不再等于 v1.3 版本化副本）。"""
         r, v = dict(root_schema), dict(v13_schema)
         r.pop("$id"), v.pop("$id")
-        assert r == v
+        assert r != v, "root schema 应已升级到 v1.4，不再等于 v1.3"
 
     def test_v13_backward_compatible_with_v12(self, v12_schema, v13_schema):
         for field in v12_schema["required"]:
@@ -362,6 +363,7 @@ class TestVersionRoutingV13:
         """v1.3 数据不含 decisionPoints（可选字段）应通过。"""
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
+        data.pop("decisionPoints", None)  # 示例数据已含 v1.4 决策链字段，剥离后测试 v1.3 可选性
         errors = validate_full(data)
         assert not errors, f"无 decisionPoints 的 v1.3 数据应通过: {[e.message for e in errors]}"
 
