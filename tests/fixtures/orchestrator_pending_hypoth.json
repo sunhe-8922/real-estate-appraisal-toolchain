@@ -492,7 +492,41 @@
       ]
     },
     "cost": null,
-    "hypotheticalDev": null
+    "hypotheticalDev": {
+      "applicable": true,
+      "analysisMethod": "dynamic",
+      "premise": "ownerInitiated",
+      "developmentValue": 12500,
+      "subsequentCosts": {
+        "construction": 2800,
+        "taxes": 400,
+        "profit": 400
+      },
+      "discountRate": 0.06,
+      "developmentPeriod": 2,
+      "finalValue": {
+        "total": 1143850,
+        "unit": 8900
+      },
+      "weight": 0.5,
+      "weightRationale": "假设开发法与比较法结果交叉验证",
+      "redLineChecks": [
+        {
+          "rule": "开发完成后价值口径",
+          "threshold": "不得用成本法测算（4.5.7 红线）",
+          "actualValue": "按可比在售项目售价测算",
+          "passed": true,
+          "explanation": ""
+        },
+        {
+          "rule": "最佳开发经营方式",
+          "threshold": "按 4.5.4 条判断",
+          "actualValue": "住宅开发，容积率 2.0",
+          "passed": true,
+          "explanation": ""
+        }
+      ]
+    }
   },
   "result": {
     "finalTotalValue": 3271720,

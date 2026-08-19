@@ -65,3 +65,16 @@ class TestPendingFixtures:
         for risk in dp["risks"]:
             assert risk["level"] in ("P0", "P1", "P2")
             assert risk["mitigation"], "风险应有缓解措施"
+
+    @pytest.mark.parametrize("name,dp_id,trigger,method", PENDING_FIXTURES)
+    def test_pending_dp_trigger_method_traceable(self, name, dp_id, trigger, method):
+        """条件 DP 触发的方法必须在 methods 中存在且 applicable=true（第四轮审查 P1-2）。
+
+        决策点规格：DP-comp/income/cost/hypoth 触发条件 = methods.<method>.applicable=true。
+        若 methods.<method> 为 null（未采用），该 DP 不应出现，且决策包结论无法溯源。
+        """
+        data = _load(name)
+        m = data["methods"].get(method)
+        assert m is not None, f"{name}: methods.{method} 不应为 null（条件 DP 已触发）"
+        assert m.get("applicable") is True, f"{name}: methods.{method}.applicable 应为 true"
+        assert m.get("finalValue", {}).get("unit"), f"{name}: methods.{method}.finalValue.unit 应存在（结论可溯源）"

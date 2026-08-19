@@ -491,7 +491,49 @@
         }
       ]
     },
-    "cost": null,
+    "cost": {
+      "applicable": true,
+      "pathType": "combined",
+      "reproductionCost": 6850,
+      "costComponents": {
+        "landAcquisition": 3200,
+        "construction": 2400,
+        "management": 96,
+        "interest": 180,
+        "taxes": 206,
+        "profit": 480,
+        "misc": 288
+      },
+      "finalValue": {
+        "total": 748191,
+        "unit": 5822.5
+      },
+      "weight": 0.5,
+      "weightRationale": "成本法与比较法结果交叉验证",
+      "redLineChecks": [
+        {
+          "rule": "重置成本口径",
+          "threshold": "房地合估/分估路径明确",
+          "actualValue": "房地合估（combined）",
+          "passed": true,
+          "explanation": ""
+        },
+        {
+          "rule": "重置成本 vs 重建成本",
+          "threshold": "重大装修/特殊设计用重建成本",
+          "actualValue": "无特殊设计，用重置成本",
+          "passed": true,
+          "explanation": ""
+        },
+        {
+          "rule": "7 项必要支出",
+          "threshold": "齐全",
+          "actualValue": "土地/建安/管理/利息/税费/利润/其他 7 项",
+          "passed": true,
+          "explanation": ""
+        }
+      ]
+    },
     "hypotheticalDev": null
   },
   "result": {
