@@ -4,6 +4,34 @@
 
 ---
 
+## [1.5] — 2026-08-19（evidenceItem.sourceGrade 信源等级结构化）
+
+### 新增（兼容 v1.4，可选）
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `evidenceItem.sourceGrade` | `string` enum (T0/T1/T2) | 证据信源等级：T0 官方/一手资料，T1 头部平台交叉验证，T2 仅供参考。与 `comparableInstances[].sourceGrade` 同构。旧数据 source 文本内的 `(T0)` 等标记保留，迁移不自动推断 |
+
+### 语义说明（P2-4）
+
+`calculationChain.version` 为计算链格式版本，独立于顶层 `schemaVersion`（schema 版本）。计算链格式演进频率低于 schema，两者解耦；当前 `calculationChain.version` 恒为 `"1.2"`，不随 schema 升级而改变。
+
+### 配套更新
+
+| 变更 | 说明 |
+|------|------|
+| 根目录 schema 升级 | `schema/appraisal-result.schema.json` v1.4 → v1.5 |
+| 版本化副本 | `schema/v1.5/appraisal-result.schema.json`（root 一致性验证 PASS） |
+| 迁移脚本 | `migrate_schema.py` 新增 1.4→1.5 路径（仅更新 schemaVersion，sourceGrade 不自动填充） |
+| 测试 helper 去重 | `tests/helpers.py` 新增共享模块（P1-3）：`strip_v12_fields` / `strip_v13_fields` / `make_minimal_decision_point` / `make_comp_decision_point`，消除 migration/v12/v13/v14 四文件重复定义 |
+
+### 测试
+
+- `tests/test_schema_v15.py`：19 用例（schema 合法性 / sourceGrade 约束 / 向后兼容 / 版本隔离 / 迁移 / CHANGELOG）
+- 全量回归：`python -m pytest tests/ -q` 273 → 292 passed
+
+---
+
 ## [1.4] — 2026-08-18（决策链建模）
 
 ### 新增（兼容 v1.3，全部可选）

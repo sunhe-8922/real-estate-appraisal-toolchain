@@ -30,6 +30,7 @@ CHANGELOG_PATH = ROOT / "CHANGELOG.md"
 sys.path.insert(0, str(ROOT / "scripts"))
 from validate_appraisal_json import detect_version, validate_full, VERSION_SCHEMA_MAP
 from migrate_schema import _migrate_1_2_to_1_3
+from helpers import make_minimal_decision_point, make_comp_decision_point
 
 
 # ── Fixtures ───────────────────────────────────────────
@@ -55,71 +56,6 @@ def root_schema():
 def example_data():
     with open(EXAMPLE_PATH, encoding="utf-8") as f:
         return json.load(f)
-
-
-def _make_minimal_decision_point(dp_id="DP1", status="approved"):
-    """构造一个最小合法的 decisionPoint 对象。"""
-    dp = {
-        "id": dp_id,
-        "name": "估价事项确认",
-        "phase": "preCalculation",
-        "trigger": "always",
-        "riskLevel": "P0",
-        "status": status,
-        "conclusion": "建议确认估价目的为抵押估价",
-        "evidence": [
-            {"item": "委托合同明确估价目的", "source": "委托合同"}
-        ],
-        "reasoning": "抵押估价要求市场价值",
-        "risks": [
-            {"description": "附属面积需确认", "level": "P0", "mitigation": "按产权证"}
-        ],
-    }
-    if status == "approved":
-        dp["humanDecision"] = {
-            "action": "approved",
-            "decidedBy": "sun",
-            "timestamp": "2026-08-18T10:30:00+08:00",
-        }
-    elif status == "modified":
-        dp["humanDecision"] = {
-            "action": "modified",
-            "decidedBy": "sun",
-            "timestamp": "2026-08-18T10:30:00+08:00",
-            "modifications": "将估价目的改为转让估价",
-        }
-    return dp
-
-
-def _make_comp_decision_point():
-    """构造一个方法特定决策点（可比实例选取）。"""
-    return {
-        "id": "DP-comp",
-        "name": "可比实例选取",
-        "phase": "inMethod",
-        "trigger": "method:comps",
-        "method": "comps",
-        "riskLevel": "P1",
-        "status": "approved",
-        "conclusion": "推荐选取实例 A/B/C",
-        "evidence": [
-            {"item": "实例 A：XX 小区，成交 2026-06-15，25000 元/m²", "source": "链家成交记录 (T0)"},
-            {"item": "实例 B：XX 小区，成交 2026-07-01，25500 元/m²", "source": "贝壳成交记录 (T1)"},
-        ],
-        "reasoning": "三个实例均在 6 个月内成交",
-        "risks": [
-            {"description": "实例 B 距地铁站远 800m", "level": "P1", "mitigation": "区位修正预计 18%"},
-        ],
-        "comparison": [
-            {"instance": "A", "differences": "同栋同户型，楼层差 2 层"},
-            {"instance": "B", "differences": "同小区不同栋，面积差 5m²"},
-        ],
-        "humanDecision": {
-            "action": "approved",
-            "decidedBy": "sun",
-            "timestamp": "2026-08-18T11:00:00+08:00",
-        },
-    }
 
 
 # ════════════════════════════════════════════════════════
@@ -195,14 +131,14 @@ class TestDecisionPointConstraints:
         """最小合法 decisionPoint 应通过验证。"""
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        data["decisionPoints"] = [_make_minimal_decision_point()]
+        data["decisionPoints"] = [make_minimal_decision_point()]
         errors = validate_full(data)
         assert not errors, f"最小 DP 应通过: {[e.message for e in errors]}"
 
     def test_dp_missing_id_rejected(self, example_data):
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        dp = _make_minimal_decision_point()
+        dp = make_minimal_decision_point()
         del dp["id"]
         data["decisionPoints"] = [dp]
         errors = validate_full(data)
@@ -211,7 +147,7 @@ class TestDecisionPointConstraints:
     def test_dp_missing_conclusion_rejected(self, example_data):
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        dp = _make_minimal_decision_point()
+        dp = make_minimal_decision_point()
         del dp["conclusion"]
         data["decisionPoints"] = [dp]
         errors = validate_full(data)
@@ -220,7 +156,7 @@ class TestDecisionPointConstraints:
     def test_dp_missing_evidence_rejected(self, example_data):
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        dp = _make_minimal_decision_point()
+        dp = make_minimal_decision_point()
         del dp["evidence"]
         data["decisionPoints"] = [dp]
         errors = validate_full(data)
@@ -229,7 +165,7 @@ class TestDecisionPointConstraints:
     def test_dp_missing_risks_rejected(self, example_data):
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        dp = _make_minimal_decision_point()
+        dp = make_minimal_decision_point()
         del dp["risks"]
         data["decisionPoints"] = [dp]
         errors = validate_full(data)
@@ -238,7 +174,7 @@ class TestDecisionPointConstraints:
     def test_dp_extra_field_rejected(self, example_data):
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        dp = _make_minimal_decision_point()
+        dp = make_minimal_decision_point()
         dp["extraField"] = "不应存在"
         data["decisionPoints"] = [dp]
         errors = validate_full(data)
@@ -247,7 +183,7 @@ class TestDecisionPointConstraints:
     def test_dp_invalid_phase_rejected(self, example_data):
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        dp = _make_minimal_decision_point()
+        dp = make_minimal_decision_point()
         dp["phase"] = "invalidPhase"
         data["decisionPoints"] = [dp]
         errors = validate_full(data)
@@ -256,7 +192,7 @@ class TestDecisionPointConstraints:
     def test_dp_invalid_status_rejected(self, example_data):
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        dp = _make_minimal_decision_point()
+        dp = make_minimal_decision_point()
         dp["status"] = "draft"
         data["decisionPoints"] = [dp]
         errors = validate_full(data)
@@ -265,7 +201,7 @@ class TestDecisionPointConstraints:
     def test_dp_empty_evidence_rejected(self, example_data):
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        dp = _make_minimal_decision_point()
+        dp = make_minimal_decision_point()
         dp["evidence"] = []
         data["decisionPoints"] = [dp]
         errors = validate_full(data)
@@ -274,7 +210,7 @@ class TestDecisionPointConstraints:
     def test_dp_empty_risks_rejected(self, example_data):
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        dp = _make_minimal_decision_point()
+        dp = make_minimal_decision_point()
         dp["risks"] = []
         data["decisionPoints"] = [dp]
         errors = validate_full(data)
@@ -288,7 +224,7 @@ class TestSubItemConstraints:
     def test_evidence_missing_item_rejected(self, example_data):
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        dp = _make_minimal_decision_point()
+        dp = make_minimal_decision_point()
         del dp["evidence"][0]["item"]
         data["decisionPoints"] = [dp]
         errors = validate_full(data)
@@ -297,7 +233,7 @@ class TestSubItemConstraints:
     def test_evidence_missing_source_rejected(self, example_data):
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        dp = _make_minimal_decision_point()
+        dp = make_minimal_decision_point()
         del dp["evidence"][0]["source"]
         data["decisionPoints"] = [dp]
         errors = validate_full(data)
@@ -306,7 +242,7 @@ class TestSubItemConstraints:
     def test_evidence_extra_field_rejected(self, example_data):
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        dp = _make_minimal_decision_point()
+        dp = make_minimal_decision_point()
         dp["evidence"][0]["extra"] = "no"
         data["decisionPoints"] = [dp]
         errors = validate_full(data)
@@ -315,7 +251,7 @@ class TestSubItemConstraints:
     def test_risk_invalid_level_rejected(self, example_data):
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        dp = _make_minimal_decision_point()
+        dp = make_minimal_decision_point()
         dp["risks"][0]["level"] = "P3"
         data["decisionPoints"] = [dp]
         errors = validate_full(data)
@@ -324,7 +260,7 @@ class TestSubItemConstraints:
     def test_risk_missing_level_rejected(self, example_data):
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        dp = _make_minimal_decision_point()
+        dp = make_minimal_decision_point()
         del dp["risks"][0]["level"]
         data["decisionPoints"] = [dp]
         errors = validate_full(data)
@@ -333,7 +269,7 @@ class TestSubItemConstraints:
     def test_comparison_missing_instance_rejected(self, example_data):
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        dp = _make_comp_decision_point()
+        dp = make_comp_decision_point()
         del dp["comparison"][0]["instance"]
         data["decisionPoints"] = [dp]
         errors = validate_full(data)
@@ -342,7 +278,7 @@ class TestSubItemConstraints:
     def test_comparison_missing_differences_rejected(self, example_data):
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        dp = _make_comp_decision_point()
+        dp = make_comp_decision_point()
         del dp["comparison"][0]["differences"]
         data["decisionPoints"] = [dp]
         errors = validate_full(data)
@@ -379,7 +315,7 @@ class TestVersionRoutingV13:
         """v1.3 新增字段在 v1.2 schema 下应被拒绝（版本隔离）。"""
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.2"
-        data["decisionPoints"] = [_make_minimal_decision_point()]
+        data["decisionPoints"] = [make_minimal_decision_point()]
         errors = validate_full(data, version="1.2")
         assert errors, "v1.2 schema 应拒绝 decisionPoints"
 
@@ -429,7 +365,7 @@ class TestFullDecisionPackage:
         """固定决策点 + 人类决策记录应通过。"""
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        data["decisionPoints"] = [_make_minimal_decision_point(status="approved")]
+        data["decisionPoints"] = [make_minimal_decision_point(status="approved")]
         errors = validate_full(data)
         assert not errors, f"固定 DP 应通过: {[e.message for e in errors]}"
 
@@ -437,7 +373,7 @@ class TestFullDecisionPackage:
         """方法特定决策点 + comparison 字段应通过。"""
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        data["decisionPoints"] = [_make_comp_decision_point()]
+        data["decisionPoints"] = [make_comp_decision_point()]
         errors = validate_full(data)
         assert not errors, f"方法特定 DP 应通过: {[e.message for e in errors]}"
 
@@ -445,7 +381,7 @@ class TestFullDecisionPackage:
         """status=pending 时 humanDecision 可不存在。"""
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        dp = _make_minimal_decision_point(status="pending")
+        dp = make_minimal_decision_point(status="pending")
         data["decisionPoints"] = [dp]
         errors = validate_full(data)
         assert not errors, f"pending DP 应通过: {[e.message for e in errors]}"
@@ -454,7 +390,7 @@ class TestFullDecisionPackage:
         """status=modified 时 humanDecision.modifications 应存在。"""
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        dp = _make_minimal_decision_point(status="modified")
+        dp = make_minimal_decision_point(status="modified")
         data["decisionPoints"] = [dp]
         errors = validate_full(data)
         assert not errors, f"modified DP 应通过: {[e.message for e in errors]}"
@@ -464,9 +400,9 @@ class TestFullDecisionPackage:
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
         data["decisionPoints"] = [
-            _make_minimal_decision_point("DP1", "approved"),
-            _make_minimal_decision_point("DP2", "approved"),
-            _make_comp_decision_point(),
+            make_minimal_decision_point("DP1", "approved"),
+            make_minimal_decision_point("DP2", "approved"),
+            make_comp_decision_point(),
         ]
         errors = validate_full(data)
         assert not errors, f"多 DP 应通过: {[e.message for e in errors]}"
@@ -487,49 +423,49 @@ class TestConditionalConstraints:
 
     def test_status_approved_requires_human_decision(self, example_data):
         """P0-1: status=approved 必须有人类决策记录。"""
-        dp = _make_minimal_decision_point(status="pending")
+        dp = make_minimal_decision_point(status="pending")
         dp["status"] = "approved"
         errors = self._validate(example_data, dp)
         assert errors, "approved 无 humanDecision 应被拒绝"
 
     def test_status_modified_requires_human_decision(self, example_data):
         """status=modified 必须有人类决策记录。"""
-        dp = _make_minimal_decision_point(status="pending")
+        dp = make_minimal_decision_point(status="pending")
         dp["status"] = "modified"
         errors = self._validate(example_data, dp)
         assert errors, "modified 无 humanDecision 应被拒绝"
 
     def test_status_rejected_requires_human_decision(self, example_data):
         """status=rejected 必须有人类决策记录。"""
-        dp = _make_minimal_decision_point(status="pending")
+        dp = make_minimal_decision_point(status="pending")
         dp["status"] = "rejected"
         errors = self._validate(example_data, dp)
         assert errors, "rejected 无 humanDecision 应被拒绝"
 
     def test_action_modified_requires_modifications(self, example_data):
         """P0-2: action=modified 必须填写 modifications。"""
-        dp = _make_minimal_decision_point(status="modified")
+        dp = make_minimal_decision_point(status="modified")
         del dp["humanDecision"]["modifications"]
         errors = self._validate(example_data, dp)
         assert errors, "modified 无 modifications 应被拒绝"
 
     def test_action_modified_empty_modifications_rejected(self, example_data):
         """action=modified 但 modifications 为空字符串应被拒绝。"""
-        dp = _make_minimal_decision_point(status="modified")
+        dp = make_minimal_decision_point(status="modified")
         dp["humanDecision"]["modifications"] = ""
         errors = self._validate(example_data, dp)
         assert errors, "空 modifications 应被拒绝（minLength: 1）"
 
     def test_method_trigger_requires_method(self, example_data):
         """P0-3: trigger=method:xxx 必须填写 method。"""
-        dp = _make_comp_decision_point()
+        dp = make_comp_decision_point()
         del dp["method"]
         errors = self._validate(example_data, dp)
         assert errors, "method: 触发无 method 应被拒绝"
 
     def test_pending_rejects_human_decision(self, example_data):
         """P0-4: status=pending 不允许有人类决策记录。"""
-        dp = _make_minimal_decision_point(status="approved")
+        dp = make_minimal_decision_point(status="approved")
         dp["status"] = "pending"
         errors = self._validate(example_data, dp)
         assert errors, "pending 有 humanDecision 应被拒绝"
@@ -537,14 +473,14 @@ class TestConditionalConstraints:
     def test_trigger_pattern_restricted(self, example_data):
         """P0-5: trigger 只能是 always 或 method:comps|income|cost|hypotheticalDev。"""
         for bad in ["whatever", "method:foo", "Method:comps", "always "]:
-            dp = _make_minimal_decision_point()
+            dp = make_minimal_decision_point()
             dp["trigger"] = bad
             errors = self._validate(example_data, dp)
             assert errors, f"非法 trigger '{bad}' 应被拒绝"
 
     def test_status_rejected_rejects_approved_action(self, example_data):
         """P0-6: status=rejected 时 action 必须也是 rejected（矛盾拒绝）。"""
-        dp = _make_minimal_decision_point(status="approved")
+        dp = make_minimal_decision_point(status="approved")
         dp["status"] = "rejected"
         dp["humanDecision"]["action"] = "approved"
         errors = self._validate(example_data, dp)
@@ -552,7 +488,7 @@ class TestConditionalConstraints:
 
     def test_status_approved_rejects_modified_action(self, example_data):
         """status=approved 时 action 必须也是 approved。"""
-        dp = _make_minimal_decision_point(status="approved")
+        dp = make_minimal_decision_point(status="approved")
         dp["humanDecision"]["action"] = "modified"
         errors = self._validate(example_data, dp)
         assert errors, "approved+modified 矛盾应被拒绝"
@@ -560,19 +496,19 @@ class TestConditionalConstraints:
     def test_risk_level_matches_max_risk(self, example_data):
         """P0-7: riskLevel 必须等于 risks 的最高等级。"""
         # riskLevel=P0 但 risks 全 P2 → 拒绝
-        dp = _make_minimal_decision_point(status="approved")
+        dp = make_minimal_decision_point(status="approved")
         dp["riskLevel"] = "P0"
         dp["risks"] = [{"description": "low risk", "level": "P2"}]
         errors = self._validate(example_data, dp)
         assert errors, "riskLevel=P0 但 risks 全 P2 应被拒绝"
         # riskLevel=P1 但 risks 含 P0 → 拒绝（P0 必须提升 riskLevel）
-        dp2 = _make_minimal_decision_point(status="approved")
+        dp2 = make_minimal_decision_point(status="approved")
         dp2["riskLevel"] = "P1"
         dp2["risks"] = [{"description": "high risk", "level": "P0"}]
         errors2 = self._validate(example_data, dp2)
         assert errors2, "riskLevel=P1 但 risks 含 P0 应被拒绝"
         # riskLevel=P2 但 risks 含 P1 → 拒绝
-        dp3 = _make_minimal_decision_point(status="approved")
+        dp3 = make_minimal_decision_point(status="approved")
         dp3["riskLevel"] = "P2"
         dp3["risks"] = [{"description": "mid risk", "level": "P1"}]
         errors3 = self._validate(example_data, dp3)
@@ -580,19 +516,19 @@ class TestConditionalConstraints:
 
     def test_phase_trigger_combo_restricted(self, example_data):
         """P0-8: always → 非 inMethod；method:xxx → inMethod。"""
-        dp = _make_comp_decision_point()
+        dp = make_comp_decision_point()
         dp["phase"] = "postReport"
         errors = self._validate(example_data, dp)
         assert errors, "postReport+method:comps 应被拒绝"
 
-        dp2 = _make_minimal_decision_point(status="approved")
+        dp2 = make_minimal_decision_point(status="approved")
         dp2["phase"] = "inMethod"  # always 触发不应出现在 inMethod
         errors2 = self._validate(example_data, dp2)
         assert errors2, "always+inMethod 应被拒绝"
 
     def test_rejected_dp_with_rejected_action_accepted(self, example_data):
         """rejected 状态 + rejected 动作应通过（正例）。"""
-        dp = _make_minimal_decision_point(status="approved")
+        dp = make_minimal_decision_point(status="approved")
         dp["status"] = "rejected"
         dp["humanDecision"]["action"] = "rejected"
         dp["humanDecision"]["comment"] = "理由不足，需补充证据"
@@ -609,8 +545,8 @@ class TestBusinessValidation:
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
         data["decisionPoints"] = [
-            _make_minimal_decision_point("DP1", "approved"),
-            _make_minimal_decision_point("DP1", "approved"),
+            make_minimal_decision_point("DP1", "approved"),
+            make_minimal_decision_point("DP1", "approved"),
         ]
         errors = validate_full(data)
         assert errors, "重复 DP id 应被业务校验拒绝"
@@ -622,8 +558,8 @@ class TestBusinessValidation:
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
         data["decisionPoints"] = [
-            _make_minimal_decision_point("DP1", "approved"),
-            _make_minimal_decision_point("DP2", "approved"),
+            make_minimal_decision_point("DP1", "approved"),
+            make_minimal_decision_point("DP2", "approved"),
         ]
         errors = validate_full(data)
         assert not errors, f"唯一 DP id 应通过: {[e.message for e in errors]}"
@@ -632,7 +568,7 @@ class TestBusinessValidation:
         """业务校验独立于 schema 校验：即使存在其它 schema 错误也应报告重复。"""
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        dp = _make_minimal_decision_point("DPX", "approved")
+        dp = make_minimal_decision_point("DPX", "approved")
         data["decisionPoints"] = [dp, dict(dp, name="另一个")]
         errors = validate_full(data)
         assert any("重复" in e.message for e in errors), "应同时报告重复 id"

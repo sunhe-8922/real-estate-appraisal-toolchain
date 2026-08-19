@@ -8,7 +8,7 @@ description: >
   - 从"用户目标输入"到"报告交付"的完整估价任务编排
   - 需要人工决策点介入的高可控估价流程（固定 DP1-DP4 + 条件 DP-comp/DP-income/DP-cost/DP-hypoth）
   - 决策链管理：驳回后自动创建新 DP（supersedes + attempt），旧 DP 保留为审计记录
-  - 生成符合 schema v1.4 的决策包（结论/证据/理由/风险/比较 五段式）
+  - 生成符合 schema v1.5 的决策包（结论/证据/理由/风险/比较 五段式）
 
   **Not ideal for:**
   - 单一方法测算（直接用 comps-method 等技能）
@@ -20,7 +20,7 @@ description: >
   - 设计总纲：《人工决策点架构设计.md》（9 维偏好矩阵）
   - 共享逻辑：`app/js/dp-core.js`（状态机 + 建链纯函数，Node 双模）
   - 人类决策界面：`app/dp-console.html`（决策包渲染 + 决策链可视化 + 决策响应导出）
-  - Schema：v1.4（decisionPoint + supersedes/attempt），校验见 scripts/validate_appraisal_json.py
+  - Schema：v1.5（decisionPoint + supersedes/attempt + evidenceItem.sourceGrade），校验见 scripts/validate_appraisal_json.py
 ---
 
 ## ⚠️ CRITICAL: 编排铁律 (READ FIRST)
@@ -79,7 +79,7 @@ comparison  仅方法特定 DP（DP-comp 等）：逐实例 vs 估价对象差�
 
 - `evidence` / `comparison` 中的每个断言必须能从工程文件结构化字段验证（如面积差 = `property.area − comparableInstances[i].area`）。
 - **禁止编造**结构化数据中不存在的信息（历史教训：楼层差曾因无法溯源被对抗式审查揪出）。
-- 信源等级标注必须与结构化 `sourceGrade` 一致：T0=官方/一手（不动产权证、政府公告、成交登记）；T1=平台/机构（链家、贝壳成交记录）；T2=口头/间接（中介实测、电话询价）。
+- 信源等级必须写入结构化字段 `evidenceItem.sourceGrade`（v1.5 起为 schema 字段，enum T0/T1/T2）：T0=官方/一手（不动产权证、政府公告、成交登记）；T1=平台/机构（链家、贝壳成交记录）；T2=口头/间接（中介实测、电话询价）。`source` 文本可保留 `(T0)` 等标记作人读提示，但校验以 sourceGrade 为准。
 
 ### 2.3 风险分级与 riskLevel
 

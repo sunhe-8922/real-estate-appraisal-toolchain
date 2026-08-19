@@ -32,6 +32,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from validate_appraisal_json import detect_version, validate_full, VERSION_SCHEMA_MAP
 from rebuild_excel_formula import rebuild_cells, rebuild_values
 from migrate_schema import _migrate_1_1_to_1_2
+from helpers import strip_v12_fields, strip_v13_fields
 
 
 # ── Fixture ───────────────────────────────────────────
@@ -64,21 +65,6 @@ def example_data():
 def chain_data():
     with open(CHAIN_PATH, encoding="utf-8") as f:
         return json.load(f)
-
-
-def _strip_v12_fields(data: dict) -> None:
-    """移除 v1.2 及 v1.3 新增字段，还原为干净 v1.1 数据。"""
-    data.pop("calculationChain", None)
-    data.pop("decisionPoints", None)
-    for inst in data.get("methods", {}).get("comps", {}).get("comparableInstances", []):
-        adj = inst.get("adjustments", {})
-        for key in ("locationDetails", "physicalDetails", "interestDetails"):
-            adj.pop(key, None)
-
-
-def _strip_v13_fields(data: dict) -> None:
-    """移除 v1.3 新增字段（decisionPoints），还原为干净 v1.2 数据。"""
-    data.pop("decisionPoints", None)
 
 
 # ════════════════════════════════════════════════════════
@@ -177,7 +163,7 @@ class TestVersionRoutingV12:
     def test_example_detects_1_2(self, example_data):
         """示例数据剥离 v1.3 字段后应检测为 v1.2。"""
         data = json.loads(json.dumps(example_data))
-        _strip_v13_fields(data)
+        strip_v13_fields(data)
         data["schemaVersion"] = "1.2"
         assert detect_version(data) == "1.2"
 
@@ -188,7 +174,7 @@ class TestVersionRoutingV12:
     def test_example_validates_under_explicit_1_2(self, example_data):
         """示例数据剥离 v1.3 字段后应通过 v1.2 schema。"""
         data = json.loads(json.dumps(example_data))
-        _strip_v13_fields(data)
+        strip_v13_fields(data)
         data["schemaVersion"] = "1.2"
         errors = validate_full(data, version="1.2")
         assert not errors
@@ -196,7 +182,7 @@ class TestVersionRoutingV12:
     def test_v12_fields_rejected_by_v11_schema(self, example_data):
         """v1.2 新增字段在 v1.1 schema 下应被拒绝（版本隔离）。"""
         data = json.loads(json.dumps(example_data))
-        _strip_v12_fields(data)
+        strip_v12_fields(data)
         data["schemaVersion"] = "1.1"
         # 干净 v1.1 数据先确认通过
         assert not validate_full(data, version="1.1")
@@ -210,7 +196,7 @@ class TestVersionRoutingV12:
         v1.1 adjustments 无 additionalProperties 限制（接受额外字段），
         但顶层 calculationChain 被拒绝——验证重点在顶层隔离。"""
         data = json.loads(json.dumps(example_data))
-        _strip_v12_fields(data)
+        strip_v12_fields(data)
         data["schemaVersion"] = "1.1"
         errors = validate_full(data, version="1.1")
         assert not errors, f"剥离 v1.2 字段后应通过 v1.1，错误: {[e.message for e in errors]}"
@@ -222,7 +208,7 @@ class TestVersionRoutingV12:
 class TestMigrationV12:
     def test_migrate_updates_schema_version(self, example_data):
         data = json.loads(json.dumps(example_data))
-        _strip_v12_fields(data)
+        strip_v12_fields(data)
         data["schemaVersion"] = "1.1"
         migrated, notes = _migrate_1_1_to_1_2(data)
         assert migrated["schemaVersion"] == "1.2"
@@ -231,7 +217,7 @@ class TestMigrationV12:
     def test_migrate_does_not_fabricate_details(self, example_data):
         """迁移只更新版本号，不自动编造子项明细（需 Excel 子项粒度）。"""
         data = json.loads(json.dumps(example_data))
-        _strip_v12_fields(data)
+        strip_v12_fields(data)
         data["schemaVersion"] = "1.1"
         migrated, _ = _migrate_1_1_to_1_2(data)
         inst = migrated["methods"]["comps"]["comparableInstances"][0]["adjustments"]
@@ -240,7 +226,7 @@ class TestMigrationV12:
 
     def test_migrated_data_passes_v12_schema(self, example_data):
         data = json.loads(json.dumps(example_data))
-        _strip_v12_fields(data)
+        strip_v12_fields(data)
         data["schemaVersion"] = "1.1"
         migrated, _ = _migrate_1_1_to_1_2(data)
         errors = validate_full(migrated, version="1.2")

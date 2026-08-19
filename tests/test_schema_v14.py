@@ -29,6 +29,7 @@ CHANGELOG_PATH = ROOT / "CHANGELOG.md"
 sys.path.insert(0, str(ROOT / "scripts"))
 from validate_appraisal_json import detect_version, validate_full, VERSION_SCHEMA_MAP
 from migrate_schema import _migrate_1_3_to_1_4
+from helpers import make_minimal_decision_point
 
 
 # ── Fixtures ───────────────────────────────────────────
@@ -54,39 +55,6 @@ def root_schema():
 def example_data():
     with open(EXAMPLE_PATH, encoding="utf-8") as f:
         return json.load(f)
-
-
-def _make_minimal_decision_point(dp_id="DP1", status="approved", supersedes=None, attempt=None):
-    """构造一个最小合法的 decisionPoint 对象（可带 supersedes/attempt）。"""
-    dp = {
-        "id": dp_id,
-        "name": "估价事项确认",
-        "phase": "preCalculation",
-        "trigger": "always",
-        "riskLevel": "P0",
-        "status": status,
-        "conclusion": "建议确认估价目的为抵押估价",
-        "evidence": [
-            {"item": "委托合同明确估价目的", "source": "委托合同"}
-        ],
-        "reasoning": "抵押估价要求市场价值",
-        "risks": [
-            {"description": "附属面积需确认", "level": "P0", "mitigation": "按产权证"}
-        ],
-    }
-    if status != "pending":
-        dp["humanDecision"] = {
-            "action": status,
-            "decidedBy": "sun",
-            "timestamp": "2026-08-18T10:30:00+08:00",
-        }
-        if status == "modified":
-            dp["humanDecision"]["modifications"] = "将估价目的改为转让估价"
-    if supersedes is not None:
-        dp["supersedes"] = supersedes
-    if attempt is not None:
-        dp["attempt"] = attempt
-    return dp
 
 
 def _build_with_dps(dps):
@@ -120,10 +88,11 @@ class TestV14Schema:
         assert props["attempt"]["type"] == "integer"
         assert props["attempt"]["minimum"] == 1
 
-    def test_root_schema_matches_v14(self, root_schema, v14_schema):
+    def test_root_schema_upgraded_beyond_v14(self, root_schema, v14_schema):
+        """根目录 schema 已升级到 v1.5（不再等于 v1.4 版本化副本）。"""
         r, v = dict(root_schema), dict(v14_schema)
         r.pop("$id"), v.pop("$id")
-        assert r == v, "根目录 schema 应等于 v1.4 版本化副本"
+        assert r != v, "root schema 应已升级到 v1.5，不再等于 v1.4"
 
     def test_v14_backward_compatible_with_v13(self, v13_schema, v14_schema):
         for field in v13_schema["required"]:
@@ -137,7 +106,7 @@ class TestV14Schema:
         """v1.4 新增字段（supersedes/attempt）在 v1.3 schema 下应被拒绝（版本隔离）。"""
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.3"
-        dp = _make_minimal_decision_point(supersedes="DP-old", attempt=2)
+        dp = make_minimal_decision_point(supersedes="DP-old", attempt=2)
         data["decisionPoints"] = [dp]
         errors = validate_full(data, version="1.3")
         assert errors, "v1.3 schema 应拒绝 supersedes/attempt"
@@ -147,8 +116,8 @@ class TestV14Schema:
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.4"
         data["decisionPoints"] = [
-            _make_minimal_decision_point(dp_id="DP-old", status="rejected", attempt=1),
-            _make_minimal_decision_point(dp_id="DP-new", status="approved",
+            make_minimal_decision_point(dp_id="DP-old", status="rejected", attempt=1),
+            make_minimal_decision_point(dp_id="DP-new", status="approved",
                                          supersedes="DP-old", attempt=2),
         ]
         errors = validate_full(data)
@@ -163,8 +132,8 @@ class TestDecisionChainValidation:
 
     def test_c1_supersedes_must_exist(self):
         data = _build_with_dps([
-            _make_minimal_decision_point(dp_id="DP-a", status="rejected"),
-            _make_minimal_decision_point(dp_id="DP-b", status="approved", supersedes="DP-ghost"),
+            make_minimal_decision_point(dp_id="DP-a", status="rejected"),
+            make_minimal_decision_point(dp_id="DP-b", status="approved", supersedes="DP-ghost"),
         ])
         errors = validate_full(data)
         assert any("不存在的决策点" in e.message for e in errors), \
@@ -172,7 +141,7 @@ class TestDecisionChainValidation:
 
     def test_c2_no_self_reference(self):
         data = _build_with_dps([
-            _make_minimal_decision_point(dp_id="DP-a", status="approved", supersedes="DP-a"),
+            make_minimal_decision_point(dp_id="DP-a", status="approved", supersedes="DP-a"),
         ])
         errors = validate_full(data)
         assert any("自引用" in e.message for e in errors), \
@@ -180,8 +149,8 @@ class TestDecisionChainValidation:
 
     def test_c3_superseded_must_be_rejected(self):
         data = _build_with_dps([
-            _make_minimal_decision_point(dp_id="DP-a", status="approved"),
-            _make_minimal_decision_point(dp_id="DP-b", status="approved", supersedes="DP-a"),
+            make_minimal_decision_point(dp_id="DP-a", status="approved"),
+            make_minimal_decision_point(dp_id="DP-b", status="approved", supersedes="DP-a"),
         ])
         errors = validate_full(data)
         assert any("只有 status=rejected" in e.message for e in errors), \
@@ -189,9 +158,9 @@ class TestDecisionChainValidation:
 
     def test_c4_one_to_one_successor(self):
         data = _build_with_dps([
-            _make_minimal_decision_point(dp_id="DP-a", status="rejected"),
-            _make_minimal_decision_point(dp_id="DP-b", status="approved", supersedes="DP-a"),
-            _make_minimal_decision_point(dp_id="DP-c", status="approved", supersedes="DP-a"),
+            make_minimal_decision_point(dp_id="DP-a", status="rejected"),
+            make_minimal_decision_point(dp_id="DP-b", status="approved", supersedes="DP-a"),
+            make_minimal_decision_point(dp_id="DP-c", status="approved", supersedes="DP-a"),
         ])
         errors = validate_full(data)
         assert any("只能被一个后继取代" in e.message for e in errors), \
@@ -199,8 +168,8 @@ class TestDecisionChainValidation:
 
     def test_c5_no_cycle(self):
         data = _build_with_dps([
-            _make_minimal_decision_point(dp_id="DP-a", status="rejected", supersedes="DP-b"),
-            _make_minimal_decision_point(dp_id="DP-b", status="rejected", supersedes="DP-a"),
+            make_minimal_decision_point(dp_id="DP-a", status="rejected", supersedes="DP-b"),
+            make_minimal_decision_point(dp_id="DP-b", status="rejected", supersedes="DP-a"),
         ])
         errors = validate_full(data)
         assert any("存在环" in e.message for e in errors), \
@@ -209,9 +178,9 @@ class TestDecisionChainValidation:
     def test_c5_long_chain_cycle(self):
         """A→B→C→A 三节点环也应拦截。"""
         data = _build_with_dps([
-            _make_minimal_decision_point(dp_id="DP-a", status="rejected", supersedes="DP-c"),
-            _make_minimal_decision_point(dp_id="DP-b", status="rejected", supersedes="DP-a"),
-            _make_minimal_decision_point(dp_id="DP-c", status="rejected", supersedes="DP-b"),
+            make_minimal_decision_point(dp_id="DP-a", status="rejected", supersedes="DP-c"),
+            make_minimal_decision_point(dp_id="DP-b", status="rejected", supersedes="DP-a"),
+            make_minimal_decision_point(dp_id="DP-c", status="rejected", supersedes="DP-b"),
         ])
         errors = validate_full(data)
         assert any("存在环" in e.message for e in errors), \
@@ -219,8 +188,8 @@ class TestDecisionChainValidation:
 
     def test_c6_attempt_consistency(self):
         data = _build_with_dps([
-            _make_minimal_decision_point(dp_id="DP-a", status="rejected", attempt=1),
-            _make_minimal_decision_point(dp_id="DP-b", status="approved", supersedes="DP-a", attempt=3),
+            make_minimal_decision_point(dp_id="DP-a", status="rejected", attempt=1),
+            make_minimal_decision_point(dp_id="DP-b", status="approved", supersedes="DP-a", attempt=3),
         ])
         errors = validate_full(data)
         assert any("attempt=3" in e.message and "应为 2" in e.message for e in errors), \
@@ -229,8 +198,8 @@ class TestDecisionChainValidation:
     # ── 正例 ──
     def test_valid_chain_passes(self):
         data = _build_with_dps([
-            _make_minimal_decision_point(dp_id="DP-a", status="rejected", attempt=1),
-            _make_minimal_decision_point(dp_id="DP-b", status="approved", supersedes="DP-a", attempt=2),
+            make_minimal_decision_point(dp_id="DP-a", status="rejected", attempt=1),
+            make_minimal_decision_point(dp_id="DP-b", status="approved", supersedes="DP-a", attempt=2),
         ])
         errors = validate_full(data)
         assert not errors, f"合法决策链应通过: {[e.message for e in errors]}"
@@ -238,8 +207,8 @@ class TestDecisionChainValidation:
     def test_chain_without_attempt_passes(self):
         """省略 attempt 的合法链（attempt 可选）应通过。"""
         data = _build_with_dps([
-            _make_minimal_decision_point(dp_id="DP-a", status="rejected"),
-            _make_minimal_decision_point(dp_id="DP-b", status="approved", supersedes="DP-a"),
+            make_minimal_decision_point(dp_id="DP-a", status="rejected"),
+            make_minimal_decision_point(dp_id="DP-b", status="approved", supersedes="DP-a"),
         ])
         errors = validate_full(data)
         assert not errors, f"省略 attempt 应通过: {[e.message for e in errors]}"
@@ -247,9 +216,9 @@ class TestDecisionChainValidation:
     def test_multiple_independent_dps_passes(self):
         """多个互不关联的 DP（无 supersedes）应通过。"""
         data = _build_with_dps([
-            _make_minimal_decision_point(dp_id="DP1"),
-            _make_minimal_decision_point(dp_id="DP2"),
-            _make_minimal_decision_point(dp_id="DP3"),
+            make_minimal_decision_point(dp_id="DP1"),
+            make_minimal_decision_point(dp_id="DP2"),
+            make_minimal_decision_point(dp_id="DP3"),
         ])
         errors = validate_full(data)
         assert not errors, f"独立多 DP 应通过: {[e.message for e in errors]}"
@@ -257,7 +226,7 @@ class TestDecisionChainValidation:
     def test_rejected_alone_passes(self):
         """单个 rejected DP（无后继）应通过——审计记录允许存在未重试的否决。"""
         data = _build_with_dps([
-            _make_minimal_decision_point(dp_id="DP-a", status="rejected"),
+            make_minimal_decision_point(dp_id="DP-a", status="rejected"),
         ])
         errors = validate_full(data)
         assert not errors, f"孤立 rejected 应通过: {[e.message for e in errors]}"
@@ -274,10 +243,15 @@ class TestVersionRoutingV14:
         assert detect_version({"schemaVersion": "1.4"}) == "1.4"
 
     def test_v14_data_passes_under_v14(self, example_data):
+        """纯 v1.4 数据（无 v1.5 sourceGrade）应通过 v1.4 验证。"""
         data = json.loads(json.dumps(example_data))
         data["schemaVersion"] = "1.4"
+        # 示例数据已升级 v1.5（含 sourceGrade），剥离 v1.5 字段还原 v1.4 样本
+        for dp in data.get("decisionPoints", []):
+            for ev in dp.get("evidence", []):
+                ev.pop("sourceGrade", None)
         errors = validate_full(data)
-        assert not errors, f"v1.4 示例数据应通过: {[e.message for e in errors]}"
+        assert not errors, f"v1.4 数据应通过: {[e.message for e in errors]}"
 
 
 # ════════════════════════════════════════════════════════

@@ -247,7 +247,7 @@ test("端到端: 示例数据 example-武汉洪山住宅.json 决策链通过 C1
   const p = path.join(__dirname, "..", "schema", "example-武汉洪山住宅.json");
   const data = JSON.parse(fs.readFileSync(p, "utf-8"));
   assert.ok(Array.isArray(data.decisionPoints));
-  assert.strictEqual(data.schemaVersion, "1.4");
+  assert.strictEqual(data.schemaVersion, "1.5");
   const errors = DPCore.validateChain(data.decisionPoints);
   assert.deepStrictEqual(errors, []);
   // 驳回链演示正确性：DP-comp rejected → DP-comp-2 approved（supersedes + attempt=2）

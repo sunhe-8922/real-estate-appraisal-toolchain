@@ -32,6 +32,7 @@ VERSION_SCHEMA_MAP = {
     "1.2": SCHEMA_DIR / "v1.2" / "appraisal-result.schema.json",
     "1.3": SCHEMA_DIR / "v1.3" / "appraisal-result.schema.json",
     "1.4": SCHEMA_DIR / "v1.4" / "appraisal-result.schema.json",
+    "1.5": SCHEMA_DIR / "v1.5" / "appraisal-result.schema.json",
 }
 
 # 方法片段 → schema 内的路径
@@ -61,7 +62,7 @@ def _load_schema(version: str = None) -> dict:
 def detect_version(data: dict) -> str:
     """
     从数据中检测 schema 版本号。
-    返回 "1.0" / "1.1" / "1.2" / "1.3" / "1.4" / "unknown"。
+    返回 "1.0" / "1.1" / "1.2" / "1.3" / "1.4" / "1.5" / "unknown"。
     """
     v = data.get("schemaVersion", "unknown")
     return v if v in VERSION_SCHEMA_MAP else "unknown"

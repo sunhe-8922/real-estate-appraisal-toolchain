@@ -27,6 +27,7 @@ MIGRATE_SCRIPT = ROOT / "scripts" / "migrate_schema.py"
 
 sys.path.insert(0, str(ROOT / "scripts"))
 from validate_appraisal_json import detect_version, validate_full
+from helpers import strip_v12_fields
 
 
 # ── Fixture ───────────────────────────────────────────
@@ -42,25 +43,12 @@ def v11_schema():
         return json.load(f)
 
 
-def _strip_v12_fields(data: dict) -> None:
-    """从数据中移除 v1.2 及 v1.3 新增字段，还原为干净 v1.1 数据。"""
-    # 顶层 calculationChain（v1.2 新增）
-    data.pop("calculationChain", None)
-    # 顶层 decisionPoints（v1.3 新增）
-    data.pop("decisionPoints", None)
-    # adjustments 子项 details 数组（v1.2 新增）
-    for inst in data.get("methods", {}).get("comps", {}).get("comparableInstances", []):
-        adj = inst.get("adjustments", {})
-        for key in ("locationDetails", "physicalDetails", "interestDetails"):
-            adj.pop(key, None)
-
-
 @pytest.fixture(scope="session")
 def example_v11_data():
     """加载 example 并标记为 1.1（深拷贝后移除 v1.2 新增字段）。"""
     with open(EXAMPLE_PATH, encoding="utf-8") as f:
         data = json.load(f)
-    _strip_v12_fields(data)
+    strip_v12_fields(data)
     data["schemaVersion"] = "1.1"
     return data
 

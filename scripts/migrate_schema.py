@@ -2,7 +2,7 @@
 """
 migrate_schema.py — 估价 JSON Schema 版本迁移工具
 
-支持 v1.0 → v1.1 → v1.2 → v1.3 → v1.4 的自动迁移，补充各版本新增的可选字段默认值。
+支持 v1.0 → v1.1 → v1.2 → v1.3 → v1.4 → v1.5 的自动迁移，补充各版本新增的可选字段默认值。
 
 用法:
   # 迁移数据文件
@@ -25,6 +25,7 @@ MIGRATIONS = {
     "1.1": "1.2",
     "1.2": "1.3",
     "1.3": "1.4",
+    "1.4": "1.5",
 }
 
 
@@ -50,6 +51,8 @@ def migrate(data: dict, from_version: str, to_version: str) -> tuple[dict, list[
         return _migrate_1_2_to_1_3(data)
     if from_version == "1.3" and to_version == "1.4":
         return _migrate_1_3_to_1_4(data)
+    if from_version == "1.4" and to_version == "1.5":
+        return _migrate_1_4_to_1_5(data)
     raise ValueError(f"不支持的迁移路径: {from_version} → {to_version}")
 
 
@@ -145,6 +148,23 @@ def _migrate_1_3_to_1_4(data: dict) -> tuple[dict, list[str]]:
         notes.append("schemaVersion: 1.3 → 1.4")
 
     # supersedes/attempt 不自动填充 — 运行时由 AI 生成（历史 DP 无决策链）
+
+    return data, notes
+
+
+def _migrate_1_4_to_1_5(data: dict) -> tuple[dict, list[str]]:
+    """
+    v1.4 → v1.5 迁移。
+    v1.5 新增（可选）：
+      - evidenceItem.sourceGrade（证据信源等级 enum T0/T1/T2）
+    迁移策略：仅更新 schemaVersion。sourceGrade 为结构化信源等级，
+    旧数据以 source 文本内 (T0)/(T1)/(T2) 形式保留，不自动推断填充。
+    """
+    notes = []
+
+    if data.get("schemaVersion") == "1.4":
+        data["schemaVersion"] = "1.5"
+        notes.append("schemaVersion: 1.4 → 1.5")
 
     return data, notes
 
