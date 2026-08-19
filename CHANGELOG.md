@@ -24,11 +24,24 @@
 | 版本化副本 | `schema/v1.5/appraisal-result.schema.json`（root 一致性验证 PASS） |
 | 迁移脚本 | `migrate_schema.py` 新增 1.4→1.5 路径（仅更新 schemaVersion，sourceGrade 不自动填充） |
 | 测试 helper 去重 | `tests/helpers.py` 新增共享模块（P1-3）：`strip_v12_fields` / `strip_v13_fields` / `make_minimal_decision_point` / `make_comp_decision_point`，消除 migration/v12/v13/v14 四文件重复定义 |
+| 前端内嵌数据同步 | `app/js/example-data.js` 同步 v1.5（22/22 evidence 含 sourceGrade），由 `tests/test_example_data_sync.py` 锁定 |
+
+### ⚠️ 发布清单（升级 schema 必读）
+
+升级 schema 版本时必须同步以下四处，否则测试失败或前后端脱节：
+
+1. **根 schema** `schema/appraisal-result.schema.json`（`schemaVersion.pattern` + 字段变更）
+2. **版本化副本** `schema/v<N>/appraisal-result.schema.json`（新建）
+3. **迁移脚本** `scripts/migrate_schema.py`（MIGRATIONS + 迁移函数）
+4. **前端内嵌数据** `app/js/example-data.js`（schemaVersion + decisionPoints，由 `tests/test_example_data_sync.py` 强制）
+
+校验：`python -m pytest tests/test_schema_v15.py tests/test_example_data_sync.py -q`
 
 ### 测试
 
 - `tests/test_schema_v15.py`：19 用例（schema 合法性 / sourceGrade 约束 / 向后兼容 / 版本隔离 / 迁移 / CHANGELOG）
-- 全量回归：`python -m pytest tests/ -q` 273 → 292 passed
+- `tests/test_example_data_sync.py`：3 用例（前端内嵌数据与 schema/示例数据同步锁定，第四轮审查 P1-1 沉淀）
+- 全量回归：`python -m pytest tests/ -q` 273 → 308 passed
 
 ---
 
