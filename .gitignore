@@ -1,6 +1,9 @@
 # WorkBuddy internal metadata
 .workbuddy/
 
+# J-space local state (skill controller workspace)
+.jspace/
+
 # Temp / extraction files
 _extract_规范.txt
 _test_outside_workbuddy.md
