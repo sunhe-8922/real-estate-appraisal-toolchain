@@ -13,6 +13,7 @@ import re
 import zipfile
 
 FIXED_TS = "2026-01-01T00:00:00Z"
+FIXED_DATE = (2026, 1, 1, 0, 0, 0)  # zip 条目 date_time（元组）
 
 
 def _rewrite_core_xml(text):
@@ -47,6 +48,7 @@ def save_frozen(wb, out_path):
             data = zin.read(item.filename)
             if item.filename == "docProps/core.xml":
                 data = _rewrite_core_xml(data.decode("utf-8")).encode("utf-8")
+            item.date_time = FIXED_DATE  # 固定条目时间戳，消除生成时刻差异
             zout.writestr(item, data)
 
     with open(out_path, "wb") as f:
