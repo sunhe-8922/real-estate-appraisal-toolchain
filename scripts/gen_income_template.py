@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """生成收益法测算 Excel 模板 — GB/T 50291-2015 第4.3节"""
 import os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from xlsx_meta import save_frozen
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side, numbers, Protection
 from openpyxl.worksheet.datavalidation import DataValidation
@@ -225,7 +227,7 @@ ws1.protection.sheet = True; ws1.protection.password = ""
 ws2.protection.sheet = True; ws2.protection.password = ""
 
 out_path = os.path.join(OUTPUT_DIR, "收益法测算_模板.xlsx")
-wb.save(out_path)
+save_frozen(wb, out_path)
 print(f"✅ 收益法模板已生成: {out_path}")
 print(f"   Sheet 1: 净收益测算 (21行)")
 print(f"   Sheet 2: 收益价值 (60年折现行 + 期末转售)")

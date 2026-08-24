@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """生成假设开发法测算 Excel 模板 — GB/T 50291-2015 第4.5节"""
 import os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from xlsx_meta import save_frozen
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.worksheet.datavalidation import DataValidation
@@ -363,7 +365,7 @@ ws1.protection.sheet = True; ws1.protection.password = ""
 ws2.protection.sheet = True; ws2.protection.password = ""
 
 out_path = os.path.join(OUTPUT_DIR, "假设开发法测算_模板.xlsx")
-wb.save(out_path)
+save_frozen(wb, out_path)
 print(f"✅ 假设开发法模板已生成: {out_path}")
 print(f"   Sheet 1: 假设开发法 (7个章节, 动态法为主)")
 print(f"   Sheet 2: 现金流时间线 (24期 + NPV)")
