@@ -183,8 +183,11 @@ def _check_decision_chain(data: dict) -> list:
 
         # C6: attempt 一致性
         attempt = dp.get("attempt")
-        if attempt is not None:
-            prev_attempt = prev.get("attempt", 1)
+        if isinstance(attempt, int) and not isinstance(attempt, bool):
+            prev_attempt = prev.get("attempt")
+            # 与 JS nextAttempt() 语义对齐：缺失或非法（非 int / <1）视作 1
+            if not isinstance(prev_attempt, int) or isinstance(prev_attempt, bool) or prev_attempt < 1:
+                prev_attempt = 1
             if attempt != prev_attempt + 1:
                 errors.append(_make_error(
                     f"decisionPoints[{i}] 的 attempt={attempt} 与 supersedes '{supersedes}'（attempt={prev_attempt}）"

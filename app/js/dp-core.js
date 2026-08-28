@@ -84,7 +84,7 @@
   }
 
   /**
-   * 计算下一个尝试序号：被取代 DP 的 attempt（缺失视作 1）+ 1（决策链模型 4.2 规则 4）。
+   * 计算下一个尝试序号：被取代 DP 的 attempt（缺失或非法【非 number / <1】视作 1）+ 1（决策链模型 4.2 规则 4）。
    */
   function nextAttempt(dp) {
     const prev = dp && typeof dp.attempt === "number" && dp.attempt >= 1 ? dp.attempt : 1;
@@ -193,6 +193,8 @@
     // C5: 无环
     decisionPoints.forEach(function (dp) {
       if (!dp || typeof dp.id !== "string") { return; }
+      // C2 已报自引用：自引用即最短环，跳过以免重复归因（与 Python 端语义一致）
+      if (typeof dp.supersedes === "string" && dp.supersedes === dp.id) { return; }
       let cursor = dp;
       const visited = {};
       while (cursor && typeof cursor.supersedes === "string") {
@@ -208,6 +210,8 @@
     });
     // C6: attempt 一致性（若提供，须 = 前驱 attempt+1）
     sups.forEach(function (d) {
+      // C2 已报自引用：自引用时 attempt 自推无意义，跳过（与 Python 端语义一致）
+      if (d.supersedes === d.id) { return; }
       if (typeof d.attempt === "number" && byId[d.supersedes]) {
         const expect = nextAttempt(byId[d.supersedes]);
         if (d.attempt !== expect) {
