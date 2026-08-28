@@ -118,6 +118,7 @@ def _check_decision_chain(data: dict) -> list:
 
     by_id = {}
     errors = []
+    reported_c4 = set()  # 去重：同一被取代 key 只报一次（对齐 JS 条数口径，Round 3）
     for i, dp in enumerate(dps):
         if isinstance(dp, dict) and dp.get("id") is not None:
             by_id[dp["id"]] = (i, dp)
@@ -160,11 +161,13 @@ def _check_decision_chain(data: dict) -> list:
         # C4: 1:1 后继（防分叉）
         for j, other in enumerate(dps):
             if j != i and isinstance(other, dict) and other.get("supersedes") == supersedes:
-                errors.append(_make_error(
-                    f"decisionPoints[{j}] 与 decisionPoints[{i}] 都声明 supersedes='{supersedes}'，"
-                    f"同一决策点只能被一个后继取代",
-                    base + ["supersedes"],
-                ))
+                if supersedes not in reported_c4:
+                    errors.append(_make_error(
+                        f"decisionPoints[{j}] 与 decisionPoints[{i}] 都声明 supersedes='{supersedes}'，"
+                        f"同一决策点只能被一个后继取代",
+                        base + ["supersedes"],
+                    ))
+                    reported_c4.add(supersedes)
                 break
 
         # C5: 不得成环（沿链走，若回到自己则成环）
