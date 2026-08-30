@@ -10,7 +10,19 @@ diff_chain_generator.py — 双端决策链校验差分测试的生成器与分�
   - 输入：decisionPoints 数组（合法 30% / 单违规注入 50% / 混合+边界 20%，18 kind）
   - 双端各输出：违规类别集合 + 错误条数（执行器见 chain_runner.js）
 """
+import os
 import random
+import re
+import shutil
+
+
+def find_node():
+    """Node 可执行文件（单一事实源，CLI 薄壳与固化测试共用）：
+    环境变量 WORKBUDDY_NODE > PATH 中的 node > ""（调用方按缺失处理）。"""
+    env = os.environ.get("WORKBUDDY_NODE")
+    if env:
+        return env
+    return shutil.which("node") or ""
 
 
 # ── 生成器 ──────────────────────────────────────────────
@@ -160,22 +172,27 @@ DIFF_KINDS = (["valid"] * 3 + ["c1", "c2", "c3", "c4", "c5", "c6",
               "dup_id", "no_status", "mixed", "empty", "null_elem"])
 
 
-# ── 分类（按类别集合，不按消息文本） ──────────────────────
+# ── 分类（按机器码，不按消息文本） ────────────────────────
+
+# 码格式：`C<n>[:key=<id>]`。Python 端取 error.code 字段（精确）；
+# JS 端从消息前缀解析（`C4:key=DP-comp: …`）。2026-08-30 起双端同构（假设池 #6）。
+CODE_RE = re.compile(r"^(C\d)(?::key=([^:]*))?")
+
+
+def classify_codes_py(errors):
+    """Python 端违规码集合：优先读 error.code，缺失时从消息前缀兜底解析。"""
+    codes = set()
+    for e in errors:
+        code = getattr(e, "code", None)
+        if code:
+            codes.add(code)
+            continue
+        m = CODE_RE.match(str(getattr(e, "message", e)))
+        if m:
+            codes.add(m.group(0))
+    return codes
+
 
 def classify_py(errors):
-    cats = set()
-    for e in errors:
-        m = str(e.message)
-        if "引用了不存在的决策点" in m:
-            cats.add("C1")
-        elif "不得自引用" in m or "引用了自身" in m:
-            cats.add("C2")
-        elif "只有 status=rejected" in m or "才能被取代" in m:
-            cats.add("C3")
-        elif "只能被一个后继取代" in m:
-            cats.add("C4")
-        elif "存在环" in m:
-            cats.add("C5")
-        elif "attempt=" in m:
-            cats.add("C6")
-    return cats
+    """Python 端违规类别集合（C1..C6，不含 key）——由机器码派生，不再靠关键词猜。"""
+    return {c.split(":")[0] for c in classify_codes_py(errors)}

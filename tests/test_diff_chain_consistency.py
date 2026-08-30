@@ -16,7 +16,6 @@ test_diff_chain_consistency.py — 双端决策链校验一致性回归测试（
 """
 import json
 import random
-import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -26,7 +25,9 @@ import pytest
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
 
-from diff_chain_generator import DIFF_KINDS, gen_case, gen_valid_dp, classify_py  # noqa: E402
+from diff_chain_generator import (  # noqa: E402
+    DIFF_KINDS, find_node, gen_case, gen_valid_dp, classify_codes_py, classify_py,
+)
 from validate_appraisal_json import _check_decision_chain  # noqa: E402
 
 SEED = 20260828
@@ -37,18 +38,7 @@ RUNNER = Path(__file__).resolve().parent / "chain_runner.js"
 # 生成器新增 kind 后此处自动跟进，杜绝"清单漏项"型失明（P1-3 教训）。
 KINDS = list(dict.fromkeys(DIFF_KINDS))
 
-
-def _find_node():
-    """NODE 可执行文件：环境变量 WORKBUDDY_NODE > PATH 中的 node，找不到返回 None。"""
-    import os
-    env = os.environ.get("WORKBUDDY_NODE")
-    if env:
-        return env
-    found = shutil.which("node")
-    return found
-
-
-NODE_BIN = _find_node()
+NODE_BIN = find_node()
 
 
 @pytest.fixture(scope="module")
@@ -63,8 +53,10 @@ def diff_dataset():
         case_kinds.append(k)
         inputs.append({"decisionPoints": gen_case(rng, k)})
 
-    py_cats = [classify_py(_check_decision_chain(inp)) for inp in inputs]
-    py_counts = [len(_check_decision_chain(inp)) for inp in inputs]
+    py_errs = [_check_decision_chain(inp) for inp in inputs]
+    py_cats = [classify_py(e) for e in py_errs]
+    py_codes = [classify_codes_py(e) for e in py_errs]
+    py_counts = [len(e) for e in py_errs]
 
     proc = subprocess.run(
         [NODE_BIN, str(RUNNER)], input=json.dumps(inputs),
@@ -74,12 +66,13 @@ def diff_dataset():
         pytest.fail("node runner 失败: " + proc.stderr)
     js_rows = json.loads(proc.stdout)
     js_cats = [set(r["violations"]) for r in js_rows]
+    js_codes = [set(r["codes"]) for r in js_rows]
     js_counts = [r["errorCount"] for r in js_rows]
 
     return {
         "inputs": inputs, "kinds": case_kinds,
-        "py_cats": py_cats, "py_counts": py_counts,
-        "js_cats": js_cats, "js_counts": js_counts,
+        "py_cats": py_cats, "py_counts": py_counts, "py_codes": py_codes,
+        "js_cats": js_cats, "js_counts": js_counts, "js_codes": js_codes,
     }
 
 
@@ -94,6 +87,35 @@ def test_judgment_consistency_rate_is_100(diff_dataset):
         f"首例 #{mismatches[0]} kind={diff_dataset['kinds'][mismatches[0]]} "
         f"py={sorted(diff_dataset['py_cats'][mismatches[0]])} "
         f"js={sorted(diff_dataset['js_cats'][mismatches[0]])}"
+    )
+
+
+def test_error_code_consistency(diff_dataset):
+    """①b 违规码（含 key）必须逐一一致——比类别级更严，能抓"归因给错对象"的漂移。
+
+    码格式 `C4:key=DP-comp`：Python 端来自 error.code 字段，JS 端来自消息前缀。
+    """
+    mismatches = [
+        i for i in range(COUNT)
+        if diff_dataset["py_codes"][i] != diff_dataset["js_codes"][i]
+    ]
+    assert not mismatches, (
+        f"违规码不一致 {len(mismatches)} 例（N={COUNT}）："
+        f"首例 #{mismatches[0]} kind={diff_dataset['kinds'][mismatches[0]]} "
+        f"py={sorted(diff_dataset['py_codes'][mismatches[0]])} "
+        f"js={sorted(diff_dataset['js_codes'][mismatches[0]])}"
+    )
+
+
+def test_every_error_carries_a_code(diff_dataset):
+    """①c 每条违规都必须带机器码（防新增分支漏挂 code 而退回人工读差）。"""
+    bare = [
+        (i, c) for i in range(COUNT)
+        for c in diff_dataset["py_codes"][i] | diff_dataset["js_codes"][i]
+        if ":" not in c or "key=" not in c
+    ]
+    assert not bare, (
+        f"以下违规缺 key 机器码（前 5）：{bare[:5]}——码格式应为 C<n>:key=<id>"
     )
 
 

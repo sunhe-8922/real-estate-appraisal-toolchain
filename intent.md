@@ -11,7 +11,7 @@
 
 | # | 指标 | 当前状态（2026-08-30 实测） |
 |---|------|------|
-| 1 | Python 测试基线 | **315 passed**（`python -m pytest tests/ -q`；含差分固化 3 + 对抗形状固化 1，2026-08-24 时为 311） |
+| 1 | Python 测试基线 | **327 passed**（`python -m pytest tests/ -q`；含 validateChain 差分 5 + 对抗形状 1 + 决策链函数 oracle 差分 4 + 存档证据自查 6，2026-08-24 时为 311） |
 | 2 | Node 测试基线 | **32 pass / 0 fail**（`node --test tests/test_dp_core.js tests/test_e2e_orchestrator.js`） |
 | 3 | Schema 版本 | v1.5（`schemaVersion` 约束 + 版本化副本 + 迁移脚本 + 前端内嵌数据四处同步） |
 | 4 | 技能体系 | 7 技能 + 1 专家 + 1 编排层（install.sh --check 验证 8/7 技能 + 3/3 专家） |

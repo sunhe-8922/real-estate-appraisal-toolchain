@@ -12,6 +12,9 @@
 | JS C4 ghost key 对齐 | `dp-core.js` C4 跳过指向不存在 id 的 key（C1 已报存在性，不重复归因），对齐 Python 权威语义 |
 | 差分护栏扩展（Round 4） | 生成器 16→18 kind（补 `attempt_float`/`ghost_fork`）；新增固化对抗形状测试；回归 315 passed / 32 pass / 差分 100%（912=912） |
 | tests/ 反向依赖解耦（P2-2） | 生成器/分类器与 Node 执行器迁至 `tests/diff_chain_generator.py` + `tests/chain_runner.js`（唯一事实源）；`rounds/1/diff_check_chain.py` 改 CLI 薄壳，历史验证命令不变；归档/清理 rounds/ 不再影响正式回归 |
+| 消息层机器码（假设池 #6） | 双端违规统一 `C<n>:key=<id>`：Python 错误对象新增 `code` 字段（C1-C6 六处，人类文案不变），JS 消息前缀补 key（`C4:key=DP-comp: …`）。分类由码派生，不再靠子串猜文本；差分新增码级一致 + 每条违规必带 key 码两条断言 |
+| 决策链函数差分扩展（假设池 #10） | `resolveChain` / `buildSuccessorShell`（原零机械验证）新增规格参考实现 oracle + 22 形状语料 + 固化测试，N=1000 双端 1000/1000 一致；发现 C5 对多节点环不可达、分叉后继被静默丢弃等 3 项问题（见 `rounds/5/RESULTS.md`） |
+| 证据机制自查常驻（P1-1 防复发） | 新增 `tests/test_rounds_evidence.py`（命名规则/文件完整性/轮次归属/tmp 残留 6 项断言），存档规则由文档约束升级为机器红灯 |
 
 ---
 

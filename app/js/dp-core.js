@@ -167,17 +167,17 @@
     sups.forEach(function (d) {
       // C1: 存在性
       if (!byId[d.supersedes]) {
-        errors.push(`C1: ${d.id} 的 supersedes 引用不存在的 id "${d.supersedes}"`);
+        errors.push(`C1:key=${d.supersedes}: ${d.id} 的 supersedes 引用不存在的 id "${d.supersedes}"`);
         return;
       }
       // C2: 不自引用
       if (d.supersedes === d.id) {
-        errors.push(`C2: ${d.id} 不得自引用 supersedes`);
+        errors.push(`C2:key=${d.id}: ${d.id} 不得自引用 supersedes`);
         return;
       }
       // C3: 被取代者必须 rejected
       if (byId[d.supersedes].status !== "rejected") {
-        errors.push(`C3: ${d.id} 取代的 ${d.supersedes} 状态为 ${byId[d.supersedes].status}，仅 rejected 可被取代`);
+        errors.push(`C3:key=${d.supersedes}: ${d.id} 取代的 ${d.supersedes} 状态为 ${byId[d.supersedes].status}，仅 rejected 可被取代`);
       }
     });
     // C4: 1:1 后继
@@ -188,7 +188,7 @@
     Object.keys(counted).forEach(function (key) {
       // ghost key（指向不存在 id，C1 已报）不进 C4——与 Python 端对齐（Round 4 修复）
       if (counted[key] > 1 && byId[key]) {
-        errors.push(`C4: ${key} 被 ${counted[key]} 个 DP 取代，决策链必须 1:1（防分叉）`);
+        errors.push(`C4:key=${key}: ${key} 被 ${counted[key]} 个 DP 取代，决策链必须 1:1（防分叉）`);
       }
     });
     // C5: 无环
@@ -200,7 +200,7 @@
       const visited = {};
       while (cursor && typeof cursor.supersedes === "string") {
         if (cursor.supersedes === dp.id) {
-          errors.push(`C5: 决策链成环（${dp.id} 沿 supersedes 链回到自身）`);
+          errors.push(`C5:key=${dp.id}: 决策链成环（${dp.id} 沿 supersedes 链回到自身）`);
           break;
         }
         if (visited[cursor.supersedes]) { break; } // 已检测过，避免死循环
@@ -216,7 +216,7 @@
       if (typeof d.attempt === "number" && byId[d.supersedes]) {
         const expect = nextAttempt(byId[d.supersedes]);
         if (d.attempt !== expect) {
-          errors.push(`C6: ${d.id} attempt=${d.attempt}，前驱 ${d.supersedes} 应推导 ${expect}`);
+          errors.push(`C6:key=${d.id}: ${d.id} attempt=${d.attempt}，前驱 ${d.supersedes} 应推导 ${expect}`);
         }
       }
     });

@@ -137,6 +137,7 @@ def _check_decision_chain(data: dict) -> list:
             errors.append(_make_error(
                 f"decisionPoints[{i}] 的 supersedes 引用了自身 '{dp_id}'，不得自引用",
                 base + ["supersedes"],
+                code=f"C2:key={dp_id}",
             ))
             continue
 
@@ -145,6 +146,7 @@ def _check_decision_chain(data: dict) -> list:
             errors.append(_make_error(
                 f"decisionPoints[{i}] 的 supersedes 引用了不存在的决策点 '{supersedes}'",
                 base + ["supersedes"],
+                code=f"C1:key={supersedes}",
             ))
             continue
 
@@ -156,6 +158,7 @@ def _check_decision_chain(data: dict) -> list:
                 f"decisionPoints[{i}] 的 supersedes 指向 '{supersedes}'（status={prev.get('status')}），"
                 f"只有 status=rejected 的决策点才能被取代",
                 base + ["supersedes"],
+                code=f"C3:key={supersedes}",
             ))
 
         # C4: 1:1 后继（防分叉）
@@ -166,6 +169,7 @@ def _check_decision_chain(data: dict) -> list:
                         f"decisionPoints[{j}] 与 decisionPoints[{i}] 都声明 supersedes='{supersedes}'，"
                         f"同一决策点只能被一个后继取代",
                         base + ["supersedes"],
+                        code=f"C4:key={supersedes}",
                     ))
                     reported_c4.add(supersedes)
                 break
@@ -182,6 +186,7 @@ def _check_decision_chain(data: dict) -> list:
             errors.append(_make_error(
                 f"decisionPoints[{i}] 的决策链存在环（{dp_id} → … → {dp_id}）",
                 base + ["supersedes"],
+                code=f"C5:key={dp_id}",
             ))
 
         # C6: attempt 一致性
@@ -199,6 +204,7 @@ def _check_decision_chain(data: dict) -> list:
                     f"decisionPoints[{i}] 的 attempt={attempt} 与 supersedes '{supersedes}'（attempt={prev_attempt}）"
                     f"不一致，应为 {prev_attempt + 1}",
                     base + ["attempt"],
+                    code=f"C6:key={dp_id}",
                 ))
 
     return errors
@@ -289,15 +295,21 @@ def validate_degraded(data: dict) -> list:
     return errors
 
 
-def _make_error(message, path):
-    """构造一个简单的错误对象。"""
+def _make_error(message, path, code=None):
+    """构造一个简单的错误对象。
+
+    code（可选）：机器可比对的错误编码，形如 `C4:key=DP-comp`（决策链 C1-C6 专用）。
+    人类可读文案保持自然语言不变——报告/命令行输出不受影响，code 只供程序比对，
+    消除双端"人工读差"（假设池 #6；此前靠关键词匹配分类，脆弱且易漏）。
+    """
     class _Err:
-        def __init__(self, message, path):
+        def __init__(self, message, path, code=None):
             self.message = message
             self.path = path
+            self.code = code
         def __str__(self):
             return self.message
-    return _Err(message, path)
+    return _Err(message, path, code)
 
 
 def format_errors(errors: list) -> str:
