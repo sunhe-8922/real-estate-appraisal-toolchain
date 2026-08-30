@@ -81,6 +81,7 @@
 - **决策**：① 不采纳 `is_integer()` 门（会把 2.5 排除出检查、与审查自己的验证预期"S2: 2.5 双端均报 C6"矛盾），改为与 JS `typeof number` **完全镜像**——全部实数（int/float，bool 除外）进入 C6，整数值浮点与整数同权，非整数浮点按数值比较；② ghost key 的 C4 归属按 Python 权威语义：C1 已报存在性，C4 跳过 ghost key（改 JS 而非 Python）。
 - **理由**：双端语义对齐的裁决标准是"审查报告的验证预期"而非"修复建议的字面公式"——建议与预期冲突时以预期为准；ghost key 无真实前驱，分叉防护（C4 本义）对不存在的 id 无意义，避免同一问题双报。
 - **影响**：回归 315 passed / 32 pass / 差分 18-kind N=1000 100%（912=912）；16-kind 基线 885=885 零扰动。护栏扩展：生成器 16→18 kind + 固化对抗形状测试（`tests/test_diff_chain_consistency.py::test_frozen_adversarial_shapes`）。证据机制：92 例重建档案 `rounds/1/EVIDENCE-RECONSTRUCTED.md` + `rounds/README.md` 存档命名规则（diff_result_roundN.json，禁止原地覆盖）。审查裁决：4 P2 已批量处理；tests/ 反向依赖 rounds/1/ 未解耦（下轮）；未检查边界（buildSuccessorShell/resolveChain 等价性）留作新假设池。
+- **修订（2026-08-30 同日）**：tests/ 反向依赖已解耦——生成器/分类器与 Node 执行器迁至 `tests/diff_chain_generator.py` + `tests/chain_runner.js`（唯一事实源；测试 KINDS 由 DIFF_KINDS 派生、去重保序，固化语料序列不变，同时杜绝"清单漏项"型失明），`rounds/1/diff_check_chain.py` 改 CLI 薄壳、`rounds/1/chain_runner.js` 冻结为存档；解耦后 N=1000 复跑 100%（912=912）逐位一致。
 
 ---
 

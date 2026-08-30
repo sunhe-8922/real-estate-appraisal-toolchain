@@ -31,6 +31,9 @@
 ## 遗留
 
 - P2 批量（占位符回填 / intent 基线 / 死代码 / decisions 登记 / tag 推送）见本轮提交。
-- tests/ 反向依赖 rounds/1/ 实验文件：未解耦（见 `rounds/README.md` 依赖提示）。
+- ~~tests/ 反向依赖 rounds/1/ 实验文件~~ **已解耦（2026-08-30 同日）**：生成器/执行器迁至
+  `tests/diff_chain_generator.py` + `tests/chain_runner.js`（唯一事实源），
+  `rounds/1/diff_check_chain.py` 改 CLI 薄壳；解耦后 N=1000 复跑 100%（912=912）逐位一致，
+  存档 `diff_result_round4_decoupled.json`。
 - 未检查边界（下轮假设池）：`buildSuccessorShell` / `resolveChain` 双端等价性、
   消息层机器可比对编码、id 唯一性校验的 JS 等价实现。

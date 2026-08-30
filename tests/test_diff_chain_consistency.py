@@ -6,10 +6,11 @@ test_diff_chain_consistency.py — 双端决策链校验一致性回归测试（
 判定一致率仅 90.70%，Round 2 修复后 100%。本测试将差分协议常驻，
 防止双端语义再次漂移。
 
-对比协议（与 rounds/1/diff_check_chain.py 一致，种子固定可复现）：
+对比协议（与 tests/diff_chain_generator.py 一致，种子固定可复现）：
   - 输入：decisionPoints 数组（分层生成：合法/单违规注入 C1-C6/混合边界）
   - 双端各输出：违规类别集合 + 错误条数
   - 断言：① 类别判定一致率 = 1.0 ② 错误条数 100% 一致 ③ 每个 kind 至少触发一次
+          ④ 固化对抗形状（浮点 attempt / ghost 分叉）双端语义锚定
 
 运行：python -m pytest tests/test_diff_chain_consistency.py -q
 """
@@ -23,21 +24,18 @@ from pathlib import Path
 import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-ROUND1_DIR = PROJECT_ROOT / "rounds" / "1"
-sys.path.insert(0, str(ROUND1_DIR))
 sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
 
-from diff_check_chain import gen_case, gen_valid_dp, classify_py  # noqa: E402
+from diff_chain_generator import DIFF_KINDS, gen_case, gen_valid_dp, classify_py  # noqa: E402
 from validate_appraisal_json import _check_decision_chain  # noqa: E402
 
 SEED = 20260828
 COUNT = 300
-RUNNER = ROUND1_DIR / "chain_runner.js"
+RUNNER = Path(__file__).resolve().parent / "chain_runner.js"
 
-KINDS = ["valid", "c1", "c2", "c3", "c4", "c5", "c6",
-         "attempt0", "attemptneg", "attempt_missing", "attempt_str",
-         "attempt_float", "ghost_fork",
-         "dup_id", "no_status", "mixed", "empty", "null_elem"]
+# KINDS 从生成器单一事实源派生（去重保序）：序列与 Round 4 固化语料完全一致，
+# 生成器新增 kind 后此处自动跟进，杜绝"清单漏项"型失明（P1-3 教训）。
+KINDS = list(dict.fromkeys(DIFF_KINDS))
 
 
 def _find_node():
