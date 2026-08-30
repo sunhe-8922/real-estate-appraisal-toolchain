@@ -186,7 +186,8 @@
       counted[d.supersedes] = (counted[d.supersedes] || 0) + 1;
     });
     Object.keys(counted).forEach(function (key) {
-      if (counted[key] > 1) {
+      // ghost key（指向不存在 id，C1 已报）不进 C4——与 Python 端对齐（Round 4 修复）
+      if (counted[key] > 1 && byId[key]) {
         errors.push(`C4: ${key} 被 ${counted[key]} 个 DP 取代，决策链必须 1:1（防分叉）`);
       }
     });

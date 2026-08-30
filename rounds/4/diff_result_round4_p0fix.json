@@ -1,0 +1,29 @@
+{
+  "seed": 20260828,
+  "count": 1000,
+  "agree": 1000,
+  "rate": 1.0,
+  "mismatch_count": 0,
+  "count_diff_only": 0,
+  "by_kind_agree": {
+    "attempt_missing": 56,
+    "c4": 58,
+    "c6": 51,
+    "c5": 47,
+    "valid": 186,
+    "null_elem": 56,
+    "c1": 60,
+    "c3": 55,
+    "no_status": 64,
+    "attemptneg": 50,
+    "attempt0": 63,
+    "mixed": 47,
+    "attempt_str": 56,
+    "dup_id": 52,
+    "c2": 51,
+    "empty": 48
+  },
+  "mismatches": [],
+  "py_counts_total": 885,
+  "js_counts_total": 885
+}

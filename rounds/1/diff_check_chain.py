@@ -137,6 +137,20 @@ def gen_case(rng, kind):
         if len(dps) >= 2:
             dps[-1]["attempt"] = "2"
         return dps
+    if kind == "attempt_float":  # P0-1 回归形状：浮点 attempt（Round 4 补）
+        dps = gen_valid_chain(rng)
+        if len(dps) >= 2:
+            if rng.random() < 0.5:
+                # 前驱整数值浮点（2.0），后继 = 前驱+1 → 双端应通过（修复前 PY 报 C6）
+                dps[-2]["attempt"] = float(dps[-2]["attempt"])
+                dps[-1]["attempt"] = dps[-2]["attempt"] + 1
+            else:
+                # 后继非整数浮点（x.5）→ 双端应报 C6（修复前 PY 静默）
+                dps[-1]["attempt"] = dps[-1]["attempt"] + 0.5
+        return dps
+    if kind == "ghost_fork":  # 双 DP 指向同一不存在 id → 双端均仅报 C1×2（Round 4 补）
+        return [gen_valid_dp("DP-b", "pending", 2, supersedes="GHOST"),
+                gen_valid_dp("DP-c", "pending", 2, supersedes="GHOST")]
     if kind == "mixed":  # 多违规混合（C1 + C6）
         dps = gen_valid_chain(rng)
         dps[-1]["supersedes"] = "NONEXISTENT"
@@ -183,6 +197,7 @@ def main():
     # 分层：合法 30% / 单违规 50% / 混合+边界 20%
     kinds = (["valid"] * 3 + ["c1", "c2", "c3", "c4", "c5", "c6",
              "attempt0", "attemptneg", "attempt_missing", "attempt_str",
+             "attempt_float", "ghost_fork",
              "dup_id", "no_status", "mixed", "empty", "null_elem"])
     inputs = []
     case_kinds = []

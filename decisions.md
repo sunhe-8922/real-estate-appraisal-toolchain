@@ -75,6 +75,15 @@
 
 ---
 
+## D-010：C6 浮点语义全镜像 + C4 ghost key 归 Python（2026-08-30，Round 4 / 对抗式审查整改）
+
+- **背景**：对抗式审查（`outputs/对抗式审查-双端校验迭代-20260830.md`）发现 P0-1——Round 2 把 Python C6 入口收窄为 `isinstance(int)`，浮点 attempt（2.0/2.5）双端判定漂移（回归，非原有缺陷）；且 ghost 分叉（双 DP 指向同一不存在 id）JS 多报 C4（P1-2 实证）。审查建议 `is_integer()` 门。
+- **决策**：① 不采纳 `is_integer()` 门（会把 2.5 排除出检查、与审查自己的验证预期"S2: 2.5 双端均报 C6"矛盾），改为与 JS `typeof number` **完全镜像**——全部实数（int/float，bool 除外）进入 C6，整数值浮点与整数同权，非整数浮点按数值比较；② ghost key 的 C4 归属按 Python 权威语义：C1 已报存在性，C4 跳过 ghost key（改 JS 而非 Python）。
+- **理由**：双端语义对齐的裁决标准是"审查报告的验证预期"而非"修复建议的字面公式"——建议与预期冲突时以预期为准；ghost key 无真实前驱，分叉防护（C4 本义）对不存在的 id 无意义，避免同一问题双报。
+- **影响**：回归 315 passed / 32 pass / 差分 18-kind N=1000 100%（912=912）；16-kind 基线 885=885 零扰动。护栏扩展：生成器 16→18 kind + 固化对抗形状测试（`tests/test_diff_chain_consistency.py::test_frozen_adversarial_shapes`）。证据机制：92 例重建档案 `rounds/1/EVIDENCE-RECONSTRUCTED.md` + `rounds/README.md` 存档命名规则（diff_result_roundN.json，禁止原地覆盖）。审查裁决：4 P2 已批量处理；tests/ 反向依赖 rounds/1/ 未解耦（下轮）；未检查边界（buildSuccessorShell/resolveChain 等价性）留作新假设池。
+
+---
+
 ## 待决策（Open）
 
 | # | 议题 | 选项 | 状态 |

@@ -186,10 +186,13 @@ def _check_decision_chain(data: dict) -> list:
 
         # C6: attempt 一致性
         attempt = dp.get("attempt")
-        if isinstance(attempt, int) and not isinstance(attempt, bool):
+        # P0-1 修复（与 JS typeof number 语义对齐）：任何实数（int/float，bool 除外）
+        # 都进入检查——整数值浮点（2.0）与整数同权，非整数浮点（2.5）按数值比较报 C6。
+        if isinstance(attempt, (int, float)) and not isinstance(attempt, bool):
             prev_attempt = prev.get("attempt")
-            # 与 JS nextAttempt() 语义对齐：缺失或非法（非 int / <1）视作 1
-            if not isinstance(prev_attempt, int) or isinstance(prev_attempt, bool) or prev_attempt < 1:
+            # 与 JS nextAttempt() 语义对齐：缺失或非法（非 number / <1）视作 1
+            if (not isinstance(prev_attempt, (int, float))
+                    or isinstance(prev_attempt, bool) or prev_attempt < 1):
                 prev_attempt = 1
             if attempt != prev_attempt + 1:
                 errors.append(_make_error(

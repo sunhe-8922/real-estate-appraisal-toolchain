@@ -4,6 +4,16 @@
 
 ---
 
+## [未发布] — 2026-08-30（双端校验语义修复，schema 不变）
+
+| 变更 | 说明 |
+|------|------|
+| Python C6 浮点语义修复（P0-1） | `validate_appraisal_json.py` C6 入口接受全部实数（int/float，bool 除外），与 JS `typeof number` 镜像；schema `type: integer` 对整数值浮点 2.0 放行，此前 2.0/2.5 形状双端判定不一致 |
+| JS C4 ghost key 对齐 | `dp-core.js` C4 跳过指向不存在 id 的 key（C1 已报存在性，不重复归因），对齐 Python 权威语义 |
+| 差分护栏扩展（Round 4） | 生成器 16→18 kind（补 `attempt_float`/`ghost_fork`）；新增固化对抗形状测试；回归 315 passed / 32 pass / 差分 100%（912=912） |
+
+---
+
 ## [1.5] — 2026-08-19（evidenceItem.sourceGrade 信源等级结构化）
 
 ### 新增（兼容 v1.4，可选）
