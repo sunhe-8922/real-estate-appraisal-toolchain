@@ -153,13 +153,17 @@
 
   /**
    * 决策链校验（JS 版 C1-C6，与 validate_appraisal_json.py 语义一致）。
-   * @returns {string[]} 违规描述数组（空 = 通过）
+   * 内部以 {code, message} 结构生成：code 供机器比对（Round 6 / P1-1 ④，
+   * 结构化导出后不再从消息文本解析码——含冒号的 key 不再有歧义），message 供人类阅读。
+   * @returns {{code: string|null, message: string}[]}
    */
-  function validateChain(decisionPoints) {
-    const errors = [];
+  function validateChainEntries(decisionPoints) {
+    const entries = [];
     if (!Array.isArray(decisionPoints)) {
-      return ["decisionPoints 必须是数组"];
+      return [{ code: null, message: "decisionPoints 必须是数组" }];
     }
+    // 码层 key 哨兵（与 Python _code_key 同构，P1-1）：非字符串 id 统一 <no-id>
+    const codeKey = function (id) { return typeof id === "string" ? id : "<no-id>"; };
     const byId = {};
     decisionPoints.forEach(function (d) { if (d && typeof d.id === "string") { byId[d.id] = d; } });
     const sups = decisionPoints.filter(function (d) { return d && typeof d.supersedes === "string"; });
@@ -167,17 +171,20 @@
     sups.forEach(function (d) {
       // C1: 存在性
       if (!byId[d.supersedes]) {
-        errors.push(`C1:key=${d.supersedes}: ${d.id} 的 supersedes 引用不存在的 id "${d.supersedes}"`);
+        entries.push({ code: `C1:key=${d.supersedes}`,
+          message: `C1:key=${d.supersedes}: ${d.id} 的 supersedes 引用不存在的 id "${d.supersedes}"` });
         return;
       }
       // C2: 不自引用
       if (d.supersedes === d.id) {
-        errors.push(`C2:key=${d.id}: ${d.id} 不得自引用 supersedes`);
+        entries.push({ code: `C2:key=${codeKey(d.id)}`,
+          message: `C2:key=${d.id}: ${d.id} 不得自引用 supersedes` });
         return;
       }
       // C3: 被取代者必须 rejected
       if (byId[d.supersedes].status !== "rejected") {
-        errors.push(`C3:key=${d.supersedes}: ${d.id} 取代的 ${d.supersedes} 状态为 ${byId[d.supersedes].status}，仅 rejected 可被取代`);
+        entries.push({ code: `C3:key=${d.supersedes}`,
+          message: `C3:key=${d.supersedes}: ${d.id} 取代的 ${d.supersedes} 状态为 ${byId[d.supersedes].status}，仅 rejected 可被取代` });
       }
     });
     // C4: 1:1 后继
@@ -188,7 +195,8 @@
     Object.keys(counted).forEach(function (key) {
       // ghost key（指向不存在 id，C1 已报）不进 C4——与 Python 端对齐（Round 4 修复）
       if (counted[key] > 1 && byId[key]) {
-        errors.push(`C4:key=${key}: ${key} 被 ${counted[key]} 个 DP 取代，决策链必须 1:1（防分叉）`);
+        entries.push({ code: `C4:key=${key}`,
+          message: `C4:key=${key}: ${key} 被 ${counted[key]} 个 DP 取代，决策链必须 1:1（防分叉）` });
       }
     });
     // C5: 无环
@@ -200,7 +208,8 @@
       const visited = {};
       while (cursor && typeof cursor.supersedes === "string") {
         if (cursor.supersedes === dp.id) {
-          errors.push(`C5:key=${dp.id}: 决策链成环（${dp.id} 沿 supersedes 链回到自身）`);
+          entries.push({ code: `C5:key=${dp.id}`,
+            message: `C5:key=${dp.id}: 决策链成环（${dp.id} 沿 supersedes 链回到自身）` });
           break;
         }
         if (visited[cursor.supersedes]) { break; } // 已检测过，避免死循环
@@ -216,11 +225,28 @@
       if (typeof d.attempt === "number" && byId[d.supersedes]) {
         const expect = nextAttempt(byId[d.supersedes]);
         if (d.attempt !== expect) {
-          errors.push(`C6:key=${d.id}: ${d.id} attempt=${d.attempt}，前驱 ${d.supersedes} 应推导 ${expect}`);
+          entries.push({ code: `C6:key=${codeKey(d.id)}`,
+            message: `C6:key=${d.id}: ${d.id} attempt=${d.attempt}，前驱 ${d.supersedes} 应推导 ${expect}` });
         }
       }
     });
-    return errors;
+    return entries;
+  }
+
+  /**
+   * 决策链校验（JS 版 C1-C6，与 validate_appraisal_json.py 语义一致）。
+   * @returns {string[]} 违规描述数组（空 = 通过）
+   */
+  function validateChain(decisionPoints) {
+    return validateChainEntries(decisionPoints).map(function (e) { return e.message; });
+  }
+
+  /**
+   * 决策链校验——机器码视图（Round 6 / 假设池 #6 落地）。
+   * @returns {string[]} 违规码数组，形如 "C4:key=DP-comp"（含冒号的 key 原样保留）
+   */
+  function validateChainCodes(decisionPoints) {
+    return validateChainEntries(decisionPoints).map(function (e) { return e.code; });
   }
 
   /**
@@ -265,6 +291,7 @@
     nextAttempt: nextAttempt,
     buildSuccessorShell: buildSuccessorShell,
     validateChain: validateChain,
+    validateChainCodes: validateChainCodes,
     resolveChain: resolveChain,
   };
 });

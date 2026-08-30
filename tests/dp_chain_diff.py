@@ -10,11 +10,17 @@ dp_chain_diff.py — resolveChain / buildSuccessorShell 的差分 CLI（Round 5�
 输出：双端一致率、不一致明细、按 kind 的断言结果分布（证据存档用）。
 """
 import argparse
+import hashlib
 import json
 import random
 import subprocess
 import sys
 from pathlib import Path
+
+
+def _sha256_of(path):
+    with open(path, "rb") as f:
+        return hashlib.sha256(f.read()).hexdigest()
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
@@ -84,7 +90,8 @@ def main():
         for m in mismatches[:3]:
             print("  #%d [%s] py=%s js=%s" % (m["index"], m["kind"], m["py"], m["js"]))
     if args.out:
-        print("\n结果存档: %s" % args.out)
+        # 存档指纹（Round 6 / P1-2）：登记进当轮 RESULTS.md，指纹不符即发现内容被覆盖
+        print("\n结果存档: %s\n存档 sha256: %s" % (args.out, _sha256_of(args.out)))
 
 
 if __name__ == "__main__":

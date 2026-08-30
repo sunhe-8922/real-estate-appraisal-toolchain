@@ -139,37 +139,59 @@ def test_every_kind_triggered_at_least_once(diff_dataset):
     assert not missing, f"生成器缺口：以下场景零触发 {missing}"
 
 
-# ── ④ 固化对抗形状（Round 4，P0-1 / P1-3 教训：随机语料之外的确定性锚点） ──
+# ── ④ 固化对抗形状（Round 4/6，P0-1 / P1-3 / P1-1 教训：随机语料之外的确定性锚点） ──
 
 def _frozen_shapes():
-    """对抗探测形状 → 双端预期（类别集合, 错误条数）。"""
+    """对抗探测形状 → 双端预期（类别集合, 违规码集合, 错误条数）。码含 key，逐一断言。"""
     a = lambda rid, status, attempt, sup=None: gen_valid_dp(rid, status, attempt, sup)
+    num_sup = a("DP-b", "pending", 2)
+    num_sup["supersedes"] = 42
+    no_id = a("DP-b", "pending", 9, "DP-a")
+    del no_id["id"]
     return [
         # S2: 非整数浮点后继 → 双端报 C6（修复前 PY 静默/JS 报，漂移）
-        ("S2_b2.5", [a("DP-a", "rejected", 1), a("DP-b", "pending", 2.5, "DP-a")], {"C6"}, 1),
+        ("S2_b2.5", [a("DP-a", "rejected", 1), a("DP-b", "pending", 2.5, "DP-a")],
+         {"C6"}, {"C6:key=DP-b"}, 1),
         # S3: 整数值浮点前驱 + 一致整数后继 → 双端通过（修复前 PY 报/JS 不报，漂移）
-        ("S3_a2.0_b3", [a("DP-a", "rejected", 2.0), a("DP-b", "pending", 3, "DP-a")], set(), 0),
+        ("S3_a2.0_b3", [a("DP-a", "rejected", 2.0), a("DP-b", "pending", 3, "DP-a")],
+         set(), set(), 0),
         # S4: 整数值浮点前驱 + 错误后继 → 双端报 C6（修复前 PY 静默/JS 报，漂移）
-        ("S4_a2.0_b2", [a("DP-a", "rejected", 2.0), a("DP-b", "pending", 2, "DP-a")], {"C6"}, 1),
+        ("S4_a2.0_b2", [a("DP-a", "rejected", 2.0), a("DP-b", "pending", 2, "DP-a")],
+         {"C6"}, {"C6:key=DP-b"}, 1),
         # GHOST: 双 DP 指向同一不存在 id → 双端均仅 C1×2（修复前 JS 多报 C4，漂移）
         ("GHOST_fork", [a("DP-b", "pending", 2, "GHOST"), a("DP-c", "pending", 2, "GHOST")],
-         {"C1"}, 2),
+         {"C1"}, {"C1:key=GHOST"}, 2),
+        # Round 6（审查 P1-1 整改固化）：
+        # NUM_SUP: 数值型 supersedes → 双端 string-only 语义静默一致（修复前 PY 报 C1:key=42）
+        ("NUM_SUP", [a("DP-a", "rejected", 1), num_sup], set(), set(), 0),
+        # NO_ID_C6: 缺 id + attempt 跳号 → 双端 C6:key=<no-id>（修复前 PY 多报假阳性 C5:key=None，
+        #   且 key 渲染 None vs undefined 漂移）
+        ("NO_ID_C6", [a("DP-a", "rejected", 1), no_id],
+         {"C6"}, {"C6:key=<no-id>"}, 1),
+        # COLON: id 含冒号的分叉 → 码结构化导出后 key 原样保留（修复前 JS 解析截断为 C4:key=DP）
+        ("COLON_fork", [a("DP:a", "rejected", 1), a("DP-b", "pending", 2, "DP:a"),
+                        a("DP-c", "pending", 2, "DP:a")],
+         {"C4"}, {"C4:key=DP:a"}, 1),
     ]
 
 
 def test_frozen_adversarial_shapes():
-    """④ 固化对抗形状：浮点 attempt 与 ghost 分叉双端语义锚定（P0-1 回归不能再溜进来）。"""
+    """④ 固化对抗形状：浮点/ghost/畸形输入双端语义锚定（码级逐一断言）。"""
     if not NODE_BIN:
         pytest.skip("未找到 node 可执行文件（设 WORKBUDDY_NODE 或加入 PATH）")
     shapes = _frozen_shapes()
-    inputs = [{"decisionPoints": dps} for _, dps, _, _ in shapes]
+    inputs = [{"decisionPoints": dps} for _, dps, _, _, _ in shapes]
 
-    for (_, dps, exp_cats, exp_count), inp in zip(shapes, inputs):
+    for (name, _, exp_cats, exp_codes, exp_count), inp in zip(shapes, inputs):
         py_errs = _check_decision_chain(inp)
         py_cats = classify_py(py_errs)
+        py_codes = classify_codes_py(py_errs)
         assert py_cats == exp_cats and len(py_errs) == exp_count, (
-            f"Python 端偏离固化预期 [{_name_of(shapes, dps)}]: "
+            f"Python 端偏离固化预期 [{name}]: "
             f"{sorted(py_cats)}x{len(py_errs)}，预期 {sorted(exp_cats)}x{exp_count}"
+        )
+        assert py_codes == exp_codes, (
+            f"Python 端违规码偏离 [{name}]: {sorted(py_codes)}，预期 {sorted(exp_codes)}"
         )
 
     proc = subprocess.run(
@@ -179,16 +201,13 @@ def test_frozen_adversarial_shapes():
     if proc.returncode != 0:
         pytest.fail("node runner 失败: " + proc.stderr)
     js_rows = json.loads(proc.stdout)
-    for (name, _, exp_cats, exp_count), row in zip(shapes, js_rows):
+    for (name, _, exp_cats, exp_codes, exp_count), row in zip(shapes, js_rows):
         js_cats = set(row["violations"])
+        js_codes = set(row["codes"])
         assert js_cats == exp_cats and row["errorCount"] == exp_count, (
             f"JS 端偏离固化预期 [{name}]: "
             f"{sorted(js_cats)}x{row['errorCount']}，预期 {sorted(exp_cats)}x{exp_count}"
         )
-
-
-def _name_of(shapes, dps):
-    for name, s_dps, _, _ in shapes:
-        if s_dps is dps:
-            return name
-    return "?"
+        assert js_codes == exp_codes, (
+            f"JS 端违规码偏离 [{name}]: {sorted(js_codes)}，预期 {sorted(exp_codes)}"
+        )

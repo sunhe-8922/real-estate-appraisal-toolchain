@@ -11,7 +11,7 @@
 | 分层生成器 | `tests/chain_shapes.py` | 22 个形状 kind（链/环/分叉/ghost/浮点 attempt/富字段/重复 id/weird id/null/空/外部 DP…），`SHAPE_KINDS` 与 validateChain 的 `DIFF_KINDS` **刻意分开**（避免扰动 885/912 固���语料，Round 4 R7） |
 | Node 执行器 | `tests/dp_chain_runner.js` | 输出规范形态：resolve（byId/roots/chains，只留 id）+ successor（ok/机器码/全字段，去 undefined） |
 | 参考实现 | `tests/dp_chain_oracle.py` | 按规格 4.2 独立实现，纪律：不照抄 JS 代码，分歧即发现 |
-| 固化测试 | `tests/test_dp_chain_vs_oracle.py` | 四断言：① resolveChain 一致 ② buildSuccessorShell 一致 ③ 每 kind 触发 ④ 规格直译锚点（9 条手写期望） |
+| 固化测试 | `tests/test_dp_chain_vs_oracle.py` | 四断言：① resolveChain 一致 ② buildSuccessorShell 一致 ③ 每 kind 触发 ④ 规格直译锚点（8 条手写期望；Round 6 审查 P2-1 勘误，原文误写 9） |
 | 差分 CLI | `tests/dp_chain_diff.py` | 与 validateChain 侧对称，常驻 tests/（P2-2 后脚本不进 rounds/） |
 
 ## 二、结果
@@ -20,7 +20,7 @@
 |---|---|
 | 双端一致率（N=1000，seed 20260830，22 kind） | **1000/1000 = 1.0000** |
 | 分支覆盖 | OK / C3 / C4 / C5 / E_DP_NO_ID 全部命中；chains 长度 0/1/2 均出现 |
-| 固化测试 | 4 passed（语料 300 例 + 9 条锚点） |
+| 固化测试 | 4 passed（语料 300 例 + 8 条锚点） |
 | 回归 | Python 319 passed / Node 32 pass |
 
 ## 三、发现（F1–F4）
@@ -59,6 +59,14 @@ schema 规定 `attempt` 为 integer ≥1，浮点属越界输入。JS 拼接时 
 - `rounds/5/diff_result_round5.json`：决策链函数侧 N=1000 完整存档（一致率、分支分布、mismatches 全量）。
 - `rounds/5/diff_result_round5_codes.json`：validateChain 侧 N=1000 存档（码级比对生效后）。
 - 复跑：`python tests/dp_chain_diff.py --count 1000 --seed 20260830 --out <file>`
+
+### 存档指纹（Round 6 / P1-2 起：CLI 落盘即输出 sha256，登记于此；指纹不符 = 内容被覆盖）
+
+| 存档 | sha256（前 16 位） |
+|---|---|
+| `diff_result_round5.json` | `4018844cd591df34` |
+| `diff_result_round5_codes.json` | `7b4e273776aa0812` |
+| `diff_result_round5_codes2.json` | `7b4e273776aa0812`（与 codes 同指纹——审查期重放逐位一致，可复现性旁证） |
 
 ---
 

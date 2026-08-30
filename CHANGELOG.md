@@ -15,6 +15,8 @@
 | 消息层机器码（假设池 #6） | 双端违规统一 `C<n>:key=<id>`：Python 错误对象新增 `code` 字段（C1-C6 六处，人类文案不变），JS 消息前缀补 key（`C4:key=DP-comp: …`）。分类由码派生，不再靠子串猜文本；差分新增码级一致 + 每条违规必带 key 码两条断言 |
 | 决策链函数差分扩展（假设池 #10） | `resolveChain` / `buildSuccessorShell`（原零机械验证）新增规格参考实现 oracle + 22 形状语料 + 固化测试，N=1000 双端 1000/1000 一致；发现 C5 对多节点环不可达、分叉后继被静默丢弃等 3 项问题（见 `rounds/5/RESULTS.md`） |
 | 证据机制自查常驻（P1-1 防复发） | 新增 `tests/test_rounds_evidence.py`（命名规则/文件完整性/轮次归属/tmp 残留 6 项断言），存档规则由文档约束升级为机器红灯 |
+| 畸形输入类型语义对齐（审查 P1-1） | Python by_id/supersedes 收紧 string-only、C5 先验 dp_id、码层 key 哨兵 `<no-id>`；JS 码升级为 `validateChainCodes` 结构化导出（不再解析消息文本）。`num_supersedes`/`no_id`/`colon_id` 3 kind 入库，固化锚点升级码级断言 |
+| 存档指纹机制（审查 P1-2） | 差分 CLI 落盘输出 sha256 并登记当轮 RESULTS；自查声明收窄为"命名类红灯，内容级靠指纹 + git 审计" |
 
 ---
 

@@ -116,11 +116,17 @@ def _check_decision_chain(data: dict) -> list:
     if not isinstance(dps, list):
         return []
 
+    def _code_key(x):
+        """码层 key 归一（Round 6 / P1-1）：非字符串 id 统一渲染为哨兵 <no-id>，
+        与 JS 端 validateChainCodes 同构，消除 None vs undefined 的渲染漂移。"""
+        return x if isinstance(x, str) else "<no-id>"
+
     by_id = {}
     errors = []
     reported_c4 = set()  # 去重：同一被取代 key 只报一次（对齐 JS 条数口径，Round 3）
     for i, dp in enumerate(dps):
-        if isinstance(dp, dict) and dp.get("id") is not None:
+        # 对齐 JS string-only 语义（P1-1）：非字符串 id 不进 by_id
+        if isinstance(dp, dict) and isinstance(dp.get("id"), str):
             by_id[dp["id"]] = (i, dp)
 
     for i, dp in enumerate(dps):
@@ -128,7 +134,8 @@ def _check_decision_chain(data: dict) -> list:
             continue
         dp_id = dp.get("id")
         supersedes = dp.get("supersedes")
-        if supersedes is None:
+        # 对齐 JS string-only 语义（P1-1）：非字符串 supersedes 不参与任何 C 类检查
+        if not isinstance(supersedes, str):
             continue
         base = ["decisionPoints", i]
 
@@ -137,7 +144,7 @@ def _check_decision_chain(data: dict) -> list:
             errors.append(_make_error(
                 f"decisionPoints[{i}] 的 supersedes 引用了自身 '{dp_id}'，不得自引用",
                 base + ["supersedes"],
-                code=f"C2:key={dp_id}",
+                code=f"C2:key={_code_key(dp_id)}",
             ))
             continue
 
@@ -175,19 +182,23 @@ def _check_decision_chain(data: dict) -> list:
                 break
 
         # C5: 不得成环（沿链走，若回到自己则成环）
-        visited = set()
-        cursor = supersedes
-        while cursor in by_id and cursor not in visited:
+        # 对齐 JS（P1-1）：非字符串 id 的 dp 跳过 C5——否则 cursor 终值 None == dp_id(None)
+        # 会产生假阳性"环"（审查实测：缺 id 的 dp 被误报 C5:key=None）。
+        # 注意只跳过 C5：JS 端 C6 对缺 id 的 dp 照常检查，此处 continue 会破坏 C6 对齐。
+        if isinstance(dp_id, str):
+            visited = set()
+            cursor = supersedes
+            while cursor in by_id and cursor not in visited:
+                if cursor == dp_id:
+                    break  # 回到起点，成环
+                visited.add(cursor)
+                cursor = by_id[cursor][1].get("supersedes")
             if cursor == dp_id:
-                break  # 回到起点，成环
-            visited.add(cursor)
-            cursor = by_id[cursor][1].get("supersedes")
-        if cursor == dp_id:
-            errors.append(_make_error(
-                f"decisionPoints[{i}] 的决策链存在环（{dp_id} → … → {dp_id}）",
-                base + ["supersedes"],
-                code=f"C5:key={dp_id}",
-            ))
+                errors.append(_make_error(
+                    f"decisionPoints[{i}] 的决策链存在环（{dp_id} → … → {dp_id}）",
+                    base + ["supersedes"],
+                    code=f"C5:key={dp_id}",
+                ))
 
         # C6: attempt 一致性
         attempt = dp.get("attempt")
@@ -204,7 +215,7 @@ def _check_decision_chain(data: dict) -> list:
                     f"decisionPoints[{i}] 的 attempt={attempt} 与 supersedes '{supersedes}'（attempt={prev_attempt}）"
                     f"不一致，应为 {prev_attempt + 1}",
                     base + ["attempt"],
-                    code=f"C6:key={dp_id}",
+                    code=f"C6:key={_code_key(dp_id)}",
                 ))
 
     return errors

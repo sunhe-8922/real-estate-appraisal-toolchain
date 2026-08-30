@@ -12,11 +12,17 @@ Node 执行器为 tests/chain_runner.js（审查 P2-2 解耦：正式回归测�
 禁止原地覆盖。
 """
 import argparse
+import hashlib
 import json
 import random
 import subprocess
 import sys
 from pathlib import Path
+
+
+def _sha256_of(path):
+    with open(path, "rb") as f:
+        return hashlib.sha256(f.read()).hexdigest()
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT / "tests"))
@@ -109,7 +115,9 @@ def main():
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
 
+    # 存档指纹（Round 6 / P1-2）：登记进当轮 RESULTS.md，指纹不符即发现内容被覆盖
     print("=" * 60)
+    print("存档 sha256: %s" % _sha256_of(args.out))
     print("差分测试结果 (seed=%d, N=%d)" % (args.seed, args.count))
     print("类别判定一致率: %d/%d = %.4f" % (agree, args.count, rate))
     print("判定不一致: %d | 违规码不一致: %d | 仅错误条数不一致: %d" % (

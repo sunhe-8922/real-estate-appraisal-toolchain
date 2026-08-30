@@ -121,6 +121,8 @@
 6. **schema 层差分锚定**：jsonschema（Python）与前端校验之间的机械一致性验证（P0-1 的暴露面就在这一层）。
 7. **AI 重写 successor 的 riskLevel 同步率**：对应 `intent.md` R2 风险，可作为训练方法维度的新核心指标。
 8. **浏览器端实测**（需人工/浏览器自动化）：`dp-console.html` 的 `validateChain` 调用路径从未实测。
+9. **oracle 交叉验证**（Round 6 审查 P2-3）：换实现者/换会话重写一版 `tests/dp_chain_oracle.py` 做交叉差分，对冲"同一作者按同一份规格写成"的共同误解风险。
+10. **畸形输入 schema 层断言**：缺 id / 数值 supersedes 在 schema 即拦截的行为未逐一断言（validateChain 直调路径已由 Round 6 固化锚点覆盖）。
 
 ### 4.3 方法论教训（本轮沉淀，写进下一轮的 PROPOSAL）
 

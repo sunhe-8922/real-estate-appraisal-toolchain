@@ -15,11 +15,12 @@ process.stdin.on("data", (d) => { raw += d; });
 process.stdin.on("end", () => {
   const inputs = JSON.parse(raw);
   const out = inputs.map((inp) => {
+    // Round 6：码改为结构化导出（validateChainCodes），不再从消息文本解析——
+    // 含冒号等特殊字符的 key 不再有歧义（审查 P1-1④ 根修）
     const errs = DPCore.validateChain(inp.decisionPoints);
     const codes = new Set();
-    errs.forEach((e) => {
-      const m = String(e).match(/^(C\d)(?::key=([^:]*))?/);
-      if (m) { codes.add(m[0]); }
+    DPCore.validateChainCodes(inp.decisionPoints).forEach((c) => {
+      if (typeof c === "string") { codes.add(c); }
     });
     const cats = new Set(Array.from(codes).map((c) => c.split(":")[0]));
     return {

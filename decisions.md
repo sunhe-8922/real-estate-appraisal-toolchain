@@ -103,6 +103,26 @@
 
 ---
 
+---
+
+## D-013：类型防御对齐 JS string-only + 码升级为结构化导出（2026-08-30，Round 6 / 审查 P1-1）
+
+- **背景**：对抗式审查实测 4 处畸形输入双端漂移——数值 supersedes（PY 报 C1 / JS 静默）、缺 id dp（PY 假阳性 C5:key=None）、C6 key 渲染 None vs undefined、id 含冒号（JS 从消息文本解析码被截断）。根因：Python 只挡 None，JS 一律 `typeof === "string"`；码格式 `C<n>:key=<id>` 对含 `:` 的 key 有歧义。
+- **决策**：① Python by_id/supersedes 收紧为 `isinstance(str)`、C5 先验 dp_id 为 str（只包 C5，不用 continue——JS 端 C6 对缺 id dp 照查）；② 两端码层 key 统一哨兵 `_code_key()`/`codeKey()`（非字符串 id → `<no-id>`）；③ JS 新增 `validateChainEntries`/`validateChainCodes`，码与消息同源结构化生成，执行器改用码源、**彻底放弃文本解析**。
+- **理由**：文本解析是码格式歧义的结构性根源，结构化导出一次消灭整类 bug；string-only 语义 JS 已在生产路径验证，Python 对齐成本低。
+- **影响**：4 探针全 OK；`num_supersedes`/`no_id`/`colon_id` 3 kind 入库 + 锚点 4→7 并升级码级断言；回归 327 passed / 32 pass / 21-kind 差分 100%（912=912）。
+
+---
+
+## D-014：存档指纹机制 + 自查声明收窄（2026-08-30，Round 6 / 审查 P1-2）
+
+- **背景**：审查伪造实验证实——用合法 JSON 原地覆盖旧存档（P1-1 原始模式），`test_rounds_evidence` 六项断言全绿灯；"P1-1 复发即红灯"声明超覆盖（不变量第 6 条复发）。
+- **决策**：① 两个差分 CLI 落盘即输出存档 sha256，当轮 RESULTS.md 登记前 16 位，指纹不符 = 内容被覆盖；② README 声明收窄为"命名类违规红灯；内容级覆盖靠指纹 + git 审计"；③ 人工自查清单增加"结束时登记指纹"一项。
+- **理由**：内容级覆盖无法用文件名规则检测，指纹是机器可核对的最低成本防线；声明必须与实际覆盖一致（P1-2 教训）。
+- **影响**：rounds/5、rounds/6 存档指纹已登记；rounds/6 函数侧存档与 round5 同指纹（4018844cd591df34）= 重放逐位一致的确定性旁证。
+
+---
+
 ## 待决策（Open）
 
 | # | 议题 | 选项 | 状态 |

@@ -151,6 +151,23 @@ def gen_case(rng, kind):
     if kind == "ghost_fork":  # 双 DP 指向同一不存在 id → 双端均仅报 C1×2（Round 4 补）
         return [gen_valid_dp("DP-b", "pending", 2, supersedes="GHOST"),
                 gen_valid_dp("DP-c", "pending", 2, supersedes="GHOST")]
+    if kind == "num_supersedes":  # 数值型 supersedes（Round 6 / P1-1：双端 string-only，静默一致）
+        dps = gen_valid_chain(rng)
+        if len(dps) >= 2:
+            dps[-1]["supersedes"] = 42
+        return dps
+    if kind == "no_id":  # 缺 id 字段（Round 6 / P1-1：C5 不再假阳性；跳号时双端 C6:key=<no-id>）
+        dps = gen_valid_chain(rng)
+        tail = dps[-1]
+        tail.pop("id", None)
+        if rng.random() < 0.5 and "attempt" in tail:
+            tail["attempt"] = tail["attempt"] + 7
+        return dps
+    if kind == "colon_id":  # id 含冒号（Round 6 / P1-1：码结构化导出后 key 原样保留）
+        a = gen_valid_dp("DP:a", "rejected", 1)
+        b = gen_valid_dp("DP:b", "pending", 2, supersedes="DP:a")
+        c = gen_valid_dp("DP:c", "pending", 2, supersedes="DP:a")
+        return [a, b, c]
     if kind == "mixed":  # 多违规混合（C1 + C6）
         dps = gen_valid_chain(rng)
         dps[-1]["supersedes"] = "NONEXISTENT"
@@ -165,10 +182,13 @@ def gen_case(rng, kind):
     raise ValueError("unknown kind: " + kind)
 
 
-# 分层清单（与 rounds/1..4 差分脚本一致）：合法 30% / 单违规 50% / 混合+边界 20%
+# 分层清单（与 rounds/1..6 差分脚本一致）：合法 30% / 单违规 50% / 混合+边界 20%
+# Round 6 起 18→21 kind（补 num_supersedes / no_id / colon_id，审查 P1-1 整改）；
+# 注意：kind 清单变更会改变抽样序列，差分总条数基线随之更新（885→912→见 rounds/6）
 DIFF_KINDS = (["valid"] * 3 + ["c1", "c2", "c3", "c4", "c5", "c6",
               "attempt0", "attemptneg", "attempt_missing", "attempt_str",
               "attempt_float", "ghost_fork",
+              "num_supersedes", "no_id", "colon_id",
               "dup_id", "no_status", "mixed", "empty", "null_elem"])
 
 
