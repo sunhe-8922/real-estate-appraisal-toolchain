@@ -17,15 +17,21 @@ FIXED_DATE = (2026, 1, 1, 0, 0, 0)  # zip 条目 date_time（元组）
 
 
 def _rewrite_core_xml(text):
-    """将 core.xml 中的 created/modified 时间戳替换为固定值。"""
+    """将 core.xml 中的 created/modified 时间戳替换为固定值。
+
+    只替换开标签与闭标签之间的文本内容，**保留开标签原样**（含元素上的
+    xmlns:dcterms / xmlns:xsi 内联声明）——openpyxl 3.1.5 起把这些声明
+    内联在元素上而非根元素，整标签替换会产生缺失命名空间声明的非法 XML，
+    导致 openpyxl(lxml 后端) 读回时 XMLSyntaxError（2026-09-01 修复）。
+    """
     text = re.sub(
-        r"<dcterms:created[^>]*>[^<]*</dcterms:created>",
-        '<dcterms:created xsi:type="dcterms:W3CDTF">%s</dcterms:created>' % FIXED_TS,
+        r"(<dcterms:created\b[^>]*>)[^<]*(</dcterms:created>)",
+        lambda m: m.group(1) + FIXED_TS + m.group(2),
         text,
     )
     text = re.sub(
-        r"<dcterms:modified[^>]*>[^<]*</dcterms:modified>",
-        '<dcterms:modified xsi:type="dcterms:W3CDTF">%s</dcterms:modified>' % FIXED_TS,
+        r"(<dcterms:modified\b[^>]*>)[^<]*(</dcterms:modified>)",
+        lambda m: m.group(1) + FIXED_TS + m.group(2),
         text,
     )
     return text
