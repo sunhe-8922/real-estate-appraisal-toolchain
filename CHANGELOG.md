@@ -17,6 +17,9 @@
 | 证据机制自查常驻（P1-1 防复发） | 新增 `tests/test_rounds_evidence.py`（命名规则/文件完整性/轮次归属/tmp 残留 6 项断言），存档规则由文档约束升级为机器红灯 |
 | 畸形输入类型语义对齐（审查 P1-1） | Python by_id/supersedes 收紧 string-only、C5 先验 dp_id、码层 key 哨兵 `<no-id>`；JS 码升级为 `validateChainCodes` 结构化导出（不再解析消息文本）。`num_supersedes`/`no_id`/`colon_id` 3 kind 入库，固化锚点升级码级断言 |
 | 存档指纹机制（审查 P1-2） | 差分 CLI 落盘输出 sha256 并登记当轮 RESULTS；自查声明收窄为"命名类红灯，内容级靠指纹 + git 审计" |
+| oracle 交叉验证（假设池 #9） | 独立会话重写 `tests/dp_chain_oracle_v2.py`（隔离纪律：只读规格 + 契约），三方 v1/v2/JS N=1000 一致；唯一分歧（重复 id 的 C4 自身排除基准，37 例）按 D-015 裁决对齐生产契约并固化锚点，附带 8 条规格模糊点清单 |
+| schema 层畸形输入断言（假设池 #10） | 新增 `tests/test_schema_malformed_inputs.py`（8 条），断言 required/type/minimum 拦截点本身；固化 `attempt=2.0` 被 schema 放行的事实（P0-1 暴露面）；与 validateChain 固化锚点构成双层防线 |
+| 决策动作 / 状态机差分 | `applyDecision` / `isTerminal`（原零机械验证）补齐生成器 + 执行器 + 规格参考实现 + 9 条锚点，N=1000 零分歧；发现并裁决数组 typeof=object 的分歧 |
 
 ---
 

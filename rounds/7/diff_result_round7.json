@@ -1,0 +1,30 @@
+{
+  "seed": 20260830,
+  "count": 1000,
+  "three_way": {
+    "seed": 20260830,
+    "count": 1000,
+    "kinds": 22,
+    "v1_vs_v2": 0,
+    "v1_vs_js": 0,
+    "v2_vs_js": 0,
+    "divergence_before_patch": {
+      "kind": "dup_id",
+      "cases": 37,
+      "adjudication": "C4 自身排除按 id（对齐 JS d.id !== dp.id）"
+    }
+  },
+  "action_diff": {
+    "seed": 20260831,
+    "count": 1000,
+    "kinds": 18,
+    "apply_mismatch": 0,
+    "terminal_mismatch": 0,
+    "divergence_before_patch": {
+      "kind": "dp_not_object",
+      "note": "数组 typeof=object 落 E_NOT_PENDING（JS），oracle 原判 E_DP_NOT_OBJECT → 裁决对齐"
+    }
+  },
+  "rate": 1.0,
+  "mismatch_count": 0
+}
