@@ -86,3 +86,26 @@ evidence/risks 为 None 的语义、C4 自身判定基准、attempt 非法值、
 | 存档 | sha256（前 16 位） |
 |---|---|
 | `diff_result_round7.json` | `e9e1702fbd84b6d1` |
+
+## 六、P1-1 整改（2026-09-01，Round 7 审查）
+
+**审查发现**：`_js_str()` 未复现 JS `String()` 的 dict/list 语义（dict → `"[object Object]"`、
+list → 逗号 join），嵌套对象/数组 comment 会双端漂移。
+
+**整改内容**：
+1. `tests/dp_action_oracle.py`：`_js_str()` 补 dict/list 分支。JS 实测校准出一处
+   **与整改指令的偏差**：list 元素为 null/undefined 时 JS 渲染为**空串**
+   （`[null,"a"]` → `",a"`），而非 "null"——按 D-015 对齐生产契约实现。
+2. `tests/dp_action_shapes.py`：新增 `comment_obj` / `mods_obj` 两 kind（F4 教训：
+   新增边界必须入库），覆盖 dict/嵌套 dict/扁平数组/null 元素/空数组边界。
+3. `tests/test_dp_action_vs_oracle.py`：补 3 条固化锚点（dict 渲染、数组 join、
+   `modifications=[]` 渲染为空串被拒的必填边界）。
+
+**结果**：N=1000 → applyDecision / isTerminal 仍 0 分歧（20/20 kind 全触发）；
+Python 全量 343 passed；Node 27 pass。
+
+**顺带修复（环境性回归，非差分发现）**：test_templates 28 例因
+`scripts/xlsx_meta.py` 的 `save_frozen()` 整标签正则替换吞掉 openpyxl 3.1.5
+内联在 `dcterms:created` 上的 `xmlns:dcterms`/`xmlns:xsi` 声明，产出非法 core.xml，
+openpyxl(lxml) 读回即 XMLSyntaxError。修复为只替换时间戳文本、保留开标签原样，
+4 个模板重新生成后回归全绿。教训：正则改 XML 必须复扫验证（与 D-014 同源）。

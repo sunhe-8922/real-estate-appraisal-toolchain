@@ -25,13 +25,21 @@ TERMINAL_STATUSES = ("approved", "modified")
 
 
 def _js_str(x):
-    """复现 JS String() 渲染（null → "null"、true → "true"、2.0 → "2"）。"""
+    """复现 JS String() 渲染（JS 实测 2026-09-01 校准）：
+    null → "null"、true → "true"、2.0 → "2"、dict → "[object Object]"、
+    list → 逗号 join 递归扁平（JS Array.prototype.toString），**元素 null/undefined → ""**
+    （[null, "a"] → ",a"，与顶层 null 的 "null" 不同——两处语义不可混用）。
+    """
     if x is None:
         return "null"
     if isinstance(x, bool):
         return "true" if x else "false"
     if isinstance(x, float) and x.is_integer():
         return str(int(x))
+    if isinstance(x, dict):
+        return "[object Object]"
+    if isinstance(x, list):
+        return ",".join("" if e is None else _js_str(e) for e in x)
     return str(x)
 
 

@@ -16,6 +16,8 @@ ACTION_KINDS = [
     "bad_action", "dp_null", "dp_not_object", "comment_padded",
     "comment_nonstring", "decided_by", "timestamp_given", "opts_missing",
     "status_edge", "modify_null_mods",
+    # P1-1 整改（Round 7 审查）：对象/数组语义（F4 教训——新增边界必须入库）
+    "comment_obj", "mods_obj",
 ]
 
 
@@ -83,6 +85,31 @@ def gen_action_case(rng, kind):
         val = rng.choice([123, True, 2.0])
         return {"dp": _dp(), "action": "approved", "status": "pending",
                 "opts": {"comment": val}}
+    if kind == "comment_obj":  # 对象/数组 comment → String() 渲染（P1-1 整改边界）
+        # dict → "[object Object]"；数组 → 逗号 join 扁平，元素 null → ""（[null,"a"] → ",a"）
+        # 空数组/空元素组合可能渲染为空串 → comment 被省略
+        val = rng.choice([
+            {"来源": "中原地产"},
+            {"nested": {"deep": 1}},
+            ["同小区成交", "近半年"],
+            [[1, 2], 3],                # 嵌套扁平化 → "1,2,3"
+            [{"a": 1}, "x"],            # → "[object Object],x"
+            [None, "a"],                # → ",a"（null 元素为空串，非 "null"）
+            [],                         # → "" → comment 被省略
+            [None, None],               # → "," → 非空，comment=","
+        ])
+        return {"dp": _dp(), "action": "approved", "status": "pending",
+                "opts": {"comment": val}}
+    if kind == "mods_obj":  # modifications 传对象/数组 → 渲染结果决定必填通过与否
+        val = rng.choice([
+            {"实例": "C"},              # → "[object Object]" → 通过
+            ["换", "2号实例"],           # → "换,2号实例" → 通过
+            [],                         # → "" → 拒绝 E_MODIFIED_REQUIRES_MODIFICATIONS
+            [None, None],               # → "," → 非空 → 通过
+        ])
+        return {"dp": _dp(), "action": "modified", "status": "pending",
+                "opts": {"modifications": val, "comment": "调整"}}
+
     if kind == "decided_by":
         return {"dp": _dp(), "action": "approved", "status": "pending",
                 "opts": {"decidedBy": sun_alias(rng)}}

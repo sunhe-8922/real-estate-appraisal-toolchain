@@ -137,6 +137,19 @@ ANCHORS = [
      {"dp": _dp(), "action": "approved", "status": "approved",
       "opts": {"comment": "  同意  "}},
      True, None, "approved", True),
+    # P1-1 整改锚点（Round 7 审查）：对象/数组语义（F4 教训：新增边界必须入库）
+    ("comment 传对象 → String() 渲染为 [object Object]",
+     {"dp": _dp(), "action": "approved", "status": "approved",
+      "opts": {"comment": {"来源": "中原地产"}}},
+     True, None, "approved", True),
+    ("modifications 传数组 → 逗号 join 渲染（JS Array.prototype.toString 扁平化）",
+     {"dp": _dp(), "action": "modified", "status": "modified",
+      "opts": {"modifications": ["换", "2号实例"]}},
+     True, None, "modified", True),
+    ("modifications 传空数组 → String([]) 渲染为空串 → 拒绝（必填边界）",
+     {"dp": _dp(), "action": "modified", "status": "pending",
+      "opts": {"modifications": []}},
+     False, "E_MODIFIED_REQUIRES_MODIFICATIONS", None, False),
 ]
 
 
