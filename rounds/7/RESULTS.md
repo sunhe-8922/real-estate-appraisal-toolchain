@@ -109,3 +109,34 @@ Python 全量 343 passed；Node 27 pass。
 内联在 `dcterms:created` 上的 `xmlns:dcterms`/`xmlns:xsi` 声明，产出非法 core.xml，
 openpyxl(lxml) 读回即 XMLSyntaxError。修复为只替换时间戳文本、保留开标签原样，
 4 个模板重新生成后回归全绿。教训：正则改 XML 必须复扫验证（与 D-014 同源）。
+
+## 七、动作差分补 CLI + 指纹（2026-09-01，交接建议 #3）
+
+`tests/dp_action_diff.py`（仿 `dp_chain_diff.py`：--count/--seed/--out + sha256 输出）
+接入证据机制。N=1000（seed=20260901）：**0 分歧**，20/20 kind 全触发，
+`modify_blank_mods`（67）/`reject_blank_comment`（58）等必填边界均有分布。
+
+存档：`rounds/7/diff_result_round7_action.json`
+存档 sha256：`33f5501aeb9e1de3`（登记待验：指纹不符 = 内容被覆盖）
+
+## 八、动作侧 oracle 交叉验证（2026-09-01，交接建议 #4）
+
+独立会话第二实现者按《决策点规格定义》§1.3/§4.3 + 函数契约重写
+`tests/dp_action_oracle_v2.py`（隔离纪律：未读任何实现代码），自决 8 条模糊点（A1-A8）。
+
+**三方交叉 N=1000（seed=20260901）初判**：v1 ≡ JS 0 分歧；
+v2 与 JS 分歧 **69 例 / 2 个分歧签名**：
+
+| # | 分歧 | v2 初版 | 生产契约（JS） | 裁决（D-015） |
+|---|------|---------|---------------|--------------|
+| 1 | list 形态 dp（A1） | E_DP_NOT_OBJECT（仅 dict 算对象） | `typeof []==="object"` 放行 → E_NOT_PENDING | 对齐 JS：dict/list 均算对象 |
+| 2 | modifications=null（A4） | 视作缺失 → 拒绝 | 无 null 排除守卫（与 comment 不对称），String(null)="null" → 通过 | 对齐 JS：键缺失→""拒绝；显式 null→"null" 通过 |
+
+另裁决 A5（decidedBy）：JS `\|\|` falsy 语义，空白串原样保留（语料外潜在分歧，一并对齐）。
+
+**补丁后复验**：v1 ≡ v2 ≡ JS **1000/1000/1000 全一致**；
+常驻交叉测试 `tests/test_dp_action_oracle_cross.py`（5 断言：v1≡v2 / v2≡JS /
+2 裁决锚点 / kind 全触发）。回归：Python 348 passed；Node 32 pass。
+
+**价值实证**：独立实现者在 A1/A4 两处按"业务直觉"实现，均与生产契约相反——
+单一实现者的"合理猜测"风险再次被交叉验证抓到（同 dup_id 模式）。
