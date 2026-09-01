@@ -325,25 +325,7 @@ if __name__ == "__main__":
     print("ALL SELF-TESTS PASSED (9 groups + extras)")
 
 
-# SPEC-AMBIGUITIES:
-# 1. 【分叉时链怎么走】resolve_chain 未定义"后继 = 第一个匹配且未访问"中"未访问"
-#    的作用域：是当前链序列内，还是跨链全局？若两个 root 的链汇入同一节点，
-#    全局 visited 会让第二条链提前截断。我选当前序列内（A4）。
-# 2. 【重复 id】同 id 覆盖后，roots 的插入顺序按首次出现还是覆盖时位置？规格未说。
-#    我按 Python dict / JS object 语义取首次出现位置（A6）。且链行走扫描原数组，
-#    同 id 的两个对象都可能作为后继匹配，"第一个匹配"自然取靠前者，但语义未定义。
-# 3. 【C4 与 C5 的守卫顺序】守卫 4（分叉）先于守卫 5（成环）执行。在 A↔B 互指环中，
-#    B.supersedes=A 同时构成"分叉"，永远先命中 C4——除非环经 dp 自引用
-#    （dp.supersedes=dp.id）。即 C5 实际只在自引用时可达；规格 4.2 规则 3 未定义
-#    两个校验的优先级，交叉验证版本若先查环结果会不同。
-# 4. 【链节点资格】无 id / id 非字符串的畸形元素能否作为链中间节点？byId 排除它们，
-#    但链行走是否同样排除未定义。我选择排除（A5），否则无法输出其 id。
-# 5. 【evidence/risks 的 None 与类型】"缺失则空 list"未覆盖：值为 None 算不算缺失？
-#    值为非 list（如字符串）是否原样深拷贝还是置 []？我选 None→[]、非 list 原样拷贝（A10）。
-# 6. 【C4 的"自身"判定】按对象同一性（is）还是按 id 相等排除 dp？若 dp 来自
-#    outsideDp（run_case 注入）而非 chain 内对象，同一性永远不命中，行为可能不同。
-# 7. 【attempt 非法值】attempt=0、负数、bool、字符串时的行为规格未定义；契约只说
-#    "实数且 ≥1 否则视作 1"。我同时把结果 attempt 规范化为 int（JS Number 语义，A1）。
-# 8. 【C1/C2/C6 未纳入 shell 守卫】契约守卫只有 E_*/C3/C4/C5；supersedes 引用不存在
-#    的 id（C1）、attempt 与前驱不一致（C6）在 build_successor_shell 中不校验，
-#    归属 resolve 层还是 shell 层规格未明确。
+# SPEC-AMBIGUITIES：实现时记录的 8 条规格模糊点已于 2026-09-01 回写
+# 《决策点规格定义》§4.5（含逐条裁决与 D-015 改判规则），此处不再重复；
+# 实现内 A1-A10 注释仅保留实现视角的最小说明。改判须先改
+# tests/test_dp_chain_oracle_cross.py 固化锚点。
