@@ -624,15 +624,13 @@
       {
         "id": "income.value",
         "target": "methods.income.finalValue.total",
-        "formula": "=ROUND(({{noi}}/({{rate}}-{{growth}})*(1-((1+{{growth}})/(1+{{rate}}))^{{forwardPeriod}})+({{noi}}*(1+{{growth}})^({{forwardPeriod}}-1))/{{rate}}/(1+{{rate}})^{{forwardPeriod}}*(1-1/(1+{{rate}})^G23)),-1)",
+        "formula": "=ROUND({{noi}}/{{rate}},0)",
         "refs": {
           "noi": "methods.income.netOperatingIncome.annualAmount",
-          "rate": "methods.income.rate.value",
-          "growth": "methods.income.netOperatingIncome.growthRate",
-          "forwardPeriod": "methods.income.holdingPeriod"
+          "rate": "methods.income.rate.value"
         },
         "excelSource": "住宅-收益法测算!G27",
-        "description": "收益价值（报酬资本化分段折现：前 forwardPeriod 年递增折现 + 剩余年限折现）。G23（剩余年限 = 收益期−前段）为 Excel 局部中间量，schema 无对应字段，cells 重建时还原为 G23 引用。"
+        "description": "收益价值（直接资本化法）= 年净收益 / 资本化率。与差异分析口径一致：报酬资本化法全剩余寿命模式低估严重，故不采用；本例净收益 48124、资本化率 1.5%，ROUND(48124/0.015)=3208267。"
       },
       {
         "id": "result.finalTotalValue",
@@ -648,15 +646,15 @@
         "description": "最终结果 = 收益价值 × 收益权重 + 比较法价值 × 比较权重（四舍五入到十位）"
       },
       {
-        "id": "result.totalValue",
-        "target": "result.finalTotalValue",
-        "formula": "ROUND({{area}}*{{unitValue}},0)",
+        "id": "result.finalUnitValue",
+        "target": "result.finalUnitValue",
+        "formula": "=ROUND({{finalTotal}}/{{area}},0)",
         "refs": {
-          "area": "property.area",
-          "unitValue": "result.finalUnitValue"
+          "finalTotal": "result.finalTotalValue",
+          "area": "property.area"
         },
         "excelSource": "评估明细表!O6",
-        "description": "评估总价 = 面积 × 单价（四舍五入到元）"
+        "description": "最终单价 = 评估总价 / 面积（派生自权威总价，四舍五入到元）。总价取加权结果 3271720，单价唯一派生，消除与 result.finalTotalValue 节点的 target 冲突（R7 P1-1 同形态整改）。"
       }
     ]
   },

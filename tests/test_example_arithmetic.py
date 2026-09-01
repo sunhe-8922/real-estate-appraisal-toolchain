@@ -32,18 +32,12 @@ ROOT = Path(__file__).resolve().parent.parent
 VERIFIER = ROOT / "scripts" / "verify_example_arithmetic.py"
 TMP = ROOT / "tests" / "_tmp_verify_out.json"
 
-# 已登记的既有缺陷（Round 8 B2 实测发现，待修复后从本表移除）
+# 已登记的既有缺陷（Round 8 B2 实测发现，Round 9 已修复后从本表移除）
+# Round 9 修复：住宅示例 income.value 公式改直接资本化法 ROUND(noi/rate,0)、
+# result.totalValue 节点改 result.finalUnitValue 派生单价（消除 target 冲突）。
+# 修复后两个示例变异判定均 100%、无 CONTAMINATED，KNOWN_DEFECTS 已清空。
 # 格式：{相对路径: [(FAIL 标签, 说明), ...]}
-KNOWN_DEFECTS = {
-    "schema/example-武汉洪山住宅.json": [
-        ("chain 节点 income.value 公式不可求值",
-         "P1-2A: chain 公式用报酬资本化法（含 growth/holdingPeriod/G23），"
-         "数据实为直接资本化法 total=ROUND(48124/0.015)=3208267；公式与数据口径不符"),
-        ("chain 末节点回乘闭合 result.totalValue",
-         "P1-2B: 末节点 ROUND(area×unit)=3271738 ≠ 权威总价 3271720（R7 P1-1 同形态，"
-         "该示例未随整改同步）；且 result.totalValue 与 result.finalTotalValue 重复 target"),
-    ],
-}
+KNOWN_DEFECTS = {}
 
 
 def _discover_examples() -> list[Path]:
