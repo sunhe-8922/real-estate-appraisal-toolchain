@@ -1,0 +1,134 @@
+{
+ "examples": [
+  {
+   "example": "schema\\example-多方法商业.json",
+   "counts": {
+    "killed": 15,
+    "survived": 0,
+    "crash": 0,
+    "skip": 0,
+    "contaminated": 0
+   },
+   "score": 100.0,
+   "results": [
+    {
+     "mutant": "result.unit+100",
+     "verdict": "killed",
+     "expected": "最终单价=ROUND(总价/面积) / 回乘容差",
+     "detail": "[FAIL] 最终单价=ROUND(总价/面积)  (2804260/85.0=32991 vs 33091)"
+    },
+    {
+     "mutant": "result.total+5000",
+     "verdict": "killed",
+     "expected": "最终总价(权威加权)",
+     "detail": "[FAIL] 最终总价(权威加权)  (算 2804260.0 vs 2809260)"
+    },
+    {
+     "mutant": "comps.inst1.adjusted+200",
+     "verdict": "killed",
+     "expected": "比准单价复现",
+     "detail": "[FAIL] comps 实例1 比准单价复现  (独立算 33878 vs 声明 34078)"
+    },
+    {
+     "mutant": "comps.finalValue.total+1000",
+     "verdict": "killed",
+     "expected": "comps 总价闭合",
+     "detail": "[FAIL] comps 总价闭合(unit×area)  (33050×85.0=2809250.0 vs 声明 2810250)"
+    },
+    {
+     "mutant": "comps.finalValue.unit+10",
+     "verdict": "killed",
+     "expected": "comps 加权单价",
+     "detail": "[FAIL] comps 加权单价  (算 33050.0 vs 声明 33060)"
+    },
+    {
+     "mutant": "income.NOI+500",
+     "verdict": "killed",
+     "expected": "收益法 NOI",
+     "detail": "[FAIL] 收益法 NOI  (163200-34272=128928)"
+    },
+    {
+     "mutant": "income.finalValue.total+5000",
+     "verdict": "killed",
+     "expected": "收益法总价(权威)",
+     "detail": "[FAIL] 收益法总价(权威)  (ROUND(128928/0.042)=3069714 vs 3074714)"
+    },
+    {
+     "mutant": "income.finalValue.unit+20",
+     "verdict": "killed",
+     "expected": "收益法单价=ROUND(总价/面积)",
+     "detail": "[FAIL] 收益法单价=ROUND(总价/面积)  (3069714/85.0=36114 vs 36134)"
+    },
+    {
+     "mutant": "cost.reproductionCost+10000",
+     "verdict": "killed",
+     "expected": "成本法重置成本",
+     "detail": "[FAIL] 成本法重置成本  (七项和 3040260 vs 3050260)"
+    },
+    {
+     "mutant": "cost.depreciation.physical+100",
+     "verdict": "killed",
+     "expected": "成本法物质折旧复现",
+     "detail": "[FAIL] 成本法物质折旧复现  (ROUND(3040260×11/58.5)=571673 vs 571773)"
+    },
+    {
+     "mutant": "cost.depreciation.total+100",
+     "verdict": "killed",
+     "expected": "成本法折旧合计",
+     "detail": "[FAIL] 成本法折旧合计  (646673 vs 646773)"
+    },
+    {
+     "mutant": "result.crossMethodDifference.max+10000",
+     "verdict": "killed",
+     "expected": "交叉验证 max/min",
+     "detail": "[FAIL] 交叉验证 max/min 一致  (3079714/2393587 vs 实算 3069714/2393587)"
+    },
+    {
+     "mutant": "result.weightAllocation 漂移",
+     "verdict": "killed",
+     "expected": "最终总价(权威加权)",
+     "detail": "[FAIL] 最终总价(权威加权)  (算 2830300.0 vs 2804260)"
+    },
+    {
+     "mutant": "property.area+3",
+     "verdict": "killed",
+     "expected": "面积相关的全部闭合断言",
+     "detail": "[FAIL] comps 总价闭合(unit×area)  (33050×88.0=2908400.0 vs 声明 2809250)"
+    },
+    {
+     "mutant": "calculationChain 末节点公式改写",
+     "verdict": "killed",
+     "expected": "chain 公式↔target 一致性",
+     "detail": "[FAIL] chain 节点 result.finalTotalValue 公式不可求值  (target (result.finalTotalValue) 有值却求不出——求值失败: refs 中无 area（引用了 refs 中不存在的键 = 公式写错）)"
+    }
+   ]
+  },
+  {
+   "example": "schema\\example-武汉洪山住宅.json",
+   "counts": {
+    "killed": 0,
+    "survived": 0,
+    "crash": 0,
+    "skip": 0,
+    "contaminated": 1
+   },
+   "score": null,
+   "results": [
+    {
+     "mutant": "<baseline>",
+     "verdict": "contaminated",
+     "expected": "基线必须干净",
+     "detail": "[FAIL] chain 节点 income.value 公式不可求值  (target (methods.income.finalValue.total) 有值却求不出——求值失败: 数据中无 methods.income.netOperatingIncome.growthRate（引用了 refs 中不存在的键 = 公式写错）)"
+    }
+   ]
+  }
+ ],
+ "totals": {
+  "killed": 15,
+  "survived": 0,
+  "crash": 0,
+  "skip": 0,
+  "scored": 15,
+  "score": 100.0
+ }
+}

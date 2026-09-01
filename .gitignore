@@ -28,3 +28,6 @@ __pycache__/
 
 # Attack test payloads (adversarial review, never commit)
 _attack/
+
+# Mutation testing scratch space (rebuilt each run)
+tests/_tmp_mutants/

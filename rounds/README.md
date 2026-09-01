@@ -14,8 +14,19 @@
 | 5 | 决策链函数（resolveChain/buildSuccessorShell）差分覆盖扩展 + 消息层机器码 + 证据机制自查常驻 | 函数侧 1000/1000 一致；码级 0 漂移；回归 327 passed |
 | 6 | 对抗式审查整改：畸形输入 string-only 对齐 + 码结构化导出 + 存档指纹机制 | 4 漂移全消；21-kind 差分 100%（912=912）；回归 327 passed |
 | 7 | oracle 交叉验证（独立实现三方比对）+ schema 层畸形输入断言 + 决策动作/状态机差分 | 三方 0 分歧；343 passed；两处规格未定义分歧已裁决 |
+| 8 | 数值自洽协议：校验器泛化 + calculationChain 公式↔target 断言 + 变异测试量化 + pytest 常驻门禁 | 变异检出率 93.3%→100%；覆盖 1/3→3/3；354 passed；翻出 P1-2A/P1-2B 两处 R7 未收口缺陷 |
 
 ## 存档命名规则（P1-1 教训，强制）
+
+### 存档类型（Round 8 起，不止一种）
+
+评估体系不再只有"差分一致率"一个指标，故存档也不再只有一种。类型由文件名决定，
+各类型有各自的必需字段——**不允许用差分字段去套变异存档**（那会逼出伪造字段）。
+
+| kind | 文件名 | 必需顶层字段 | 产出者 |
+|---|---|---|---|
+| diff | `diff_result_roundN[_suffix].json` | seed/count/rate/mismatch_count | `*_diff.py` |
+| mutation | `mutation_result_roundN[_suffix].json` | examples/totals(+totals.score) | `tests/mutation_harness.py` |
 
 1. **差分结果按轮次独立命名**：`rounds/N/diff_result_roundN.json`，由
    `diff_check_chain.py --out` 显式指定。**禁止原地覆盖**任何已存在的存档文件。
