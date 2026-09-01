@@ -3,7 +3,8 @@
 > **生成时间**：2026-09-01 07:50
 > **继承自**：`outputs/HANDOFF-2026-08-30-round6.md`（其「四、后续迭代建议」1-3 条已全部完成，见本文）
 > **状态**：Round 7 三任务 + 对抗式审查（0 P0 / 1 P1 / 2 P2）+ P1-1 整改**全部完成**；
->   本地提交 4 笔（`28797ae` / `798d12e` / `4be77e2` / `11e1369`）**待推送**（远程 = `4da2a73`，
+>   历史遗留五项**全部处置完毕**（真实对话演练外挂；固定 DP 验证、多方法示例已执行）；本地提交 6 笔
+>   （`28797ae` / `798d12e` / `4be77e2` / `11e1369` / `74e6990` / `25d82cf`）**待推送**（远程 = `4da2a73`，
 >   2026-09-01 07:45 `git ls-remote` 实测）；git 纪律：**等 sun 指令才推送**，推送后 `ls-remote` 复核
 > **前置文档**：`outputs/对抗式审查-Round7-交叉验证与动作差分-20260831.md`（审查证据，`798d12e`）、
 >   `rounds/7/RESULTS.md`（§六 = P1-1 整改记录）、`rounds/README.md`、`decisions.md` D-012 / D-015
@@ -64,7 +65,7 @@
 
 | 指标 | 值 |
 |---|---|
-| Python 全量（`pytest tests/ -q`） | **343 passed**（315 + test_templates 28） |
+| Python 全量（`pytest tests/ -q`） | **348 passed**（2026-09-01 10:48 实测，较 343 基线 +5） |
 | Node 全量（`node --test tests/test_dp_core.js tests/test_e2e_orchestrator.js`） | **32 pass / 0 fail** |
 | 三方交叉（决策链函数，N=1000） | v1 ≡ v2 ≡ JS，0 分歧 |
 | 决策动作差分（N=1000，20 kind） | 0 分歧 |
@@ -83,7 +84,7 @@
 | 4 | **oracle 独立性（动作侧）** | `dp_action_oracle.py` 仍是单实现者；链侧已交叉验证（v2），动作侧未做——可复用同套路 |
 | 5 | **无 Python 生产实现** | 链函数与决策动作的 oracle 均为测试件；编排层若需 Python 侧建链/决策能力，需先确认需求再落地（届时差分声明升级为「JS ≡ Python 生产实现」） |
 | 6 | ~~dp-console.html 浏览器实测~~ **已关闭（2026-09-01）**：固定 DP1-DP4 三分支流转 + 驳回建链（DP3-2/attempt=2）+ 链可视化 + C1-C6 校验 + 导出激活全部通过，见 `outputs/DP1-DP4浏览器验证报告-20260901.md`（含证据截图与环境坑备注） |
-| 7 | **历史遗留（自 HANDOFF-2026-08-24）** | ~~真实对话演练（编排层）、固定 DP 浏览器验证、多方法工程示例、R2 redLineChecks 语义、git 历史 PII 方案 B/C~~ **2026-09-01 处置（sun 拍板）**：redLineChecks 维持宽松（O-1 已裁决关闭）；PII 维持方案 A（O-3 已裁决关闭）；**本轮已执行** DP1-DP4 浏览器验证；真实对话演练 + 多方法工程示例**顺延**（演练前置条件已满足：skill 已索引生效） |
+| 7 | **历史遗留（自 HANDOFF-2026-08-24）** | ~~真实对话演练（编排层）、固定 DP 浏览器验证、多方法工程示例、R2 redLineChecks 语义、git 历史 PII 方案 B/C~~ **2026-09-01 处置（sun 拍板）**：redLineChecks 维持宽松（O-1 已裁决关闭）；PII 维持方案 A（O-3 已裁决关闭）；**本轮已执行** DP1-DP4 浏览器验证 + **多方法完整工程示例**（`schema/example-多方法商业.json`，三方法 8 决策点，schema 校验 + 348 pytest + 32 Node 全绿，dp-console 链可视化实测通过，见 `outputs/多方法示例-链可视化验证-20260901.png`）；真实对话演练**顺延**（前置条件已满足：skill 已索引生效，需专门估价会话） |
 | 8 | **工作区其他会话改动** | ~~`CLAUDE.md`（已修改）、`outputs/CLAUDE.md`（未跟踪，双副本问题）~~ **2026-09-01 处置（sun 拍板，D-016）**：双副本已删除；根 `CLAUDE.md` v10.0 已提交入库；防复发规则已登记 decisions.md D-016。格力海岸 3105 产物若干未跟踪文件仍在，与本任务无关 |
 
 ---
@@ -112,7 +113,7 @@
 4. **动作侧 oracle 交叉验证**（假设池套路复用）：换会话按规格重写 `dp_action_oracle.py`，三方（v1 ≡ v2 ≡ JS）N=1000。
 5. **Python 生产实现评估**：编排层若需命令行侧建链/决策，以 oracle 为底落到 `scripts/`；**需 sun 确认需求后立项**。
 6. **前端可选用码**：`dp-console.html` 可直接消费 `validateChainCodes`，无需解析文本。
-7. ~~**历史遗留**（二.7）与 `outputs/CLAUDE.md` 双副本决策~~ **已完成（2026-09-01，sun 拍板）**：双副本删除 + v10.0 提交 + D-016 防复发规则；O-1/O-3 裁决关闭；DP1-DP4 浏览器验证已执行。遗留仅剩：真实对话演练、多方法工程示例。
+7. ~~**历史遗留**（二.7）与 `outputs/CLAUDE.md` 双副本决策~~ **已完成（2026-09-01，sun 拍板）**：双副本删除 + v10.0 提交 + D-016 防复发规则；O-1/O-3 裁决关闭；DP1-DP4 浏览器验证 + **多方法完整工程示例**（`schema/example-多方法商业.json`）已执行。遗留仅剩：真实对话演练（需专门估价会话）。
 
 ---
 
@@ -160,6 +161,10 @@ pytest tests/test_rounds_evidence.py -v
 | `outputs/对抗式审查-Round7-交叉验证与动作差分-20260831.md` | 新增：审查报告（0 P0 / 1 P1 / 2 P2） | `798d12e` |
 | `scripts/xlsx_meta.py` + `outputs/templates/*.xlsx`（4 个） | 修改：core.xml 命名空间保留 + 模板重生成 | `11e1369` |
 | `decisions.md`（D-015）/ `CHANGELOG.md` | 修改 | `28797ae` |
+| `decisions.md`（D-016）/ 根 `CLAUDE.md` v10.0 | 修改/新增：单一事实源规则 + 宪章 v10.0 入库 | `74e6990` |
+| `outputs/DP1-DP4浏览器验证报告-20260901.md` + `outputs/DP1-DP4浏览器验证-20260901.png` | 新增：固定 DP 浏览器实测（关闭遗留 2.2/二.6） | `25d82cf` |
+| `schema/example-多方法商业.json` | **新增：多方法完整工程示例**（比较法 0.5/收益法 0.3/成本法 0.2，8 决策点含 rejected→successor 链与 modified 首例，calculationChain 11 节点，全部数字手工推演自洽） | 随本次提交 |
+| `outputs/多方法示例-链可视化验证-20260901.png` | 新增：多方法示例 dp-console 链可视化实测截图 | 随本次提交 |
 | `outputs/HANDOFF-2026-09-01-round7.md` | 新增：本交接文档 | 随本次提交 |
 
 ---
@@ -167,15 +172,18 @@ pytest tests/test_rounds_evidence.py -v
 ## 七、Git 状态
 
 ```
-本轮提交链（4 笔，均待推送）:
+本轮提交链（6 笔，均待推送）:
   28797ae test(chain): oracle cross-validation, schema malformed-input guards,
           action/state-machine diff (Round 7)
   798d12e docs(review): adversarial review of Round 7 (0 P0 / 1 P1 / 2 P2)
   4be77e2 fix(test): restore JS String() object/array semantics in action oracle (P1-1)
   11e1369 fix(scripts): preserve inline xmlns declarations when freezing core.xml
+  74e6990 docs(governance): charter v10.0 + D-016 single-source rule + close O-1/O-3
+  25d82cf test(ui): verify fixed DP1-DP4 in browser - close legacy item 2.2
+（+ 未推送第 7 笔：多方法工程示例 + 链可视化验证 + 本交接文档更新）
 远程核对: git ls-remote origin master = 4da2a73（2026-09-01 07:45 实测）
 推送纪律: 等 sun 指令；推送后 ls-remote 复核；可打 tag round7-done
-工作区: 其他会话未提交改动仍在（R8）——历次提交均显式排除
+工作区: 其他会话未提交改动仍在（R8）——历次提交均显式排除（格力海岸 3105 产物、临时脚本 _tmp_check_example.py / tmp_dpcheck.js）
 ```
 
 ---

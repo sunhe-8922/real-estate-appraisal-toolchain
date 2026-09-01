@@ -1,0 +1,889 @@
+{
+  "schemaVersion": "1.5",
+  "sourceMode": "json",
+  "project": {
+    "name": "武汉市洪山区珞狮路某小区2栋1单元101室沿街商业房地产抵押估价",
+    "purpose": "为确定抵押贷款额度提供参考依据而评估房地产抵押价值",
+    "client": "××银行股份有限公司武汉分行",
+    "agency": "××房地产土地资产评估有限公司",
+    "appraiser": {
+      "name": "张××",
+      "registrationNumber": "××××××"
+    },
+    "coAppraiser": {
+      "name": "李××",
+      "registrationNumber": "××××××"
+    },
+    "reportDate": "2026-08-03",
+    "reportNumber": "××房估字〔2026〕第0818号"
+  },
+  "property": {
+    "area": 85.0,
+    "usage": "商业",
+    "address": "武汉市洪山区珞狮路某小区2栋1单元101室（沿街商业）",
+    "propertyType": "商业用房",
+    "completionYear": 2015,
+    "remainingUsefulLife": 47.5,
+    "landUseRightYears": 28.3,
+    "floor": "1/2层",
+    "orientation": "南向",
+    "decoration": "简装",
+    "ownershipType": "出让"
+  },
+  "valuation": {
+    "valueDate": "2026-08-01",
+    "valueType": "抵押价值（等于市场价值）",
+    "currency": "CNY"
+  },
+  "methods": {
+    "comps": {
+      "applicable": true,
+      "comparableInstances": [
+        {
+          "name": "可比实例A — 珞狮路1号小区沿街铺",
+          "location": "洪山区珞狮路",
+          "area": 82.0,
+          "transactionDate": "2026-05-20",
+          "transactionPrice": 2665000,
+          "unitPrice": 32500,
+          "adjustments": {
+            "transactionSituation": 1.0,
+            "marketCondition": 1.02,
+            "location": 0.970874,
+            "physical": 1.052632,
+            "interest": 1.0,
+            "locationDetails": [
+              { "name": "与有关重要场所的距离", "factor": 102 },
+              { "name": "临街（路、巷）状况", "factor": 100 },
+              { "name": "朝向", "factor": 100 },
+              { "name": "楼层", "factor": 101 },
+              { "name": "道路状况", "factor": 100 },
+              { "name": "出入可用的公共交通工具及便利程度", "factor": 100 },
+              { "name": "停车便利程度", "factor": 100 },
+              { "name": "交通管理情况", "factor": 100 },
+              { "name": "基础设施", "factor": 100 },
+              { "name": "公共服务设施", "factor": 100 },
+              { "name": "环境质量", "factor": 100 },
+              { "name": "景观", "factor": 100 }
+            ],
+            "interestDetails": [
+              { "name": "规划用途", "factor": 100 },
+              { "name": "土地使用年限", "factor": 100 },
+              { "name": "容积率", "factor": 100 },
+              { "name": "租约限制", "factor": 100 },
+              { "name": "物业管理状况", "factor": 100 }
+            ],
+            "physicalDetails": [
+              { "name": "建筑规模（㎡）", "factor": 96 },
+              { "name": "建筑外观", "factor": 100 },
+              { "name": "建筑结构", "factor": 100 },
+              { "name": "设施设备", "factor": 100 },
+              { "name": "装饰装修", "factor": 100 },
+              { "name": "建筑性能", "factor": 100 },
+              { "name": "空间布局", "factor": 100 },
+              { "name": "新旧程度", "factor": 99 }
+            ]
+          },
+          "adjustedUnitPrice": 33878,
+          "sourceGrade": "T1"
+        },
+        {
+          "name": "可比实例B — 珞狮路2号小区沿街铺",
+          "location": "洪山区珞狮路",
+          "area": 88.0,
+          "transactionDate": "2026-06-11",
+          "transactionPrice": 2816000,
+          "unitPrice": 32000,
+          "adjustments": {
+            "transactionSituation": 0.98,
+            "marketCondition": 1.01,
+            "location": 1.010101,
+            "physical": 0.990099,
+            "interest": 1.0,
+            "locationDetails": [
+              { "name": "与有关重要场所的距离", "factor": 99 },
+              { "name": "临街（路、巷）状况", "factor": 100 },
+              { "name": "朝向", "factor": 100 },
+              { "name": "楼层", "factor": 100 },
+              { "name": "道路状况", "factor": 100 },
+              { "name": "出入可用的公共交通工具及便利程度", "factor": 100 },
+              { "name": "停车便利程度", "factor": 100 },
+              { "name": "交通管理情况", "factor": 100 },
+              { "name": "基础设施", "factor": 100 },
+              { "name": "公共服务设施", "factor": 100 },
+              { "name": "环境质量", "factor": 100 },
+              { "name": "景观", "factor": 100 }
+            ],
+            "interestDetails": [
+              { "name": "规划用途", "factor": 100 },
+              { "name": "土地使用年限", "factor": 100 },
+              { "name": "容积率", "factor": 100 },
+              { "name": "租约限制", "factor": 100 },
+              { "name": "物业管理状况", "factor": 100 }
+            ],
+            "physicalDetails": [
+              { "name": "建筑规模（㎡）", "factor": 101 },
+              { "name": "建筑外观", "factor": 100 },
+              { "name": "建筑结构", "factor": 100 },
+              { "name": "设施设备", "factor": 100 },
+              { "name": "装饰装修", "factor": 100 },
+              { "name": "建筑性能", "factor": 100 },
+              { "name": "空间布局", "factor": 100 },
+              { "name": "新旧程度", "factor": 100 }
+            ]
+          },
+          "adjustedUnitPrice": 31677,
+          "sourceGrade": "T1"
+        },
+        {
+          "name": "可比实例D — 珞狮路4号小区沿街铺",
+          "location": "洪山区珞狮路",
+          "area": 84.0,
+          "transactionDate": "2026-06-25",
+          "transactionPrice": 2772000,
+          "unitPrice": 33000,
+          "adjustments": {
+            "transactionSituation": 1.0,
+            "marketCondition": 1.0,
+            "location": 1.0,
+            "physical": 1.010101,
+            "interest": 1.0,
+            "locationDetails": [
+              { "name": "与有关重要场所的距离", "factor": 101 },
+              { "name": "临街（路、巷）状况", "factor": 100 },
+              { "name": "朝向", "factor": 100 },
+              { "name": "楼层", "factor": 99 },
+              { "name": "道路状况", "factor": 100 },
+              { "name": "出入可用的公共交通工具及便利程度", "factor": 100 },
+              { "name": "停车便利程度", "factor": 100 },
+              { "name": "交通管理情况", "factor": 100 },
+              { "name": "基础设施", "factor": 100 },
+              { "name": "公共服务设施", "factor": 100 },
+              { "name": "环境质量", "factor": 100 },
+              { "name": "景观", "factor": 100 }
+            ],
+            "interestDetails": [
+              { "name": "规划用途", "factor": 100 },
+              { "name": "土地使用年限", "factor": 100 },
+              { "name": "容积率", "factor": 100 },
+              { "name": "租约限制", "factor": 100 },
+              { "name": "物业管理状况", "factor": 100 }
+            ],
+            "physicalDetails": [
+              { "name": "建筑规模（㎡）", "factor": 99 },
+              { "name": "建筑外观", "factor": 100 },
+              { "name": "建筑结构", "factor": 100 },
+              { "name": "设施设备", "factor": 100 },
+              { "name": "装饰装修", "factor": 100 },
+              { "name": "建筑性能", "factor": 100 },
+              { "name": "空间布局", "factor": 100 },
+              { "name": "新旧程度", "factor": 100 }
+            ]
+          },
+          "adjustedUnitPrice": 33333,
+          "sourceGrade": "T1"
+        }
+      ],
+      "finalValue": {
+        "total": 2809250,
+        "unit": 33050
+      },
+      "weight": 0.5,
+      "weightRationale": "沿街商铺同类交易活跃，三个实例均为正常成交（T1 信源）、成交时间距价值时点最远 73 天，比较法结果最可靠，取主导权重 50%",
+      "redLineChecks": [
+        {
+          "rule": "可比实例数量",
+          "threshold": "≥3个",
+          "actualValue": "3个",
+          "passed": true,
+          "explanation": ""
+        },
+        {
+          "rule": "成交距价值时点",
+          "threshold": "≤2年",
+          "actualValue": "最远73天",
+          "passed": true,
+          "explanation": ""
+        },
+        {
+          "rule": "单项修正幅度",
+          "threshold": "≤20%",
+          "actualValue": "最大5.3%（实例A实物状况合并系数 100/95）",
+          "passed": true,
+          "explanation": ""
+        },
+        {
+          "rule": "综合修正幅度",
+          "threshold": "≤30%",
+          "actualValue": "最大4.3%（实例A）",
+          "passed": true,
+          "explanation": ""
+        },
+        {
+          "rule": "最高价/最低价比",
+          "threshold": "≤1.2",
+          "actualValue": "33878/31677=1.070",
+          "passed": true,
+          "explanation": ""
+        }
+      ]
+    },
+    "income": {
+      "applicable": true,
+      "calculationMode": "directCapitalization",
+      "incomeType": "rentalIncome",
+      "netOperatingIncome": {
+        "effectiveGrossIncome": 163200,
+        "operatingExpenses": 34272,
+        "annualAmount": 128928,
+        "historicalDataYears": 3
+      },
+      "rate": {
+        "type": "capitalizationRate",
+        "value": 0.042,
+        "determinationMethod": "市场提取法 — 同商圈沿街商铺租金回报率中位数（样本 9 例，区间 3.6%-4.9%）"
+      },
+      "finalValue": {
+        "total": 3069714,
+        "unit": 36114
+      },
+      "weight": 0.3,
+      "weightRationale": "商铺收益属性强、租约市场公开，收益法为重要验证路径；直接资本化法适用于持有出租型商业，取权重 30%",
+      "redLineChecks": [
+        {
+          "rule": "历史数据调查年数",
+          "threshold": "≥3年",
+          "actualValue": "3年（2023-2025）",
+          "passed": true,
+          "explanation": ""
+        },
+        {
+          "rule": "净收益客观性",
+          "threshold": "取正常客观值",
+          "actualValue": "已扣除空置损失+运营费用（税费/物业/维修）",
+          "passed": true,
+          "explanation": ""
+        }
+      ]
+    },
+    "cost": {
+      "applicable": true,
+      "pathType": "combined",
+      "costComponents": {
+        "landCost": 1020000,
+        "constructionCost": 1530000,
+        "managementFee": 45900,
+        "investmentInterest": 76500,
+        "salesTax": 128520,
+        "developerProfit": 213840,
+        "other": 25500
+      },
+      "reproductionCost": 3040260,
+      "depreciation": {
+        "method": "ageLife",
+        "physical": 571671,
+        "functional": 30000,
+        "external": 45000,
+        "total": 646671
+      },
+      "finalValue": {
+        "total": 2393589,
+        "unit": 28160
+      },
+      "weight": 0.2,
+      "weightRationale": "成本法仅反映重置成本扣减折旧，商铺所在商圈土地增值与区位溢价未能体现，结果系统性偏低，作为价值下限参考与交叉验证，取权重 20%",
+      "redLineChecks": [
+        {
+          "rule": "7项必要支出",
+          "threshold": "齐全",
+          "actualValue": "土地/建安/管理/利息/税费/利润/其他 7 项",
+          "passed": true,
+          "explanation": ""
+        },
+        {
+          "rule": "折旧口径",
+          "threshold": "物质/功能/外部分解列示",
+          "actualValue": "年龄-寿命法：物质 571671 + 功能 30000 + 外部 45000",
+          "passed": true,
+          "explanation": ""
+        }
+      ]
+    },
+    "hypotheticalDev": null
+  },
+  "result": {
+    "finalTotalValue": 2804260,
+    "finalUnitValue": 32991,
+    "finalTotalValueInWords": "人民币贰佰捌拾万肆仟贰佰陆拾元整",
+    "determinationMethod": "加权平均（比较法50% + 收益法30% + 成本法20%）",
+    "weightAllocation": {
+      "comps": 0.5,
+      "income": 0.3,
+      "cost": 0.2,
+      "hypotheticalDev": 0
+    },
+    "weightSum": 1.0,
+    "crossMethodDifference": {
+      "maxValue": 3069714,
+      "minValue": 2393589,
+      "ratio": 1.282,
+      "analysis": "三方法中收益法最高（307.0 万）、成本法最低（239.4 万），比值 1.282。成本法较比较法系统性偏低 14.8%（2393589/2809250=0.852），原因是成本法只反映重置成本扣减折旧，未涵盖该商圈沿街商铺的土地增值与区位溢价——这正是商业物业成本法的典型局限，故权重降至 20% 作下限参考。收益法与比较法差异 9.3%（3069714/2809250=1.093），在 10% 预警线内收敛良好。最终取三方法加权平均 280.4 万。"
+    }
+  },
+  "crossMethodConsistency": [
+    {
+      "checkItem": "area",
+      "passed": true,
+      "detail": "三方法均使用 85.00 m²"
+    },
+    {
+      "checkItem": "usage",
+      "passed": true,
+      "detail": "三方法均为商业用途"
+    },
+    {
+      "checkItem": "valueDate",
+      "passed": true,
+      "detail": "三方法价值时点均为 2026-08-01"
+    },
+    {
+      "checkItem": "propertyType",
+      "passed": true,
+      "detail": "三方法均为商业用房（沿街商铺）"
+    },
+    {
+      "checkItem": "remainingYears",
+      "passed": true,
+      "detail": "比较法/收益法不直接使用；成本法折旧采用剩余经济寿命 47.5 年（年龄-寿命法分母 58.5 年）"
+    },
+    {
+      "checkItem": "landUseRight",
+      "passed": true,
+      "detail": "三方法均以剩余土地使用权 28.3 年为限制条件（商业用地 40 年，自 2014-08 起算）"
+    },
+    {
+      "checkItem": "rate",
+      "passed": true,
+      "detail": "收益法资本化率 4.2%（市场提取法）；比较法不涉及报酬率；成本法计息口径为投资利息（已列 7 项支出内）"
+    }
+  ],
+  "calculationChain": {
+    "version": "1.2",
+    "nodes": [
+      {
+        "id": "comps.adjustedUnitPrice.instance1",
+        "target": "methods.comps.comparableInstances[0].adjustedUnitPrice",
+        "formula": "=ROUND({{unitPrice}}*{{txAdj}}*{{mktAdj}}*100/(SUM({{locFactors0}})-1100)*100/(SUM({{intFactors0}})-400)*100/(SUM({{phyFactors0}})-700),0)",
+        "refs": {
+          "locFactors0": "methods.comps.comparableInstances[0].adjustments.locationDetails",
+          "intFactors0": "methods.comps.comparableInstances[0].adjustments.interestDetails",
+          "phyFactors0": "methods.comps.comparableInstances[0].adjustments.physicalDetails",
+          "txAdj": "methods.comps.comparableInstances[0].adjustments.transactionSituation",
+          "mktAdj": "methods.comps.comparableInstances[0].adjustments.marketCondition",
+          "unitPrice": "methods.comps.comparableInstances[0].unitPrice"
+        },
+        "excelSource": "商业-比较法测算!T32",
+        "description": "比准单价（实例A）= 成交单价 × 交易情况 × 市场状况 × 区位偏差合并 × 权益偏差合并 × 实物偏差合并。子项合并为偏差加总法：系数=100/(100+Σ(f-100))，Excel 展开式 100/(Σf-(n-1)*100)。"
+      },
+      {
+        "id": "comps.adjustedUnitPrice.instance2",
+        "target": "methods.comps.comparableInstances[1].adjustedUnitPrice",
+        "formula": "=ROUND({{unitPrice}}*{{txAdj}}*{{mktAdj}}*100/(SUM({{locFactors1}})-1100)*100/(SUM({{intFactors1}})-400)*100/(SUM({{phyFactors1}})-700),0)",
+        "refs": {
+          "locFactors1": "methods.comps.comparableInstances[1].adjustments.locationDetails",
+          "intFactors1": "methods.comps.comparableInstances[1].adjustments.interestDetails",
+          "phyFactors1": "methods.comps.comparableInstances[1].adjustments.physicalDetails",
+          "txAdj": "methods.comps.comparableInstances[1].adjustments.transactionSituation",
+          "mktAdj": "methods.comps.comparableInstances[1].adjustments.marketCondition",
+          "unitPrice": "methods.comps.comparableInstances[1].unitPrice"
+        },
+        "excelSource": "商业-比较法测算!W32",
+        "description": "比准单价（实例B），同上结构"
+      },
+      {
+        "id": "comps.adjustedUnitPrice.instance3",
+        "target": "methods.comps.comparableInstances[2].adjustedUnitPrice",
+        "formula": "=ROUND({{unitPrice}}*{{txAdj}}*{{mktAdj}}*100/(SUM({{locFactors2}})-1100)*100/(SUM({{intFactors2}})-400)*100/(SUM({{phyFactors2}})-700),0)",
+        "refs": {
+          "locFactors2": "methods.comps.comparableInstances[2].adjustments.locationDetails",
+          "intFactors2": "methods.comps.comparableInstances[2].adjustments.interestDetails",
+          "phyFactors2": "methods.comps.comparableInstances[2].adjustments.physicalDetails",
+          "txAdj": "methods.comps.comparableInstances[2].adjustments.transactionSituation",
+          "mktAdj": "methods.comps.comparableInstances[2].adjustments.marketCondition",
+          "unitPrice": "methods.comps.comparableInstances[2].unitPrice"
+        },
+        "excelSource": "商业-比较法测算!Z32",
+        "description": "比准单价（实例D），同上结构"
+      },
+      {
+        "id": "comps.finalUnitPrice",
+        "target": "methods.comps.finalValue.unit",
+        "formula": "ROUND(({{adjPrice0}}*0.4+{{adjPrice1}}*0.3+{{adjPrice2}}*0.3),-1)",
+        "refs": {
+          "adjPrice0": "methods.comps.comparableInstances[0].adjustedUnitPrice",
+          "adjPrice1": "methods.comps.comparableInstances[1].adjustedUnitPrice",
+          "adjPrice2": "methods.comps.comparableInstances[2].adjustedUnitPrice"
+        },
+        "excelSource": "商业-比较法测算!T34",
+        "description": "比准单价加权平均 = 实例A×0.4 + 实例B×0.3 + 实例D×0.3，四舍五入到十位。权重为模板常量（Excel T33/W33/Z33 数值单元格）。"
+      },
+      {
+        "id": "income.noi",
+        "target": "methods.income.netOperatingIncome.annualAmount",
+        "formula": "={{egi}}-{{oe}}",
+        "refs": {
+          "egi": "methods.income.netOperatingIncome.effectiveGrossIncome",
+          "oe": "methods.income.netOperatingIncome.operatingExpenses"
+        },
+        "excelSource": "商业-收益法测算!G4",
+        "description": "年净收益 = 有效毛收入 − 运营费用"
+      },
+      {
+        "id": "income.value",
+        "target": "methods.income.finalValue.total",
+        "formula": "=ROUND({{noi}}/{{rate}},0)",
+        "refs": {
+          "noi": "methods.income.netOperatingIncome.annualAmount",
+          "rate": "methods.income.rate.value"
+        },
+        "excelSource": "商业-收益法测算!G27",
+        "description": "收益价值（直接资本化法）= 年净收益 ÷ 资本化率。本工程采用 directCapitalization 模式；报酬资本化模式（fullRemainingLife/holdAndResale）公式见 schema/example-武汉洪山住宅.json 的 income.value 节点。"
+      },
+      {
+        "id": "cost.reproductionCost",
+        "target": "methods.cost.reproductionCost",
+        "formula": "=+{{landCost}}+{{constructionCost}}+{{managementFee}}+{{investmentInterest}}+{{salesTax}}+{{developerProfit}}+{{other}}",
+        "refs": {
+          "landCost": "methods.cost.costComponents.landCost",
+          "constructionCost": "methods.cost.costComponents.constructionCost",
+          "managementFee": "methods.cost.costComponents.managementFee",
+          "investmentInterest": "methods.cost.costComponents.investmentInterest",
+          "salesTax": "methods.cost.costComponents.salesTax",
+          "developerProfit": "methods.cost.costComponents.developerProfit",
+          "other": "methods.cost.costComponents.other"
+        },
+        "excelSource": "商业-成本法测算!F12",
+        "description": "重置成本 = 土地取得成本 + 建设成本 + 管理费用 + 投资利息 + 销售税费 + 开发利润 + 其他必要支出（4.4.4 条七项）"
+      },
+      {
+        "id": "cost.depreciationTotal",
+        "target": "methods.cost.depreciation.total",
+        "formula": "={{physical}}+{{functional}}+{{external}}",
+        "refs": {
+          "physical": "methods.cost.depreciation.physical",
+          "functional": "methods.cost.depreciation.functional",
+          "external": "methods.cost.depreciation.external"
+        },
+        "excelSource": "商业-成本法测算!F18",
+        "description": "折旧合计 = 物质折旧 + 功能折旧 + 外部折旧（年龄-寿命法：物质折旧 = 重置成本 × 有效年龄/(有效年龄+剩余经济寿命) = 3040260×11/58.5）"
+      },
+      {
+        "id": "cost.value",
+        "target": "methods.cost.finalValue.total",
+        "formula": "=ROUND({{reproductionCost}}-{{depreciationTotal}},0)",
+        "refs": {
+          "reproductionCost": "methods.cost.reproductionCost",
+          "depreciationTotal": "methods.cost.depreciation.total"
+        },
+        "excelSource": "商业-成本法测算!F20",
+        "description": "成本价值 = 重置成本 − 折旧合计（房地合估路径）"
+      },
+      {
+        "id": "result.finalTotalValue",
+        "target": "result.finalTotalValue",
+        "formula": "=ROUND(+{{compsValue}}*{{compsWeight}}+{{incomeValue}}*{{incomeWeight}}+{{costValue}}*{{costWeight}},-1)",
+        "refs": {
+          "compsValue": "methods.comps.finalValue.total",
+          "compsWeight": "result.weightAllocation.comps",
+          "incomeValue": "methods.income.finalValue.total",
+          "incomeWeight": "result.weightAllocation.income",
+          "costValue": "methods.cost.finalValue.total",
+          "costWeight": "result.weightAllocation.cost"
+        },
+        "excelSource": "商业-成本法测算!J29",
+        "description": "最终结果 = 比较法价值 × 比较法权重 + 收益法价值 × 收益法权重 + 成本价值 × 成本法权重（四舍五入到十位）"
+      },
+      {
+        "id": "result.totalValue",
+        "target": "result.finalTotalValue",
+        "formula": "ROUND({{area}}*{{unitValue}},0)",
+        "refs": {
+          "area": "property.area",
+          "unitValue": "result.finalUnitValue"
+        },
+        "excelSource": "评估明细表!O6",
+        "description": "评估总价 = 面积 × 单价（四舍五入到元）"
+      }
+    ]
+  },
+  "decisionPoints": [
+    {
+      "id": "DP1",
+      "name": "估价事项确认",
+      "phase": "preCalculation",
+      "trigger": "always",
+      "riskLevel": "P0",
+      "status": "approved",
+      "conclusion": "估价目的为抵押估价，价值类型为抵押价值（等于市场价值），价值时点 2026-08-01，估价对象为武汉市洪山区珞狮路某小区2栋1单元101室沿街商业房地产",
+      "evidence": [
+        {
+          "item": "委托合同明确估价目的：为确定抵押贷款额度提供参考依据而评估房地产抵押价值",
+          "source": "委托合同 (T0)",
+          "sourceGrade": "T0"
+        },
+        {
+          "item": "产权证载明用途为商业，建筑面积 85.00 m²，一层沿街",
+          "source": "不动产权证 (T0)",
+          "sourceGrade": "T0"
+        },
+        {
+          "item": "估价对象为商业用房，2015 年竣工，剩余经济寿命 47.5 年，剩余土地使用权 28.3 年",
+          "source": "竣工验收备案表 + 国有建设用地使用权出让合同 (T0)",
+          "sourceGrade": "T0"
+        }
+      ],
+      "reasoning": "抵押估价要求评估市场价值，价值时点为估价作业期日。估价对象为沿街商铺，同类交易与租赁市场均活跃，适合比较法、收益法和成本法三方法并用。",
+      "risks": [
+        {
+          "description": "商业用地剩余年限 28.3 年短于建筑物剩余经济寿命 47.5 年，收益期需以土地剩余年限为限",
+          "level": "P0",
+          "mitigation": "收益法资本化口径已与土地剩余年限对齐，并在报告中披露"
+        }
+      ],
+      "humanDecision": {
+        "action": "approved",
+        "decidedBy": "张××",
+        "timestamp": "2026-08-01T09:00:00+08:00"
+      }
+    },
+    {
+      "id": "DP2",
+      "name": "测算方案确认",
+      "phase": "preCalculation",
+      "trigger": "always",
+      "riskLevel": "P1",
+      "status": "approved",
+      "conclusion": "采用比较法（权重50%）+ 收益法（权重30%）+ 成本法（权重20%）三方法测算，不采用假设开发法",
+      "evidence": [
+        {
+          "item": "珞狮路沿街商铺近 3 个月同类成交 6 例，市场交易活跃",
+          "source": "链家/贝壳商铺成交数据 (T1)",
+          "sourceGrade": "T1"
+        },
+        {
+          "item": "估价对象已出租（年租金 16.32 万），同商圈沿街商铺租金样本 9 例",
+          "source": "商圈租赁调研 (T1)",
+          "sourceGrade": "T1"
+        },
+        {
+          "item": "估价对象为已建成商铺，非待开发土地，不适用假设开发法",
+          "source": "现场查勘 (T0)",
+          "sourceGrade": "T0"
+        }
+      ],
+      "reasoning": "沿街商铺交易与租赁市场双重活跃，比较法与收益法均为适用方法；成本法对商业物业存在土地增值未覆盖的系统性局限，仅作下限参考与交叉验证，权重压至 20%。",
+      "risks": [
+        {
+          "description": "成本法结果可能显著低于市场结果，拉低加权平均值",
+          "level": "P1",
+          "mitigation": "权重设为 20% 并在结果分析中披露成本法口径局限；若三方法差异超预警线需在 DP3 复核"
+        }
+      ],
+      "humanDecision": {
+        "action": "approved",
+        "decidedBy": "张××",
+        "timestamp": "2026-08-01T09:40:00+08:00"
+      }
+    },
+    {
+      "id": "DP-comp",
+      "name": "可比实例选取",
+      "phase": "inMethod",
+      "trigger": "method:comps",
+      "method": "comps",
+      "riskLevel": "P1",
+      "status": "rejected",
+      "conclusion": "推荐选取实例 A/B/C，均为珞狮路沿街商铺，成交时间 2026-05 至 2026-06，与估价对象可比性良好",
+      "evidence": [
+        {
+          "item": "实例 A：珞狮路1号小区沿街铺，82.0 m²，成交 2026-05-20，单价 32500 元/m²",
+          "source": "链家成交记录 (T1)",
+          "sourceGrade": "T1"
+        },
+        {
+          "item": "实例 B：珞狮路2号小区沿街铺，88.0 m²，成交 2026-06-11，单价 32000 元/m²",
+          "source": "贝壳成交记录 (T1)",
+          "sourceGrade": "T1"
+        },
+        {
+          "item": "实例 C：珞狮路对面沿街铺，80.0 m²，挂牌价 35800 元/m²（2026-06-30 挂牌）",
+          "source": "门店挂牌信息 (T2)",
+          "sourceGrade": "T2"
+        }
+      ],
+      "reasoning": "实例 A/B 为正常成交记录，实例 C 位于马路对面、商业氛围一致。三者与估价对象均在同一商圈，面积差异在 6 m² 以内，初判可比性良好。",
+      "risks": [
+        {
+          "description": "实例 C 数据来源为门店挂牌价，未经成交核实",
+          "level": "P1",
+          "mitigation": "已标注信源等级 T2，待成交核实后使用"
+        }
+      ],
+      "comparison": [
+        {
+          "instance": "A",
+          "differences": "不同小区沿街铺，面积差 3.0 m²（82.0 vs 85.0，建筑规模修正指数 96），距重要场所略近（102），楼层修正 101"
+        },
+        {
+          "instance": "B",
+          "differences": "不同小区沿街铺，面积差 3.0 m²（88.0 vs 85.0，修正指数 101），交易情况系数 0.98（原判急售交易）"
+        },
+        {
+          "instance": "C",
+          "differences": "马路对面沿街铺，面积差 5.0 m²，挂牌价非成交价，价格含议价空间"
+        }
+      ],
+      "humanDecision": {
+        "action": "rejected",
+        "decidedBy": "张××",
+        "timestamp": "2026-08-01T10:30:00+08:00",
+        "comment": "实例 C 为挂牌价（T2 信源），挂牌价与成交价偏差可达 40%，禁止与成交价混入同组比较；请更换为有成交记录的实例后重新提交。"
+      }
+    },
+    {
+      "id": "DP-comp-2",
+      "name": "可比实例选取",
+      "phase": "inMethod",
+      "trigger": "method:comps",
+      "method": "comps",
+      "riskLevel": "P1",
+      "status": "approved",
+      "supersedes": "DP-comp",
+      "attempt": 2,
+      "conclusion": "修正后推荐选取实例 A/B/D，均为珞狮路沿街商铺正常成交（T1 信源），成交时间 2026-05 至 2026-06，与估价对象可比性良好",
+      "evidence": [
+        {
+          "item": "实例 A：珞狮路1号小区沿街铺，82.0 m²，成交 2026-05-20，单价 32500 元/m²",
+          "source": "链家成交记录 (T1)",
+          "sourceGrade": "T1"
+        },
+        {
+          "item": "实例 B：珞狮路2号小区沿街铺，88.0 m²，成交 2026-06-11，单价 32000 元/m²",
+          "source": "贝壳成交记录 (T1)",
+          "sourceGrade": "T1"
+        },
+        {
+          "item": "实例 D：珞狮路4号小区沿街铺，84.0 m²，成交 2026-06-25，单价 33000 元/m²",
+          "source": "链家成交记录 (T1)",
+          "sourceGrade": "T1"
+        }
+      ],
+      "reasoning": "按估价师驳回意见，剔除挂牌价实例 C，更换为正常成交的实例 D（修正指数 99/101，区位与实物条件基本一致）。三个实例均为 T1 信源成交记录，成交时间距价值时点最远 73 天。单项修正幅度最大 5.3%（实例A实物状况合并），综合修正幅度最大 4.3%，远低于 20%/30% 红线。最高价/最低价比 1.070，远低于 1.2 红线。",
+      "risks": [
+        {
+          "description": "实例 B 交易情况系数 0.98（原判急售），可能与实际交易背景存在偏差",
+          "level": "P2",
+          "mitigation": "已向中介核实为业主置换性出售、价格偏离幅度有限，系数保留 0.98"
+        },
+        {
+          "description": "三个实例均来自线上平台，缺少线下实际成交核实",
+          "level": "P1",
+          "mitigation": "已交叉比对链家和贝壳数据，价格趋势一致；对实例 D 做线下中介核实"
+        }
+      ],
+      "comparison": [
+        {
+          "instance": "A",
+          "differences": "不同小区沿街铺，面积差 3.0 m²（82.0 vs 85.0，建筑规模修正指数 96），新旧程度略逊（99），距重要场所略近（102），楼层修正 101"
+        },
+        {
+          "instance": "B",
+          "differences": "不同小区沿街铺，面积差 3.0 m²（88.0 vs 85.0，修正指数 101），交易情况系数 0.98，距重要场所略远（99）"
+        },
+        {
+          "instance": "D",
+          "differences": "不同小区沿街铺，面积差 1.0 m²（84.0 vs 85.0，修正指数 99），距重要场所略近（101），楼层修正 99，其余条件基本一致"
+        }
+      ],
+      "humanDecision": {
+        "action": "approved",
+        "decidedBy": "张××",
+        "timestamp": "2026-08-01T11:00:00+08:00"
+      }
+    },
+    {
+      "id": "DP-income",
+      "name": "收益率确定",
+      "phase": "inMethod",
+      "trigger": "method:income",
+      "method": "income",
+      "riskLevel": "P1",
+      "status": "approved",
+      "conclusion": "收益率（资本化率）取 4.2%，采用市场提取法，来源为同商圈沿街商铺租金回报率中位数",
+      "evidence": [
+        {
+          "item": "珞狮路商圈沿街商铺租金回报率采样：3.6%-4.9%，中位数 4.2%",
+          "source": "商圈租赁市场调研 (T1)",
+          "sourceGrade": "T1"
+        },
+        {
+          "item": "采样样本 9 例，面积区间 70-100 m²，均为一层沿街商铺，与估价对象可比",
+          "source": "链家/58 商铺租赁数据 (T1)",
+          "sourceGrade": "T1"
+        },
+        {
+          "item": "央行五年期以上 LPR 3.85%，商铺资本化率高于无风险利率约 35BP，符合商业物业风险溢价特征",
+          "source": "中国人民银行公告 (T0)",
+          "sourceGrade": "T0"
+        }
+      ],
+      "reasoning": "市场提取法直接反映估价对象所在商圈的实际收益水平。商铺租金回报率显著高于住宅（住宅约 1.5%），4.2% 处于商圈中位数水平，与商业物业的经营风险匹配。估价对象已出租且租约正常，采用直接资本化法。",
+      "risks": [
+        {
+          "description": "租金样本中含 2 例转租口径，可能高估有效毛收入",
+          "level": "P2",
+          "mitigation": "已剔除转租样本后复核中位数仍为 4.2%"
+        },
+        {
+          "description": "剩余土地使用权 28.3 年短于常见收益期口径",
+          "level": "P1",
+          "mitigation": "资本化口径已与土地剩余年限对齐，报告中披露"
+        }
+      ],
+      "humanDecision": {
+        "action": "approved",
+        "decidedBy": "张××",
+        "timestamp": "2026-08-01T11:30:00+08:00"
+      }
+    },
+    {
+      "id": "DP-cost",
+      "name": "成本路径与折旧口径确认",
+      "phase": "inMethod",
+      "trigger": "method:cost",
+      "method": "cost",
+      "riskLevel": "P1",
+      "status": "modified",
+      "conclusion": "采用房地合估路径；AI 初稿按「已使用年限 11 ÷ 商业用地法定最高年限 40 年」直线计提折旧（27.5%，折旧 836072 元），估价师驳回该口径、改用年龄-寿命法（有效年龄 11 ÷ 建筑物总经济寿命 58.5 年）并补计功能折旧 30000 元、外部折旧 45000 元，折旧合计 646671 元，成本价值由 2204188 元修正为 2393589 元",
+      "evidence": [
+        {
+          "item": "土地取得成本 102 万（2014 年出让口径 + 基准地价修正）",
+          "source": "国有建设用地使用权出让合同 + 基准地价文件 (T0)",
+          "sourceGrade": "T0"
+        },
+        {
+          "item": "建安成本 1800 元/m²（同类商业结构造价区间 1700-1950）",
+          "source": "武汉市建设工程造价信息 (T0)",
+          "sourceGrade": "T0"
+        },
+        {
+          "item": "商圈能级较周边核心商圈低一档，客流与可见性存在外部性折减",
+          "source": "现场查勘 + 商圈调研 (T1)",
+          "sourceGrade": "T1"
+        }
+      ],
+      "reasoning": "房地合估路径适用于本估价对象（土地与建筑物价值可合并测算）。AI 初稿以商业用地法定最高年限 40 年为折旧年限，混淆了土地使用权年限与建筑物经济寿命：估价对象为 2014 年建成、钢混结构商业用房，建筑物经济寿命 58.5 年远长于土地剩余年限，按 40 年计提会把土地到期后的续期预期一并折掉，属口径错误而非取值偏差。估价师改为年龄-寿命法（有效年龄 11 年 / 总经济寿命 58.5 年 → 物质折旧率 18.80%），再叠加功能折旧（层高与管线布局落后于现行商业标准）与外部折旧（商圈能级低一档）。修正后成本价值 2393589 元，与比较法单价 33050 元/㎡（总价 2809250 元）的差距由 −21.5% 收窄至 −14.8%。",
+      "risks": [
+        {
+          "description": "折旧口径变更使成本法结果由 2,204,188 元升至 2,393,589 元（+8.6%）；其中功能折旧 30,000 元与外部折旧 45,000 元依赖对商圈能级、建筑标准的主观分档，不同估价师可能给出不同折旧额——属可修正但影响最终取值",
+          "level": "P1",
+          "mitigation": "成本法权重已压至 20% 作下限参考，权重敏感性在 DP3 一并复核；折旧参数（有效年龄/剩余寿命/三项折旧额）全部写入测算轨迹可回溯"
+        },
+        {
+          "description": "有效年龄 11 年为估价师勘察判断，可能与实际维护差异有关",
+          "level": "P2",
+          "mitigation": "已在勘察记录中留存维护状况照片与说明"
+        }
+      ],
+      "humanDecision": {
+        "action": "modified",
+        "decidedBy": "张××",
+        "timestamp": "2026-08-01T14:00:00+08:00",
+        "modifications": "折旧年限由「商业用地法定最高年限 40 年」改为「建筑物总经济寿命 58.5 年」（年龄-寿命法：有效年龄 11 年），物质折旧 836072 元 → 571671 元；同时补计功能折旧 30000 元（层高 3.2m 低于现行商业标准 3.6m、管线布局老旧）与外部折旧 45000 元（商圈能级较核心商圈低一档）。成本价值 2204188 → 2393589 元。"
+      }
+    },
+    {
+      "id": "DP3",
+      "name": "测算结果审核",
+      "phase": "postMethod",
+      "trigger": "always",
+      "riskLevel": "P1",
+      "status": "approved",
+      "conclusion": "最终评估总价 280.4 万元（2804260 元），单价 32991 元/m²。比较法 280.9 万、收益法 307.0 万、成本法 239.4 万；收益法/比较法差异 9.3% 收敛，成本法系统性偏低 14.8%（价值下限参考），与权重设计一致",
+      "evidence": [
+        {
+          "item": "比较法结果：总价 2809250 元，单价 33050 元/m²",
+          "source": "测算表-比较法 (T0)",
+          "sourceGrade": "T0"
+        },
+        {
+          "item": "收益法结果：总价 3069714 元，单价 36114 元/m²",
+          "source": "测算表-收益法 (T0)",
+          "sourceGrade": "T0"
+        },
+        {
+          "item": "成本法结果：总价 2393589 元，单价 28160 元/m²",
+          "source": "测算表-成本法 (T0)",
+          "sourceGrade": "T0"
+        },
+        {
+          "item": "全部红线检查通过：可比实例≥3、成交≤2年、单项修正≤20%、综合修正≤30%、极差比≤1.2、七项支出齐全、折旧口径分解列示",
+          "source": "红线检查表 (T0)",
+          "sourceGrade": "T0"
+        }
+      ],
+      "reasoning": "三方法结果中收益法最高、成本法最低，比值 1.282。成本法偏低是商业物业成本法的典型局限（土地增值与区位溢价未在成本构成中体现），权重已压至 20% 作下限参考；收益法与比较法差异 9.3%，在 10% 预警线内。加权平均 280.4 万落在比较法结果附近，符合以市场路径主导的权重设计。",
+      "risks": [
+        {
+          "description": "收益法结果高于比较法 9.3%，接近预警线，若租金口径偏乐观将进一步放大",
+          "level": "P1",
+          "mitigation": "资本化率取商圈中位数并经转租样本剔除复核；DP3 审核确认最终取值以比较法为主导"
+        }
+      ],
+      "humanDecision": {
+        "action": "approved",
+        "decidedBy": "张××",
+        "timestamp": "2026-08-02T09:30:00+08:00"
+      }
+    },
+    {
+      "id": "DP4",
+      "name": "报告签发",
+      "phase": "postReport",
+      "trigger": "always",
+      "riskLevel": "P0",
+      "status": "approved",
+      "conclusion": "报告经审核合格，准予签发。报告编号 ××房估字〔2026〕第0818号",
+      "evidence": [
+        {
+          "item": "报告全文已完成三级审核：估价师自审→复核人审核→技术负责人审批",
+          "source": "审核记录 (T0)",
+          "sourceGrade": "T0"
+        },
+        {
+          "item": "所有红线检查通过，三方法测算结果自洽，成本法口径局限已在报告中披露",
+          "source": "质量检查表 (T0)",
+          "sourceGrade": "T0"
+        },
+        {
+          "item": "报告日期 2026-08-03，在委托合同约定的交付期限内",
+          "source": "委托合同 (T0)",
+          "sourceGrade": "T0"
+        }
+      ],
+      "reasoning": "报告内容完整，三方法测算过程可追溯，成本法局限与收益期限制均已披露，结论合理。估价师和复核人均已在报告上签字。",
+      "risks": [
+        {
+          "description": "抵押估价报告需附《房地产抵押估价风险提示》，确认已包含",
+          "level": "P0",
+          "mitigation": "报告第8章已包含风险提示及变现能力分析"
+        }
+      ],
+      "humanDecision": {
+        "action": "approved",
+        "decidedBy": "张××",
+        "timestamp": "2026-08-03T15:00:00+08:00"
+      }
+    }
+  ]
+}
