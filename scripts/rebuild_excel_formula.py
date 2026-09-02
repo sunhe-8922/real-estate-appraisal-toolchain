@@ -221,12 +221,16 @@ def safe_eval(expr: str):
 
 def rebuild_values(chain: dict, data: dict) -> list[dict]:
     """values 模式：数值公式求值验证。返回每个节点的验证结果。"""
-    # 节点级容差：默认 ±1；ROUND(...,-1) 到十位 → ±10；
-    # result.totalValue 为 面积×单价 vs 加权总价 的双口径舍入传播 → ±65。
+    # 节点级容差：默认 ±1；ROUND(...,-1) 到十位 → ±10。
+    # 容差须有缺陷编号背书（Round 8 教训 5）。历史条目 "result.totalValue": 65
+    # 已于 Round 10（H10）删除：它出自 v1.2 创建时的"面积×单价 vs 加权总价 双口径
+    # 舍入传播"假设（659e9e3），无缺陷编号背书；R7/R9 把末节点整改为"单价派生自
+    # 权威总价"后该口径不复存在，65 反而把 P1-2B 形态的 18 元错误豁免成静默 PASS。
     NODE_TOLERANCE = {
+        # 背书：ROUND(...,-1) 十位舍入（单次误差 ≤5，加权平均双次取整放宽到 ±10）；
+        # P1-1 整改（23466a3）沿用。
         "comps.finalUnitPrice": 10,
         "result.finalTotalValue": 10,
-        "result.totalValue": 65,
     }
     results = []
 

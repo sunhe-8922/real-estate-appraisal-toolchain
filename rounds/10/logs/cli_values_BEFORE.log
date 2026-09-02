@@ -1,0 +1,13 @@
+values 模式：calculation_chain.json + example-武汉洪山住宅.json
+节点                                  状态    计算值           实际值           差异
+------------------------------------------------------------------------------------------
+comps.adjustedUnitPrice.instance1   PASS  25773.0       25773         0.0 (±1)
+comps.adjustedUnitPrice.instance2   PASS  25490.0       25490         0.0 (±1)
+comps.adjustedUnitPrice.instance3   PASS  26283.0       26283         0.0 (±1)
+comps.finalUnitPrice                PASS  25790.0       25790         0.0 (±10)
+income.noi                          PASS  48124.0       48124         0.0 (±1)
+income.value                        SKIP                              求值失败: 数据中无 methods.income.netOperatingIncome.growthRate 
+result.finalTotalValue              PASS  3271720.0     3271720       0.0 (±10)
+result.totalValue                   PASS  3271738.0     3271720       18.0 (±65)
+------------------------------------------------------------------------------------------
+PASS 7/8

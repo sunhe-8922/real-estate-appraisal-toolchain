@@ -1,0 +1,100 @@
+diff --git a/outputs/calculation_chain.json b/outputs/calculation_chain.json
+index 6286caf..bbb7796 100644
+--- a/outputs/calculation_chain.json
++++ b/outputs/calculation_chain.json
+@@ -96,15 +96,15 @@
+       "description": "最终结果 = 收益价值 × 收益权重 + 比较法价值 × 比较权重"
+     },
+     {
+-      "id": "result.totalValue",
+-      "target": "result.finalTotalValue",
+-      "formula": "ROUND({{area}}*{{unitValue}},0)",
++      "id": "result.finalUnitValue",
++      "target": "result.finalUnitValue",
++      "formula": "=ROUND({{finalTotal}}/{{area}},0)",
+       "refs": {
+-        "area": "property.area",
+-        "unitValue": "result.finalUnitValue"
++        "finalTotal": "result.finalTotalValue",
++        "area": "property.area"
+       },
+       "excelSource": "评估明细表!O6",
+-      "description": "评估总价 = 面积 × 单价"
++      "description": "最终单价 = 评估总价 / 面积（派生自权威总价，四舍五入到元）。Round 10（H10）同步 R7 P1-1 整改形态：原 ROUND(面积×单价) 旧形态与 result.finalTotalValue 重复 target、回乘差 18 元，依赖已删除的 NODE_TOLERANCE=65 豁免；单价唯一派生，消除 target 冲突。"
+     }
+   ]
+ }
+\ No newline at end of file
+diff --git a/scripts/rebuild_excel_formula.py b/scripts/rebuild_excel_formula.py
+index 7dbea22..3cc4514 100644
+--- a/scripts/rebuild_excel_formula.py
++++ b/scripts/rebuild_excel_formula.py
+@@ -221,12 +221,16 @@ def safe_eval(expr: str):
+ 
+ def rebuild_values(chain: dict, data: dict) -> list[dict]:
+     """values 模式：数值公式求值验证。返回每个节点的验证结果。"""
+-    # 节点级容差：默认 ±1；ROUND(...,-1) 到十位 → ±10；
+-    # result.totalValue 为 面积×单价 vs 加权总价 的双口径舍入传播 → ±65。
++    # 节点级容差：默认 ±1；ROUND(...,-1) 到十位 → ±10。
++    # 容差须有缺陷编号背书（Round 8 教训 5）。历史条目 "result.totalValue": 65
++    # 已于 Round 10（H10）删除：它出自 v1.2 创建时的"面积×单价 vs 加权总价 双口径
++    # 舍入传播"假设（659e9e3），无缺陷编号背书；R7/R9 把末节点整改为"单价派生自
++    # 权威总价"后该口径不复存在，65 反而把 P1-2B 形态的 18 元错误豁免成静默 PASS。
+     NODE_TOLERANCE = {
++        # 背书：ROUND(...,-1) 十位舍入（单次误差 ≤5，加权平均双次取整放宽到 ±10）；
++        # P1-1 整改（23466a3）沿用。
+         "comps.finalUnitPrice": 10,
+         "result.finalTotalValue": 10,
+-        "result.totalValue": 65,
+     }
+     results = []
+ 
+diff --git a/scripts/verify_example_arithmetic.py b/scripts/verify_example_arithmetic.py
+index a12ca1d..63dffe7 100644
+--- a/scripts/verify_example_arithmetic.py
++++ b/scripts/verify_example_arithmetic.py
+@@ -94,10 +94,12 @@ def parse_value_date(d: dict, override: str | None) -> tuple[datetime.date, str]
+ 
+ 
+ # 末节点（target 在 result.* 上）的回乘闭合阈值。
+-# 背景：rebuild_excel_formula.NODE_TOLERANCE 给 result.totalValue 开了 ±65 的特例
+-# （"面积×单价 vs 加权总价 双口径舍入传播"）。实测该容差足以放过 P1-1 形态的末节点
+-# 断裂（武汉洪山住宅 result.totalValue 差 18 元却 PASS）。末节点是报告最终结论值，
+-# 不存在"双口径"借口——ROUND 语义确定，闭合差应由取整传播上界界定，不靠拍脑袋常量。
++# 背景：rebuild_excel_formula.NODE_TOLERANCE 曾给 result.totalValue 开 ±65 特例
++# （"面积×单价 vs 加权总价 双口径舍入传播"，出自 659e9e3 创建日，无缺陷编号背书）。
++# 实测该容差足以放过 P1-1 形态的末节点断裂（武汉洪山住宅 result.totalValue 差 18 元
++# 却 PASS）。该豁免已于 Round 10（H10）删除：R7/R9 整改为"单价派生自权威总价"后
++# 双口径不复存在。末节点是报告最终结论值，不存在"双口径"借口——
++# ROUND 语义确定，闭合差应由取整传播上界界定，不靠拍脑袋常量。
+ CHAIN_TAIL_TOLERANCE = 1
+ 
+ 
+diff --git a/tests/test_schema_v12.py b/tests/test_schema_v12.py
+index c6d78ae..61b0737 100644
+--- a/tests/test_schema_v12.py
++++ b/tests/test_schema_v12.py
+@@ -318,10 +318,11 @@ class TestRebuildCells:
+         # egi → G5（effectiveGrossIncome），oe → G11（operatingExpenses）
+         assert rebuilt == "=G5-G11"
+ 
+-    def test_total_value_formula(self, chain_data):
++    def test_final_unit_value_formula(self, chain_data):
++        """末节点 = 单价派生自权威总价（R7 P1-1 整改形态，Round 10 H10 同步冻结载体）。"""
+         nodes = {n["id"]: n for n in chain_data["nodes"]}
+-        rebuilt = rebuild_cells({"nodes": [nodes["result.totalValue"]]})[0]["rebuilt"]
+-        assert rebuilt == "ROUND(M6*N6,0)"
++        rebuilt = rebuild_cells({"nodes": [nodes["result.finalUnitValue"]]})[0]["rebuilt"]
++        assert rebuilt == "=ROUND(O6/M6,0)"
+ 
+     def test_all_nodes_rebuild_without_leftover_refs(self, chain_data):
+         """所有节点重建后不应残留 {{refKey}} 占位符（局部引用 G23 除外）。"""
+@@ -349,7 +350,7 @@ class TestRebuildValues:
+             "comps.finalUnitPrice",
+             "income.noi",
+             "result.finalTotalValue",
+-            "result.totalValue",
++            "result.finalUnitValue",
+         ]:
+             assert by_id[node_id]["status"] == "PASS", (
+                 f"{node_id}: {by_id[node_id]}"

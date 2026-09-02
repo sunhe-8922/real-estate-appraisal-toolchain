@@ -318,10 +318,11 @@ class TestRebuildCells:
         # egi → G5（effectiveGrossIncome），oe → G11（operatingExpenses）
         assert rebuilt == "=G5-G11"
 
-    def test_total_value_formula(self, chain_data):
+    def test_final_unit_value_formula(self, chain_data):
+        """末节点 = 单价派生自权威总价（R7 P1-1 整改形态，Round 10 H10 同步冻结载体）。"""
         nodes = {n["id"]: n for n in chain_data["nodes"]}
-        rebuilt = rebuild_cells({"nodes": [nodes["result.totalValue"]]})[0]["rebuilt"]
-        assert rebuilt == "ROUND(M6*N6,0)"
+        rebuilt = rebuild_cells({"nodes": [nodes["result.finalUnitValue"]]})[0]["rebuilt"]
+        assert rebuilt == "=ROUND(O6/M6,0)"
 
     def test_all_nodes_rebuild_without_leftover_refs(self, chain_data):
         """所有节点重建后不应残留 {{refKey}} 占位符（局部引用 G23 除外）。"""
@@ -349,7 +350,7 @@ class TestRebuildValues:
             "comps.finalUnitPrice",
             "income.noi",
             "result.finalTotalValue",
-            "result.totalValue",
+            "result.finalUnitValue",
         ]:
             assert by_id[node_id]["status"] == "PASS", (
                 f"{node_id}: {by_id[node_id]}"

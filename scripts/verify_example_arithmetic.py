@@ -94,10 +94,12 @@ def parse_value_date(d: dict, override: str | None) -> tuple[datetime.date, str]
 
 
 # 末节点（target 在 result.* 上）的回乘闭合阈值。
-# 背景：rebuild_excel_formula.NODE_TOLERANCE 给 result.totalValue 开了 ±65 的特例
-# （"面积×单价 vs 加权总价 双口径舍入传播"）。实测该容差足以放过 P1-1 形态的末节点
-# 断裂（武汉洪山住宅 result.totalValue 差 18 元却 PASS）。末节点是报告最终结论值，
-# 不存在"双口径"借口——ROUND 语义确定，闭合差应由取整传播上界界定，不靠拍脑袋常量。
+# 背景：rebuild_excel_formula.NODE_TOLERANCE 曾给 result.totalValue 开 ±65 特例
+# （"面积×单价 vs 加权总价 双口径舍入传播"，出自 659e9e3 创建日，无缺陷编号背书）。
+# 实测该容差足以放过 P1-1 形态的末节点断裂（武汉洪山住宅 result.totalValue 差 18 元
+# 却 PASS）。该豁免已于 Round 10（H10）删除：R7/R9 整改为"单价派生自权威总价"后
+# 双口径不复存在。末节点是报告最终结论值，不存在"双口径"借口——
+# ROUND 语义确定，闭合差应由取整传播上界界定，不靠拍脑袋常量。
 CHAIN_TAIL_TOLERANCE = 1
 
 
