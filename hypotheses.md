@@ -19,10 +19,10 @@
 | H9 | R9 | 数据策略 | 住宅示例 chain 同步直接资本化法 + 末节点派生单价后，门禁可泛化到第二示例 | adopted | CONTAMINATED 解除；变异总数 15→27 且两示例均 100% |
 | H10 | R10 | 评估体系 | 删除 `NODE_TOLERANCE["result.totalValue"]=65` 并同步冻结 fixture 末节点形态，可消除 P1-2B 形态错误的合法化外衣，且不破坏回归 | **adopted** | 豁免 1→0，三载体末节点形态统一；变异 27/27 持平（基线/终局 sha256 相同 `11839dfeac2e9848`）；回归 354 不破坏。溯源修正：65 非"调大"而是创建日（659e9e3）写死 |
 | H10a | R10 | 数据策略 | 全示例 `excelSource` 裸单元格引用审计（R9 输入 2） | adopted | 两示例 19 节点 0 处裸引用（G23 已随 R9 消除）——审计闭环，无需修复 |
-| H11 | R11 | 底层算子 | `extract_calculation_chain.py` 生成器仍产出旧形态 `result.totalValue`（ROUND(面积×单价) + 重复 target），应与整改形态同步 | proposed | R8 教训 5 的直接延伸：容差删除后旧形态再生成会被门禁拦（diff 18 > 尾阈值 1），但生成器本身仍是缺陷源 |
-| H12 | R11 | 数据策略 | 冻结 fixture `outputs/calculation_chain.json` 的 `income.value` 仍是报酬资本化法旧形态（P1-2A 同形态残留），测试目前以 SKIP 容忍 | proposed | R9 只同步了示例 JSON 未同步 fixture；不产生红灯但保持两载体口径分裂 |
+| H11 | R11 | 底层算子 | `extract_calculation_chain.py` 生成器仍产出旧形态 `result.totalValue`（ROUND(面积×单价) + 重复 target），应与整改形态同步 | **adopted** | 生成器末节点同步整改形态，冻结载体由生成器重写（字段级全等）；载体分裂三例终结；奇偶+形态+负向门禁 5 用例；变异 27/27（指纹与 R9/R10 相同）；回归 359 |
+| H12 | R12 | 数据策略 | 冻结载体 `outputs/calculation_chain.json` 的 `income.value` 仍是报酬资本化法旧形态（P1-2A 同形态残留），测试目前以 SKIP 容忍 | proposed | R9 只同步了示例 JSON 未同步载体；建议与两示例对齐（直接资本化法），变更面小 |
 | H13 | — | 评估体系 | 「写入即校验」前移：schema 写入/保存路径挂同一校验器，把拦截从 CI 时提前到编辑时 | proposed | R8 P2 建议，未立项 |
-| H14 | — | 评估体系 | chain 结构整改同步机制：末节点形态变更时自动检测所有示例/载体一致性 | proposed | R9 P2 建议；R10 再证必要性（fixture 与生成器都是漏同步载体），可升优先级 |
+| H14 | — | 评估体系 | chain 结构整改同步机制：末节点形态变更时自动检测所有示例/载体一致性 | proposed | R9-R11 三连证必要性；R11 已用奇偶门禁覆盖生成器↔冻结载体，剩余缺口 = 示例 JSON（手维护载体）的末节点形态断言，可并入 `test_example_arithmetic.py` |
 
 ## 登记规则
 

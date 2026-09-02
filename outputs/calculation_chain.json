@@ -104,7 +104,7 @@
         "area": "property.area"
       },
       "excelSource": "评估明细表!O6",
-      "description": "最终单价 = 评估总价 / 面积（派生自权威总价，四舍五入到元）。Round 10（H10）同步 R7 P1-1 整改形态：原 ROUND(面积×单价) 旧形态与 result.finalTotalValue 重复 target、回乘差 18 元，依赖已删除的 NODE_TOLERANCE=65 豁免；单价唯一派生，消除 target 冲突。"
+      "description": "最终单价 = 评估总价 / 面积（派生自权威总价，四舍五入到元）。单价唯一派生自加权总价，不与 result.finalTotalValue 重复 target（R7 P1-1 整改形态，Round 11 H11 同步生成器）。excelSource 保留原 O6（旧总价节点所在单元格）作为出处记录，派生方向以公式为准。"
     }
   ]
 }

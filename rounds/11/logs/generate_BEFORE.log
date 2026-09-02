@@ -1,0 +1,11 @@
+提取计算链: outputs\房地产评估明细表-计算模板.xlsx
+  [OK (6 refs), 局部引用 1: ['市场价比较法!T4']] comps.adjustedUnitPrice.instance1: =ROUND({{unitPrice}}*{{txAdj}}*{{mktAdj}}*100/(SUM({{locFactors0}})-1100)*100/(SUM({{intFa
+  [OK (6 refs), 局部引用 1: ['市场价比较法!W4']] comps.adjustedUnitPrice.instance2: =ROUND({{unitPrice}}*{{txAdj}}*{{mktAdj}}*100/(SUM({{locFactors1}})-1100)*100/(SUM({{intFa
+  [OK (6 refs), 局部引用 1: ['市场价比较法!Z4']] comps.adjustedUnitPrice.instance3: =ROUND({{unitPrice}}*{{txAdj}}*{{mktAdj}}*100/(SUM({{locFactors2}})-1100)*100/(SUM({{intFa
+  [OK (3 refs), 局部引用 6: ['市场价比较法!T32', '市场价比较法!T33', '市场价比较法!W32', '市场价比较法!W33', '市场价比较法!Z32', '市场价比较法!Z33']] comps.finalUnitPrice: ROUND(({{adjPrice0}}*0.5+{{adjPrice1}}*0.3+{{adjPrice2}}*0.2),-1)
+  [OK (2 refs)] income.noi: ={{egi}}-{{oe}}
+  [OK (4 refs), 局部引用 1: ['住宅-收益法测算!G23']] income.value: =ROUND(({{noi}}/({{rate}}-{{growth}})*(1-((1+{{growth}})/(1+{{rate}}))^{{forwardPeriod}})+
+  [OK (4 refs), 局部引用 1: ['住宅-收益法测算!J27']] result.finalTotalValue: ROUND({{incomeValue}}*{{incomeWeight}}+{{compsValue}}*{{compsWeight}},-1)
+  [OK (2 refs)] result.totalValue: ROUND({{area}}*{{unitValue}},0)
+
+✅ 计算链已保存: rounds\11\generated_chain_baseline.json（8 个节点）

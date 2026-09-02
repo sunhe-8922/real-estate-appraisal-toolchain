@@ -1,0 +1,2 @@
+生成器输出 == 冻结载体（字段级全等）: True
+节点序: ['comps.adjustedUnitPrice.instance1', 'comps.adjustedUnitPrice.instance2', 'comps.adjustedUnitPrice.instance3', 'comps.finalUnitPrice', 'income.noi', 'income.value', 'result.finalTotalValue', 'result.finalUnitValue']

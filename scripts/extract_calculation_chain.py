@@ -324,11 +324,15 @@ def extract_chain(excel_path: str) -> dict:
                 "adjPrice2": "methods.comps.comparableInstances[2].adjustedUnitPrice",
             },
         },
-        "result.totalValue": {
-            "formula": "ROUND({{area}}*{{unitValue}},0)",
+        # R7 P1-1 整改形态（Round 11 H11 同步）：末节点 = 单价派生自权威总价，
+        # target 唯一。旧形态 ROUND(面积×单价) 与 result.finalTotalValue 重复 target、
+        # 回乘差可达 面积/2（128.5㎡→18 元），曾靠已删除的 NODE_TOLERANCE=65 豁免
+        # （Round 10 H10 删除）；再生成旧形态会被门禁拦（尾阈值 1）。
+        "result.finalUnitValue": {
+            "formula": "=ROUND({{finalTotal}}/{{area}},0)",
             "refs": {
+                "finalTotal": "result.finalTotalValue",
                 "area": "property.area",
-                "unitValue": "result.finalUnitValue",
             },
         },
         "result.finalTotalValue": {
@@ -393,10 +397,12 @@ def extract_chain(excel_path: str) -> dict:
             None,
         ),
         (
-            "result.totalValue",
+            "result.finalUnitValue",
             "评估明细表!O6",
-            "result.finalTotalValue",
-            "评估总价 = 面积 × 单价",
+            "result.finalUnitValue",
+            "最终单价 = 评估总价 / 面积（派生自权威总价，四舍五入到元）。单价唯一派生自加权总价，"
+            "不与 result.finalTotalValue 重复 target（R7 P1-1 整改形态，Round 11 H11 同步生成器）。"
+            "excelSource 保留原 O6（旧总价节点所在单元格）作为出处记录，派生方向以公式为准。",
             None,
         ),
     ]
