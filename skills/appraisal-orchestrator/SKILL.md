@@ -1,5 +1,6 @@
 ---
 name: appraisal-orchestrator
+agent_created: true
 description: >
   估价任务总编排——AI 作为执行主体，在 8 个人工决策点（DP）暂停生成决策包等待估价师判断，
   其余流程连续执行不打断。决策点管理全部在编排层，7 个方法/报告技能保持不变。

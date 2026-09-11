@@ -1,5 +1,6 @@
 ---
 name: web-research-methodology
+agent_created: true
 description: >
   联网信息收集方法论：并行子Agent搜索策略、信息来源优先级、充分性自检。
   适用于任何需要深度调研的研究任务（产品分析、行业研究、技术选型、竞品对比等）。

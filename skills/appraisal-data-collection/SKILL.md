@@ -1,5 +1,6 @@
 ---
 name: appraisal-data-collection
+agent_created: true
 description: >
   搜集房地产估价所需资料，生成结构化资料清单与来源渠道指引。
   根据 GB/T 50291-2015 第3.0.5条，按估价对象状况、同类交易/收益/成本数据、区域市场因素、宏观因素四大维度系统化收集。
