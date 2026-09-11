@@ -2,7 +2,8 @@
 
 > 核心逻辑：**Intent → Context → Execute → Verify → Compress**；前提不满足即停。
 
-版本：10.0 | 适用：WorkBuddy（项目开发 + 知识管理）
+版本：10.0 | 适用：**本项目专用**（G:\gujia开发，WorkBuddy 环境，项目开发 + 知识管理）
+> 同源规范另有一份「State-Native 机制版」（AI Development OS，平台无关，位于 F:\sunwork\gongzonghao写手 等项目）。两份各管各的项目，不互相覆盖：本份绑定 gujia 项目与 WorkBuddy 工具路由；那份是通用执行内核，可复制到任意项目。
 
 ---
 
