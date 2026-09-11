@@ -31,3 +31,9 @@ _attack/
 
 # Mutation testing scratch space (rebuilt each run)
 tests/_tmp_mutants/
+
+# Local scratch (screenshots/logs/throwaway scripts) — never commit
+tmp/
+
+# Working backups of xlsx deliverables (~2MB each, binary, no diff value)
+*_bak.xlsx
