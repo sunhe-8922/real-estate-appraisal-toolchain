@@ -43,7 +43,5 @@ tmp/
 #       入仓会让真实客户地址随公开历史永久暴露。
 # 仓库只保留虚构示例（如 武汉洪山住宅_*）与治理文档。
 # 若确实需要留档，先用 scripts/anonymize_template.py + anonymize_rules.yaml 匿名化。
+# 具体案名的 glob 放在 .git/info/exclude（本地专属、不入库），避免案名本身进公开历史。
 cases/
-outputs/*格力海岸*
-outputs/*白莲路*
-outputs/*云海路*
