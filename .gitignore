@@ -37,3 +37,13 @@ tmp/
 
 # Working backups of xlsx deliverables (~2MB each, binary, no diff value)
 *_bak.xlsx
+
+# 真实委托案件 —— 含真实标的地址，公开仓库不入库。
+# 理由：README 声明「仓库所有数据均为虚构」，且 decisions.md D-007 确认 git 历史公开可读；
+#       入仓会让真实客户地址随公开历史永久暴露。
+# 仓库只保留虚构示例（如 武汉洪山住宅_*）与治理文档。
+# 若确实需要留档，先用 scripts/anonymize_template.py + anonymize_rules.yaml 匿名化。
+cases/
+outputs/*格力海岸*
+outputs/*白莲路*
+outputs/*云海路*
