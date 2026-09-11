@@ -177,9 +177,17 @@ DP-comp-2:
 生成/更新 `decisionPoints[]` 后，运行：
 
 ```bash
-python scripts/validate_appraisal_json.py <工程.json>     # 全量校验（schema + 业务 + 红线）
-python scripts/validate_appraisal_json.py --fragment decisionPoints <文件>  # 仅决策点
+# 推荐：仓库根校验器，决策点在此走全量校验（schema + 业务 + C1-C6 + 红线）
+python scripts/validate_appraisal_json.py <工程.json>
 ```
+
+> ⚠️ **存在两个同名校验器，`--fragment` 语义不同，切勿混用**：
+> - **仓库根 `scripts/validate_appraisal_json.py`**（jsonschema 实现，受 359 用例回归保护）：
+>   `--fragment` 只接受方法片段 `comps` / `income` / `cost` / `hypotheticalDev`；
+>   传 `decisionPoints` 会抛 `ValueError: 未知方法`。**决策点没有片段模式，一律用上面的全量模式校验。**
+> - **本 skill 自带 `scripts/` 下的同名脚本**（轻量独立实现）：支持 `--fragment decisionPoints`，
+>   但只跑 `validate_dp` + C1-C6，**不覆盖 schema 与业务红线**，不能替代全量校验；
+>   相对路径命令只有在 skill 安装目录下执行才会解析到它。
 
 链式约束 C1-C6（`_check_decision_chain()` 强制，前端 JS 等价实现 `DPCore.validateChain()`）：
 
